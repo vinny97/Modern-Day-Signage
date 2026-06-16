@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Digital Signage Plans | Fully Managed vs Self-Service | ScreenTinker</title>
+  <meta name="description" content="Compare ScreenTinker's fully managed digital signage service with the self-service account. See pricing, features, responsibilities, and which tier fits your UK small business.">
+  <meta name="keywords" content="digital signage pricing, managed digital signage pricing, self service digital signage, UK digital signage, ScreenTinker pricing">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://screentinker.com/compare/pricing-tiers.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://screentinker.com/compare/pricing-tiers.html">
+  <meta property="og:title" content="Compare ScreenTinker Plans">
+  <meta property="og:description" content="Fully managed digital signage from £30/screen/month or self-service from £25/screen/month. Compare both tiers.">
+  <meta property="og:image" content="https://screentinker.com/assets/dashboard-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Compare ScreenTinker Plans">
+  <meta name="twitter:description" content="Fully managed digital signage from £30/screen/month or self-service from £25/screen/month. Compare both tiers.">
+  <meta name="twitter:image" content="https://screentinker.com/assets/dashboard-preview.png">
+  <meta name="theme-color" content="#111827">
+  <link rel="icon" href="/assets/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#111827; --card:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --red:#dc2626; --red-dark:#991b1b; --green:#16a34a; --blue:#3b82f6; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#f8fafc; line-height:1.6; }
+    a { color:inherit; text-decoration:none; }
+    nav { position:sticky; top:0; z-index:20; background:rgba(17,24,39,0.92); backdrop-filter:blur(12px); border-bottom:1px solid #334155; }
+    .nav-inner { max-width:1180px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .nav-logo a { display:flex; align-items:center; gap:10px; color:var(--blue); font-weight:800; font-size:18px; }
+    .nav-links { display:flex; align-items:center; gap:22px; font-size:14px; color:#94a3b8; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; border:1px solid transparent; border-radius:8px; padding:10px 18px; font-weight:800; cursor:pointer; }
+    .btn-primary { background:var(--red); color:#fff; }
+    .btn-primary:hover { background:#b91c1c; }
+    .btn-outline { border-color:#334155; color:#e5e7eb; }
+    .hero { max-width:980px; margin:0 auto; padding:86px 24px 48px; text-align:center; }
+    .badge { display:inline-flex; border:1px solid #334155; border-radius:999px; padding:7px 16px; color:#cbd5e1; font-size:13px; font-weight:800; margin-bottom:22px; }
+    h1 { font-size:clamp(36px,5vw,62px); line-height:1.05; letter-spacing:0; margin-bottom:18px; }
+    .hero p { color:#cbd5e1; font-size:18px; max-width:720px; margin:0 auto; }
+    .wrap { max-width:1180px; margin:0 auto; padding:0 24px 80px; }
+    .panel { background:#f8fafc; color:var(--ink); border:1px solid rgba(148,163,184,0.35); border-radius:22px; padding:28px; box-shadow:0 24px 80px rgba(0,0,0,0.28); }
+    .summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; margin-bottom:26px; }
+    .summary-card { background:var(--card); border:1px solid var(--line); border-top:4px solid var(--green); border-radius:18px; padding:28px; }
+    .summary-card.self { border-top-color:var(--red); }
+    .eyebrow { display:inline-flex; border-radius:999px; border:1px solid #bbf7d0; background:#f0fdf4; color:#166534; padding:6px 14px; font-size:11px; font-weight:900; letter-spacing:1.6px; text-transform:uppercase; margin-bottom:18px; }
+    .self .eyebrow { border-color:#fecaca; background:#fef2f2; color:var(--red-dark); }
+    h2 { font-size:28px; line-height:1.15; margin-bottom:12px; }
+    .summary-card p { color:var(--muted); margin-bottom:22px; }
+    .price { display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+    .amount { color:#030712; font-size:52px; line-height:0.95; font-weight:900; }
+    .unit { color:var(--muted); padding-bottom:7px; }
+    .vat { color:#9ca3af; font-size:13px; }
+    .table-scroll { overflow-x:auto; margin-top:24px; }
+    table { width:100%; border-collapse:collapse; min-width:760px; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+    th, td { padding:16px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { background:#f9fafb; font-size:13px; text-transform:uppercase; letter-spacing:0.7px; color:#374151; }
+    td { color:#4b5563; font-size:15px; }
+    td:first-child { color:#111827; font-weight:800; width:24%; }
+    .yes { color:#15803d; font-weight:800; }
+    .no { color:#b91c1c; font-weight:800; }
+    .fit-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; margin-top:26px; }
+    .fit-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; }
+    .fit-card h3 { font-size:20px; margin-bottom:12px; }
+    ul { list-style:none; display:flex; flex-direction:column; gap:12px; }
+    li { color:#4b5563; display:flex; gap:10px; }
+    li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:999px; background:#f0fdf4; color:#15803d; font-size:13px; font-weight:900; flex:0 0 20px; margin-top:2px; }
+    .fit-card.self li::before { background:#fef2f2; color:#b91c1c; }
+    .cta { text-align:center; margin-top:34px; padding:30px; background:#fff; border:1px solid var(--line); border-radius:16px; }
+    .cta p { color:var(--muted); margin:8px 0 20px; }
+    footer { max-width:1180px; margin:0 auto; padding:36px 24px; color:#64748b; font-size:13px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; border-top:1px solid #334155; }
+    footer .links { display:flex; gap:16px; flex-wrap:wrap; }
+    footer a { color:#94a3b8; }
+    @media (max-width:760px) {
+      .nav-links a:not(.btn) { display:none; }
+      .summary-grid, .fit-grid { grid-template-columns:1fr; }
+      .panel { padding:16px; }
+      .amount { font-size:44px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <a href="/">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span>ScreenTinker</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/app#/login" class="btn btn-outline">Sign In</a>
+        <a href="/app#/login" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="badge">Fully managed or self-service</div>
+      <h1>Compare ScreenTinker Tiers</h1>
+      <p>Choose a fully managed digital signage service where we handle everything, or a lower-cost self-service account where you manage your own screens.</p>
+    </section>
+
+    <section class="wrap">
+      <div class="panel">
+        <div class="summary-grid">
+          <article class="summary-card">
+            <div class="eyebrow">Tier 1</div>
+            <h2>Fully managed service</h2>
+            <p>We manage the screen setup, graphics, scheduling, content changes, monitoring, and support.</p>
+            <div class="price"><span class="amount">&pound;30</span><span class="unit">/ screen / month from</span></div>
+            <div class="vat">inc. VAT &middot; menu screen package</div>
+          </article>
+          <article class="summary-card self">
+            <div class="eyebrow">Tier 2</div>
+            <h2>Self-service account</h2>
+            <p>You log in, upload your own graphics, and schedule content yourself from the dashboard.</p>
+            <div class="price"><span class="amount">&pound;25</span><span class="unit">/ screen / month</span></div>
+            <div class="vat">inc. VAT &middot; 5GB media storage included</div>
+          </article>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Feature</th><th>Tier 1 — We manage everything</th><th>Tier 2 — You manage your screens</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Starting price</td><td>&pound;30/screen/month inc. VAT</td><td>&pound;25/screen/month inc. VAT</td></tr>
+              <tr><td>Screen options</td><td>Menu screens, window displays, or complete package</td><td>Any supported screen you connect to your account</td></tr>
+              <tr><td>Graphics</td><td class="yes">Designed by our team</td><td>You create or upload your own</td></tr>
+              <tr><td>Scheduling</td><td class="yes">Managed by ScreenTinker</td><td>You schedule from the dashboard</td></tr>
+              <tr><td>Content changes</td><td>Submit requests through your customer portal</td><td>Make changes directly whenever you like</td></tr>
+              <tr><td>Approval workflow</td><td class="yes">You approve before anything goes live</td><td>You publish your own updates</td></tr>
+              <tr><td>Templates</td><td class="yes">Included where useful</td><td class="yes">Pre-built template library included</td></tr>
+              <tr><td>Storage</td><td>Managed for your package</td><td>5GB included, add more for &pound;5/month</td></tr>
+              <tr><td>Best for</td><td>Businesses that want signage handled for them</td><td>Businesses with their own content or staff</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="fit-grid">
+          <article class="fit-card">
+            <h3>Choose Tier 1 if...</h3>
+            <ul>
+              <li>You want us to design and schedule your content.</li>
+              <li>You prefer sending requests instead of managing a dashboard.</li>
+              <li>You need menu screens, a window display, or a complete package.</li>
+            </ul>
+          </article>
+          <article class="fit-card self">
+            <h3>Choose Tier 2 if...</h3>
+            <ul>
+              <li>You already have graphics or can make your own.</li>
+              <li>You want the lowest monthly cost per screen.</li>
+              <li>You want direct control over uploads and schedules.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="cta">
+          <h2>Ready to choose a tier?</h2>
+          <p>Start with the plan that fits how hands-on you want to be.</p>
+          <a href="/app#/login" class="btn btn-primary">Get Started</a>
+          <a href="/#pricing" class="btn" style="border-color:#e5e7eb;color:#111827;margin-left:8px">View Pricing Cards</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>&copy; 2026 ScreenTinker. All rights reserved.</div>
+    <div class="links">
+      <a href="/">Home</a>
+      <a href="/legal/terms.html">Terms</a>
+      <a href="/legal/privacy.html">Privacy</a>
+      <a href="/legal/third-party.html">Licenses</a>
+      <a href="/app#/login">Sign In</a>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://screentinker.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://screentinker.com/#pricing" },
+      { "@type": "ListItem", "position": 3, "name": "Compare Pricing Tiers", "item": "https://screentinker.com/compare/pricing-tiers.html" }
+    ]
+  }
+  </script>
+</body>
+</html>

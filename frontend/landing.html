@@ -106,30 +106,55 @@
     /* Pricing */
     .pricing { max-width:1200px; margin:0 auto; padding:80px 24px; }
     .pricing h2 { text-align:center; font-size:36px; margin-bottom:12px; }
-    .pricing .subtitle { text-align:center; color:var(--muted); margin-bottom:48px; font-size:18px; }
-    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
-    .price-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:28px; position:relative; }
-    .price-card.featured { border-color:var(--accent); }
-    .price-card.featured::before { content:'Most Popular'; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:4px 16px; border-radius:12px; font-size:12px; font-weight:600; }
-    .price-card h3 { font-size:20px; margin-bottom:4px; }
-    .price-card .price { font-size:36px; font-weight:700; color:var(--accent); margin:12px 0; }
-    .price-card .price span { font-size:16px; color:var(--muted); font-weight:400; }
-    .price-card .yearly { font-size:12px; color:var(--dim); margin-bottom:16px; }
-    .price-card ul { list-style:none; margin-bottom:20px; }
-    .price-card li { font-size:14px; color:var(--muted); padding:4px 0; }
-    .price-card li::before { content:'✓ '; color:var(--accent); }
-
-    /* Compare */
-    .compare { max-width:1000px; margin:0 auto; padding:80px 24px; }
-    .compare h2 { text-align:center; font-size:36px; margin-bottom:40px; }
-    .compare-table { width:100%; border-collapse:collapse; font-size:14px; }
-    .compare-table th, .compare-table td { padding:12px 16px; text-align:left; border-bottom:1px solid var(--border); }
-    .compare-table th { color:var(--dim); font-weight:500; }
-    .compare-table td:first-child { color:var(--muted); }
-    .compare-table .yes { color:#22c55e; }
-    .compare-table .no { color:#ef4444; }
-    .compare-table .paid { color:#f59e0b; }
-    .compare-table .partial { color:#f59e0b; }
+    .pricing .subtitle { text-align:center; color:var(--muted); margin:0 auto 32px; font-size:18px; max-width:720px; }
+    .pricing-shell { background:#f8fafc; color:#111827; border:1px solid rgba(148,163,184,0.35); border-radius:18px; padding:28px; box-shadow:0 24px 80px rgba(0,0,0,0.28); }
+    .pricing-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; max-width:760px; margin:0 auto 42px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:16px; }
+    .pricing-tab { appearance:none; border:0; background:transparent; color:#6b7280; border-radius:12px; padding:13px 16px; font:inherit; font-weight:800; cursor:pointer; }
+    .pricing-tab.active { background:#fff; color:#111827; box-shadow:0 4px 18px rgba(15,23,42,0.12); }
+    .pricing-panel { display:none; }
+    .pricing-panel.active { display:block; }
+    .managed-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+    .service-card { background:#fff; border:1px solid #e5e7eb; border-top:4px solid #dc2626; border-radius:22px; padding:30px; display:flex; flex-direction:column; min-height:660px; box-shadow:0 14px 40px rgba(15,23,42,0.08); }
+    .service-card.featured { border-color:#fecaca; border-top-color:#dc2626; }
+    .service-card.value { border-color:#bbf7d0; border-top-color:#16a34a; }
+    .plan-badge { display:inline-flex; align-items:center; border-radius:999px; border:1px solid #fecaca; background:#fef2f2; color:#991b1b; padding:7px 16px; font-size:12px; font-weight:900; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:24px; }
+    .plan-badge.green { border-color:#bbf7d0; background:#f0fdf4; color:#166534; }
+    .service-card h3, .self-card h3 { font-size:26px; line-height:1.15; margin-bottom:14px; }
+    .plan-copy { color:#6b7280; font-size:16px; line-height:1.6; margin-bottom:24px; }
+    .price-box { border:1px solid #e5e7eb; background:#f9fafb; border-radius:14px; padding:24px; margin-bottom:26px; }
+    .price-line { display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap; }
+    .amount { font-size:56px; line-height:0.95; font-weight:900; letter-spacing:0; color:#030712; }
+    .price-unit { color:#6b7280; font-size:16px; padding-bottom:7px; }
+    .vat { color:#9ca3af; font-size:13px; margin-top:8px; }
+    .price-note { margin-top:14px; color:#b91c1c; font-size:14px; font-weight:800; }
+    .price-note.green { color:#15803d; }
+    .feature-list { list-style:none; margin:0 0 28px; padding:0; display:flex; flex-direction:column; gap:14px; }
+    .feature-list li { color:#4b5563; font-size:15px; line-height:1.45; display:flex; gap:12px; align-items:flex-start; }
+    .feature-list li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:999px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:13px; font-weight:900; flex:0 0 20px; margin-top:1px; }
+    .feature-list.green li::before { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+    .plan-action { margin-top:auto; width:100%; justify-content:center; padding:14px 20px; font-size:16px; background:#dc2626; color:#fff; border-color:#dc2626; }
+    .plan-action:hover { background:#b91c1c; }
+    .plan-action.ghost { background:#fff; color:#991b1b; border-color:#fecaca; }
+    .plan-action.green { background:#16a34a; border-color:#16a34a; }
+    .self-layout { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:24px; align-items:start; }
+    .self-card, .tier-explainer, .tier-compare-card { background:#fff; border:1px solid #e5e7eb; border-top:4px solid #dc2626; border-radius:18px; padding:30px; }
+    .self-card .plan-badge { border-color:#bbf7d0; background:#f0fdf4; color:#166534; }
+    .tier-explainer { border-top:0; background:#fbfbfb; }
+    .eyebrow { color:#8b8b8b; font-size:11px; font-weight:900; letter-spacing:2px; text-transform:uppercase; margin-bottom:22px; }
+    .comparison-list { list-style:none; margin:26px 0 0; padding:0; }
+    .comparison-list li { display:grid; grid-template-columns:22px 1fr auto; gap:12px; align-items:start; padding:14px 0; border-bottom:1px solid #e5e7eb; color:#4b5563; font-size:14px; }
+    .comparison-list li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:6px; background:#fef2f2; color:#b91c1c; font-weight:900; }
+    .comparison-list li.unavailable::before { content:'×'; background:#f3f4f6; color:#9ca3af; }
+    .tier-only { color:#991b1b; background:#fee2e2; border-radius:4px; padding:3px 6px; font-size:10px; font-weight:900; white-space:nowrap; }
+    .managed-nudge { margin-top:28px; padding:18px; border:1px solid #e5e7eb; border-radius:14px; background:#fff; }
+    .compare-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
+    .tier-compare-card { border-top-color:#16a34a; }
+    .tier-compare-card.self { border-top-color:#dc2626; }
+    .tier-compare-table { width:100%; border-collapse:collapse; margin-top:24px; font-size:14px; }
+    .tier-compare-table th, .tier-compare-table td { border-bottom:1px solid #e5e7eb; padding:13px 12px; text-align:left; color:#4b5563; vertical-align:top; }
+    .tier-compare-table th { color:#111827; font-weight:900; background:#f9fafb; }
+    .tier-compare-table td:first-child { font-weight:800; color:#111827; }
+    .compare-page-link { text-align:center; margin-top:24px; }
 
     /* CTA */
     .cta { text-align:center; padding:80px 24px; background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1)); border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:80px 0; }
@@ -159,9 +184,12 @@
 
     @media (max-width:768px) {
       .feature-grid { grid-template-columns:1fr; }
-      .pricing-grid { grid-template-columns:1fr; }
-      .compare-table { font-size:12px; min-width:560px; }
-      .compare-table th, .compare-table td { padding:8px; }
+      .pricing-tabs { grid-template-columns:1fr; margin-bottom:24px; }
+      .pricing-shell { padding:16px; }
+      .managed-grid, .self-layout, .compare-grid { grid-template-columns:1fr; }
+      .service-card { min-height:auto; padding:24px; }
+      .amount { font-size:46px; }
+      .tier-compare-table { min-width:680px; }
       footer { flex-direction:column; text-align:center; }
 
       /* 44px tap targets for all buttons on mobile */
@@ -184,7 +212,7 @@
         <a href="#features">Features</a>
         <a href="#platforms">Platforms</a>
         <a href="#pricing">Pricing</a>
-        <a href="#compare">Compare</a>
+        <a href="/compare/pricing-tiers.html">Compare</a>
         <a href="/app#/login" class="btn btn-outline" style="margin-left:16px">Sign In</a>
         <a href="/app#/login" class="btn btn-primary" style="margin-left:8px"><span class="btn-full">Start Your Setup</span><span class="btn-short">Start</span></a>
       </div>
@@ -199,16 +227,9 @@
     <p>Screens, graphics &amp; scheduling from &pound;30/month. We help you get content on TVs, displays, and kiosks without the technical hassle.</p>
     <div class="hero-btns">
       <a href="/app#/login" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Start Your Setup</a>
-      <a href="#compare" class="btn btn-outline" style="padding:14px 28px;font-size:16px">See How We Compare</a>
+      <a href="/compare/pricing-tiers.html" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Compare Both Tiers</a>
     </div>
   </section>
-
-  <!-- Intro video -->
-  <div style="max-width:800px;margin:32px auto;border-radius:12px;overflow:hidden;border:1px solid var(--border)">
-    <div style="position:relative;padding-bottom:56.25%;height:0">
-      <iframe src="https://www.youtube.com/embed/Sq3RbnuDgKw?rel=0" title="ScreenTinker - Fully Managed Digital Signage for Any Screen" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%"></iframe>
-    </div>
-  </div>
 
   <!-- Dashboard preview -->
   <div class="screenshot">
@@ -264,34 +285,145 @@
 
   <!-- Pricing -->
   <section class="pricing" id="pricing">
-    <h2>Simple, Honest Pricing</h2>
-    <p class="subtitle">All plans include remote control, monitoring, and unlimited content</p>
-    <div class="pricing-grid" id="pricingGrid"></div>
-  </section>
+    <h2>Choose How Hands-On You Want To Be</h2>
+    <p class="subtitle">Two simple tiers: fully managed signage where we handle everything, or a self-service account where you manage your own screens.</p>
+    <div class="pricing-shell">
+      <div class="pricing-tabs" role="tablist" aria-label="Pricing tiers">
+        <button class="pricing-tab active" type="button" data-pricing-tab="managed" role="tab" aria-selected="true">Tier 1 — We manage everything</button>
+        <button class="pricing-tab" type="button" data-pricing-tab="self" role="tab" aria-selected="false">Tier 2 — You manage your screens</button>
+        <button class="pricing-tab" type="button" data-pricing-tab="compare" role="tab" aria-selected="false">Compare both tiers</button>
+      </div>
 
-  <!-- Compare -->
-  <section class="compare" id="compare">
-    <h2>How We Compare</h2>
-    <div class="table-scroll">
-    <table class="compare-table">
-      <thead><tr><th></th><th style="color:var(--accent);font-weight:700">ScreenTinker</th><th>Yodeck</th><th>ScreenCloud</th><th>OptiSigns</th></tr></thead>
-      <tbody>
-        <tr><td>Price (15 devices/yr)</td><td style="color:var(--accent);font-weight:600">$1,188</td><td>$1,440+</td><td>$3,600+</td><td>$1,800+</td></tr>
-        <tr><td>Free tier</td><td class="yes">&#10003; 1 device</td><td class="yes">&#10003;</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-        <tr><td>Video Wall</td><td class="yes">&#10003; Included</td><td class="partial">Basic</td><td class="partial">Basic<!-- VERIFY: multi-screen confirmed; bezel-compensated video wall not confirmed --></td><td class="partial">Paid add-on</td></tr>
-        <tr><td>Live screen view + remote key presses*</td><td class="yes">&#10003; All plans</td><td class="partial">Limited</td><td class="partial">Limited</td><td class="partial">Limited</td></tr>
-        <tr><td>Kiosk/Touchscreen</td><td class="yes">&#10003; Included</td><td class="yes">&#10003;</td><td class="partial">Limited</td><td class="yes">&#10003;</td></tr>
-        <tr><td>Proof-of-Play</td><td class="yes">&#10003; All plans</td><td class="paid">Paid tier</td><td class="paid">Paid</td><td class="paid">Paid</td></tr>
-        <tr><td>Managed setup support</td><td class="yes">&#10003; Included</td><td class="partial">Limited</td><td class="paid">Paid</td><td class="partial">Limited</td></tr>
-        <tr><td>White Label</td><td class="yes">&#10003; Included</td><td class="paid">Paid</td><td class="paid">Enterprise</td><td class="paid">Paid tier</td></tr>
-        <tr><td>Email Alerts</td><td class="yes">&#10003; All plans</td><td class="paid">Paid</td><td class="paid">Paid</td><td class="paid">Paid</td></tr>
-      </tbody>
-    </table>
+      <div class="pricing-panel active" id="pricing-managed" role="tabpanel">
+        <div class="managed-grid">
+          <article class="service-card">
+            <h3>Menu screen</h3>
+            <p class="plan-copy">Indoor menu or price display. We update it whenever your items or prices change — you submit the request, we handle the rest.</p>
+            <div class="price-box">
+              <div class="price-line"><span class="amount">&pound;30</span><span class="price-unit">/ screen / month</span></div>
+              <div class="vat">inc. VAT &middot; &pound;25.00 ex. VAT</div>
+              <div class="price-note">Regular content updates included</div>
+            </div>
+            <ul class="feature-list">
+              <li>Remote scheduling &amp; management</li>
+              <li>Graphics designed by our team</li>
+              <li>Requests via your customer portal</li>
+              <li>You approve before anything goes live</li>
+            </ul>
+            <a href="/app#/login" class="btn plan-action ghost">Get Started</a>
+          </article>
+
+          <article class="service-card featured">
+            <div class="plan-badge">Most Popular</div>
+            <h3>Window display</h3>
+            <p class="plan-copy">High-brightness screen for your window. Stops people outside and brings them in — we create, you approve, we schedule.</p>
+            <div class="price-box">
+              <div class="price-line"><span class="amount">&pound;75</span><span class="price-unit">/ screen / month</span></div>
+              <div class="vat">inc. VAT &middot; &pound;62.50 ex. VAT</div>
+              <div class="price-note">Monthly creative refresh included</div>
+            </div>
+            <ul class="feature-list">
+              <li>Remote scheduling &amp; management</li>
+              <li>Graphics designed by our team</li>
+              <li>Requests via your customer portal</li>
+              <li>You approve before anything goes live</li>
+            </ul>
+            <a href="/app#/login" class="btn plan-action">Get Started</a>
+          </article>
+
+          <article class="service-card value">
+            <div class="plan-badge green">Best Value</div>
+            <h3>Complete Package</h3>
+            <p class="plan-copy">3 menu screens and 1 window display, fully managed. Everything your business needs — installed, designed, and looked after for you.</p>
+            <div class="price-box">
+              <div class="price-line"><span class="amount">&pound;140</span><span class="price-unit">/ month</span></div>
+              <div class="vat">inc. VAT &middot; &pound;116.67 ex. VAT</div>
+              <div class="price-note green">Saves &pound;25/month vs. buying separately</div>
+            </div>
+            <ul class="feature-list green">
+              <li>3 &times; menu screens included</li>
+              <li>1 &times; high-brightness window display included</li>
+              <li>Priority updates across all screens</li>
+              <li>You approve before anything goes live</li>
+            </ul>
+            <a href="/app#/login" class="btn plan-action green">Get Started</a>
+          </article>
+        </div>
+      </div>
+
+      <div class="pricing-panel" id="pricing-self" role="tabpanel">
+        <div class="self-layout">
+          <article class="self-card">
+            <div class="plan-badge">Self-Managed Account</div>
+            <h3>Self-manage account</h3>
+            <p class="plan-copy">Log in to your ScreenTinker account, upload your own graphics, and schedule your content — on any screen, any time.</p>
+            <div class="price-box">
+              <div class="price-line"><span class="amount">&pound;25</span><span class="price-unit">/ screen / month</span></div>
+              <div class="vat">inc. VAT &middot; &pound;20.83 ex. VAT</div>
+              <div class="price-note">5GB media storage included per account</div>
+            </div>
+            <ul class="feature-list">
+              <li>Account login &amp; scheduling dashboard</li>
+              <li>Unlimited content uploads</li>
+              <li>Pre-built template library included</li>
+              <li>AI assistant for help &amp; guidance</li>
+              <li>Works on any HDMI screen via media player</li>
+              <li>5GB storage — add more for &pound;5/month</li>
+            </ul>
+            <a href="/app#/login" class="btn plan-action">Get Started</a>
+          </article>
+
+          <aside class="tier-explainer">
+            <div class="eyebrow">How Tier 2 compares to Tier 1</div>
+            <h3>You're in the driving seat.</h3>
+            <p class="plan-copy">Full control at a lower monthly cost. Here's what you manage yourself — and what Tier 1 handles for you.</p>
+            <ul class="comparison-list">
+              <li><span><strong>You upload your own graphics.</strong> Your team creates the content — you upload directly to your portal.</span></li>
+              <li><span><strong>You schedule your own content.</strong> Choose what plays, when, and for how long — from your dashboard.</span></li>
+              <li><span><strong>Ready-to-use templates.</strong> Pre-built designs you can customise — no design experience needed.</span></li>
+              <li class="unavailable"><span>Graphics created by our team</span><span class="tier-only">Tier 1 only</span></li>
+              <li class="unavailable"><span>Scheduling managed entirely by ScreenTinker</span><span class="tier-only">Tier 1 only</span></li>
+              <li class="unavailable"><span>Monthly design requests with approval workflow</span><span class="tier-only">Tier 1 only</span></li>
+            </ul>
+            <div class="managed-nudge">
+              <p style="margin-bottom:12px;color:#4b5563">Want it fully managed? <strong>Tier 1 starts from &pound;30/month.</strong></p>
+              <button class="btn plan-action" type="button" data-pricing-tab="managed">View Tier 1</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="pricing-panel" id="pricing-compare" role="tabpanel">
+        <div class="compare-grid">
+          <article class="tier-compare-card">
+            <div class="plan-badge green">Tier 1</div>
+            <h3>Fully managed service</h3>
+            <p class="plan-copy">Best when you want the screens, graphics, scheduling, updates, and support handled for you.</p>
+          </article>
+          <article class="tier-compare-card self">
+            <div class="plan-badge">Tier 2</div>
+            <h3>Self-service account</h3>
+            <p class="plan-copy">Best when you already have graphics or a team member who can upload, schedule, and update screens.</p>
+          </article>
+        </div>
+        <div class="table-scroll">
+          <table class="tier-compare-table">
+            <thead><tr><th>What you get</th><th>Tier 1 — Fully managed</th><th>Tier 2 — Self-service</th></tr></thead>
+            <tbody>
+              <tr><td>Starting price</td><td>&pound;30/screen/month inc. VAT</td><td>&pound;25/screen/month inc. VAT</td></tr>
+              <tr><td>Content creation</td><td>Graphics designed by our team</td><td>You upload your own graphics</td></tr>
+              <tr><td>Scheduling</td><td>We schedule updates for you</td><td>You schedule content from the dashboard</td></tr>
+              <tr><td>Approvals</td><td>You approve before anything goes live</td><td>You publish your own changes</td></tr>
+              <tr><td>Best for</td><td>Busy cafes, salons, takeaways, clinics, and shops that want everything handled</td><td>Businesses with their own content or staff who want direct control</td></tr>
+              <tr><td>Support</td><td>Managed requests, monitoring, and help included</td><td>Account support and help guidance included</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="compare-page-link">
+          <a href="/compare/pricing-tiers.html" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Open Full Tier Compare Page</a>
+        </div>
+      </div>
     </div>
-    <p style="max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--dim);line-height:1.6">
-      * Live screen view + remote key presses is Android only and requires granting the on-device accessibility permission.<br>
-      Comparison as of June 2026, based on each vendor's publicly listed pricing and documentation. Spot an error? <a href="/app#/login" style="color:var(--accent)">Contact us</a> and we'll fix it.
-    </p>
   </section>
 
   <!-- Resources / internal linking for SEO -->
@@ -314,10 +446,10 @@
         <div style="font-weight:600;margin-bottom:4px">Fully managed signage setup</div>
         <div style="font-size:13px;color:var(--muted)">Screens, graphics, scheduling, and support.</div>
       </a>
-      <a href="/compare/yodeck-alternative.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
+      <a href="/compare/pricing-tiers.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
         <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Compare</div>
-        <div style="font-weight:600;margin-bottom:4px">ScreenTinker vs Yodeck</div>
-        <div style="font-size:13px;color:var(--muted)">Features, pricing, platform support.</div>
+        <div style="font-weight:600;margin-bottom:4px">Fully managed vs self-service</div>
+        <div style="font-size:13px;color:var(--muted)">Which tier is right for your business.</div>
       </a>
       <a href="/compare/screencloud-alternative.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
         <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Compare</div>
@@ -335,8 +467,8 @@
   <!-- CTA -->
   <section class="cta">
     <h2>Ready to Get Started?</h2>
-    <p>14-day free Pro trial. No credit card required. Set up in under 5 minutes.</p>
-    <a href="/app#/login" class="btn btn-primary" style="padding:14px 32px;font-size:16px">Start Free Trial</a>
+    <p>Tell us what screens you need, or start with a self-service account from &pound;25/screen/month.</p>
+    <a href="/app#/login" class="btn btn-primary" style="padding:14px 32px;font-size:16px">Get Started</a>
   </section>
   </main>
 
@@ -358,6 +490,7 @@
       <div>
         <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Compare</div>
         <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <a href="/compare/pricing-tiers.html" style="color:var(--muted)">Tier comparison</a>
           <a href="/compare/yodeck-alternative.html" style="color:var(--muted)">vs Yodeck</a>
           <a href="/compare/screencloud-alternative.html" style="color:var(--muted)">vs ScreenCloud</a>
           <a href="/compare/optisigns-alternative.html" style="color:var(--muted)">vs OptiSigns</a>
@@ -450,26 +583,34 @@
     "offers": [
       {
         "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-        "name": "Free",
-        "description": "1 device, 500MB storage"
+        "price": "30",
+        "priceCurrency": "GBP",
+        "name": "Menu screen",
+        "description": "Fully managed menu screen with graphics, scheduling, and regular content updates"
       },
       {
         "@type": "Offer",
-        "price": "39",
-        "priceCurrency": "USD",
+        "price": "75",
+        "priceCurrency": "GBP",
         "priceValidUntil": "2027-12-31",
-        "name": "Starter",
-        "description": "5 devices, 5GB storage, remote URL streaming"
+        "name": "Window display",
+        "description": "Fully managed high-brightness window display with monthly creative refresh"
       },
       {
         "@type": "Offer",
-        "price": "99",
-        "priceCurrency": "USD",
+        "price": "140",
+        "priceCurrency": "GBP",
         "priceValidUntil": "2027-12-31",
-        "name": "Pro",
-        "description": "15 devices, 20GB storage, all features"
+        "name": "Complete Package",
+        "description": "3 menu screens and 1 window display, fully managed"
+      },
+      {
+        "@type": "Offer",
+        "price": "25",
+        "priceCurrency": "GBP",
+        "priceValidUntil": "2027-12-31",
+        "name": "Self-manage account",
+        "description": "Self-service digital signage account with dashboard scheduling and 5GB media storage"
       }
     ],
     "aggregateRating": {
@@ -526,10 +667,10 @@
       },
       {
         "@type": "Question",
-        "name": "Is there a free plan?",
+        "name": "What does ScreenTinker cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, ScreenTinker offers a free plan with 1 device and 500MB of storage. New accounts also get a 14-day free trial of the Pro plan with 15 devices."
+          "text": "Fully managed menu screens start from £30 per screen per month including VAT. Self-service accounts start from £25 per screen per month including VAT."
         }
       },
       {
@@ -553,51 +694,19 @@
   </script>
 
   <script>
-    // Load pricing from API. The 'enterprise' plan is filtered out of the
-    // public render because its DB row has price=0 / max=-1 (renders as
-    // "Free" + "Unlimited") which would undercut the actual Free tier and
-    // confuse visitors. The row itself stays in the DB - it's actively used
-    // for first-user assignment and white-label gating - we just
-    // replace it on the public marketing page with a hardcoded Contact Us
-    // card. Other consumers of /api/subscription/plans (billing.js,
-    // settings.js, admin.js) get the full list as before.
-    fetch('/api/subscription/plans').then(r => r.json()).then(plans => {
-      const grid = document.getElementById('pricingGrid');
-      const publicPlans = plans.filter(p => p.active && p.name !== 'enterprise');
-      const planCardsHtml = publicPlans.map((p, i) => `
-        <div class="price-card ${i === 2 ? 'featured' : ''}">
-          <h3>${p.display_name}</h3>
-          <div class="price">${p.price_monthly > 0 ? '$' + p.price_monthly : 'Free'}<span>${p.price_monthly > 0 ? '/mo' : ''}</span></div>
-          ${p.price_yearly > 0 ? `<div class="yearly">or $${p.price_yearly}/year (save ${Math.round((1 - p.price_yearly / (p.price_monthly * 12)) * 100)}%)</div>` : '<div class="yearly">&nbsp;</div>'}
-          <ul>
-            <li>${p.max_devices === -1 ? 'Unlimited' : p.max_devices} device${p.max_devices !== 1 ? 's' : ''}</li>
-            <li>${p.max_storage_mb === -1 ? 'Unlimited' : p.max_storage_mb >= 1024 ? (p.max_storage_mb / 1024) + ' GB' : p.max_storage_mb + ' MB'} storage</li>
-            <li>Remote control & live view</li>
-            ${p.remote_url ? '<li>Remote URL streaming</li>' : ''}
-            ${p.priority_support ? '<li>Priority support</li>' : ''}
-          </ul>
-          <a href="/app#/login" class="btn ${i === 0 ? 'btn-outline' : 'btn-primary'}" style="width:100%;justify-content:center">${p.price_monthly > 0 ? 'Start Trial' : 'Get Started'}</a>
-        </div>
-      `).join('');
-      // Hardcoded Enterprise / Custom card. Uses .price class for vertical
-      // alignment with the other cards (same baseline for the feature list);
-      // empty .yearly spacer matches the Free card's structure.
-      const enterpriseCardHtml = `
-        <div class="price-card">
-          <h3>Enterprise / Custom</h3>
-          <div class="price">Let's talk</div>
-          <div class="yearly">&nbsp;</div>
-          <ul>
-            <li>Everything in Business</li>
-            <li>Multi-tenant / multiple organizations</li>
-            <li>Volume device pricing</li>
-            <li>Custom hosting options</li>
-            <li>Priority support</li>
-          </ul>
-          <button type="button" class="btn btn-primary" style="width:100%;justify-content:center" onclick="openContactModal()">Contact Us</button>
-        </div>
-      `;
-      grid.innerHTML = planCardsHtml + enterpriseCardHtml;
+    function showPricingTab(name) {
+      document.querySelectorAll('.pricing-tab').forEach(tab => {
+        const isActive = tab.dataset.pricingTab === name;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', String(isActive));
+      });
+      document.querySelectorAll('.pricing-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === `pricing-${name}`);
+      });
+    }
+
+    document.querySelectorAll('[data-pricing-tab]').forEach(tab => {
+      tab.addEventListener('click', () => showPricingTab(tab.dataset.pricingTab));
     });
 
     // Smooth scroll for anchor links
@@ -610,8 +719,7 @@
     });
 
     // Contact modal: open/close, submit, validation. Functions are attached
-    // to window so the inline onclick handlers on the Contact Us button (in
-    // the dynamically-rendered pricing card) can find them.
+    // to window so inline onclick handlers can find them.
     window.openContactModal = function() {
       document.getElementById('contactModal').style.display = 'flex';
       setTimeout(() => document.querySelector('#contactForm input[name="name"]')?.focus(), 50);
