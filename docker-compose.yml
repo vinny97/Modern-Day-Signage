@@ -4,7 +4,7 @@
 # reverse proxy or Cloudflare in production.
 services:
   screentinker:
-    image: ghcr.io/screentinker/screentinker:latest
+    build: .
     # ...or build from source instead of pulling:
     # build: .
     restart: unless-stopped
