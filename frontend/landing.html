@@ -133,6 +133,15 @@
     .feature-list li { color:#4b5563; font-size:15px; line-height:1.45; display:flex; gap:12px; align-items:flex-start; }
     .feature-list li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:999px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:13px; font-weight:900; flex:0 0 20px; margin-top:1px; }
     .feature-list.green li::before { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+    .custom-builder { display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
+    .custom-row { display:grid; grid-template-columns:1fr 86px; gap:12px; align-items:center; border:1px solid #e5e7eb; background:#fff; border-radius:12px; padding:14px; }
+    .custom-row label { color:#111827; font-size:14px; font-weight:800; }
+    .custom-rate { color:#6b7280; font-size:12px; margin-top:2px; }
+    .custom-row input { width:100%; min-height:44px; border:1px solid #d1d5db; border-radius:10px; padding:8px 10px; color:#111827; font:inherit; font-weight:800; text-align:center; }
+    .custom-total { border:1px solid #bbf7d0; background:#f0fdf4; border-radius:14px; padding:16px; margin-bottom:22px; }
+    .custom-total-line { display:flex; justify-content:space-between; gap:12px; color:#166534; font-size:14px; margin-bottom:6px; }
+    .custom-total-line.muted { color:#6b7280; }
+    .custom-total-line.final { color:#052e16; font-size:20px; font-weight:900; margin:10px 0 0; padding-top:10px; border-top:1px solid #bbf7d0; }
     .plan-action { margin-top:auto; width:100%; justify-content:center; padding:14px 20px; font-size:16px; background:#dc2626; color:#fff; border-color:#dc2626; }
     .plan-action:hover { background:#b91c1c; }
     .plan-action.ghost { background:#fff; color:#991b1b; border-color:#fecaca; }
@@ -332,18 +341,34 @@
           </article>
 
           <article class="service-card value">
-            <div class="plan-badge green">Best Value</div>
-            <h3>Complete Package</h3>
-            <p class="plan-copy">3 menu screens and 1 window display, fully managed. Everything your business needs — installed, designed, and looked after for you.</p>
-            <div class="price-box">
-              <div class="price-line"><span class="amount">&pound;140</span><span class="price-unit">/ month</span></div>
-              <div class="vat">inc. VAT &middot; &pound;116.67 ex. VAT</div>
-              <div class="price-note green">Saves &pound;25/month vs. buying separately</div>
+            <div class="plan-badge green">Custom</div>
+            <h3>Custom</h3>
+            <p class="plan-copy">Build the fully managed setup around your space. Choose how many menu screens and shop/window screens you need, then get 10% off the monthly total.</p>
+            <div class="custom-builder">
+              <div class="custom-row">
+                <div>
+                  <label for="customMenuScreens">Menu screens</label>
+                  <div class="custom-rate">&pound;20 per screen / month</div>
+                </div>
+                <input id="customMenuScreens" class="custom-price-input" type="number" min="0" max="99" step="1" value="1" inputmode="numeric">
+              </div>
+              <div class="custom-row">
+                <div>
+                  <label for="customWindowScreens">Shop/window screens</label>
+                  <div class="custom-rate">&pound;40 per screen / month</div>
+                </div>
+                <input id="customWindowScreens" class="custom-price-input" type="number" min="0" max="99" step="1" value="1" inputmode="numeric">
+              </div>
+            </div>
+            <div class="custom-total" aria-live="polite">
+              <div class="custom-total-line muted"><span>Subtotal</span><strong id="customSubtotal">&pound;60/month</strong></div>
+              <div class="custom-total-line"><span>Custom discount (10%)</span><strong id="customDiscount">-&pound;6/month</strong></div>
+              <div class="custom-total-line final"><span>Total</span><strong id="customTotal">&pound;54/month</strong></div>
             </div>
             <ul class="feature-list green">
-              <li>3 &times; menu screens included</li>
-              <li>1 &times; high-brightness window display included</li>
-              <li>Priority updates across all screens</li>
+              <li>10% discount applied to your custom package</li>
+              <li>Fully managed scheduling across every screen</li>
+              <li>Graphics designed by our team</li>
               <li>You approve before anything goes live</li>
             </ul>
             <a href="/app#/login" class="btn plan-action green">Get Started</a>
@@ -358,8 +383,8 @@
             <h3>Self-manage account</h3>
             <p class="plan-copy">Log in to your ScreenFizz account, upload your own graphics, and schedule your content — on any screen, any time.</p>
             <div class="price-box">
-              <div class="price-line"><span class="amount">&pound;15</span><span class="price-unit">/ screen / month</span></div>
-              <div class="vat">inc. VAT &middot; &pound;12.50 ex. VAT</div>
+              <div class="price-line"><span class="amount">&pound;5</span><span class="price-unit">/ screen / month</span></div>
+              <div class="vat">inc. VAT &middot; &pound;4.17 ex. VAT</div>
               <div class="price-note">&pound;50 one-time media player fee — yours to keep</div>
             </div>
             <ul class="feature-list">
@@ -410,7 +435,7 @@
           <table class="tier-compare-table">
             <thead><tr><th>What you get</th><th>Tier 1 — Fully managed</th><th>Tier 2 — Self-service</th></tr></thead>
             <tbody>
-              <tr><td>Starting price</td><td>&pound;30/screen/month inc. VAT</td><td>&pound;15/screen/month inc. VAT + &pound;50 media player</td></tr>
+              <tr><td>Starting price</td><td>&pound;30/screen/month inc. VAT</td><td>&pound;5/screen/month inc. VAT + &pound;50 media player</td></tr>
               <tr><td>Content creation</td><td>Graphics designed by our team</td><td>You upload your own graphics</td></tr>
               <tr><td>Scheduling</td><td>We schedule updates for you</td><td>You schedule content from the dashboard</td></tr>
               <tr><td>Approvals</td><td>You approve before anything goes live</td><td>You publish your own changes</td></tr>
@@ -467,7 +492,7 @@
   <!-- CTA -->
   <section class="cta">
     <h2>Ready to Get Started?</h2>
-    <p>Tell us what screens you need, or start with a self-service account from &pound;15/screen/month plus a &pound;50 media player.</p>
+    <p>Tell us what screens you need, or start with a self-service account from &pound;5/screen/month plus a &pound;50 media player.</p>
     <a href="/app#/login" class="btn btn-primary" style="padding:14px 32px;font-size:16px">Get Started</a>
   </section>
   </main>
@@ -598,11 +623,9 @@
       },
       {
         "@type": "Offer",
-        "price": "140",
-        "priceCurrency": "GBP",
         "priceValidUntil": "2027-12-31",
-        "name": "Complete Package",
-        "description": "3 menu screens and 1 window display, fully managed"
+        "name": "Custom",
+        "description": "Custom fully managed package with menu screens at £20/month, shop/window screens at £40/month, and a 10% package discount"
       },
       {
         "@type": "Offer",
@@ -670,7 +693,7 @@
         "name": "What does ScreenTinker cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Fully managed menu screens start from £30 per screen per month including VAT. Self-service accounts start from £15 per screen per month including VAT, plus a one-time £50 media player fee."
+          "text": "Fully managed menu screens start from £30 per screen per month including VAT. Self-service accounts start from £5 per screen per month including VAT, plus a one-time £50 media player fee."
         }
       },
       {
@@ -708,6 +731,28 @@
     document.querySelectorAll('[data-pricing-tab]').forEach(tab => {
       tab.addEventListener('click', () => showPricingTab(tab.dataset.pricingTab));
     });
+
+    function updateCustomPricing() {
+      const menuInput = document.getElementById('customMenuScreens');
+      const windowInput = document.getElementById('customWindowScreens');
+      if (!menuInput || !windowInput) return;
+
+      const menuScreens = Math.max(0, parseInt(menuInput.value, 10) || 0);
+      const windowScreens = Math.max(0, parseInt(windowInput.value, 10) || 0);
+      const subtotal = (menuScreens * 20) + (windowScreens * 40);
+      const discount = subtotal * 0.1;
+      const total = subtotal - discount;
+      const formatPrice = value => `&pound;${Number.isInteger(value) ? value : value.toFixed(2)}/month`;
+
+      document.getElementById('customSubtotal').innerHTML = formatPrice(subtotal);
+      document.getElementById('customDiscount').innerHTML = `-${formatPrice(discount)}`;
+      document.getElementById('customTotal').innerHTML = formatPrice(total);
+    }
+
+    document.querySelectorAll('.custom-price-input').forEach(input => {
+      input.addEventListener('input', updateCustomPricing);
+    });
+    updateCustomPricing();
 
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(a => {
