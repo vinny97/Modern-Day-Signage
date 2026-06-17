@@ -10,8 +10,9 @@ a:hover { text-decoration: underline; }
 /* Nav (matches landing.html) */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(17,24,39,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
 .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-.nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--accent); flex-shrink: 0; }
-.nav-logo a { color: var(--accent); }
+.nav-logo { display: flex; align-items: center; flex-shrink: 0; }
+.nav-logo a { color: var(--accent); display:flex; align-items:center; }
+.nav-logo img { display:block; width:184px; height:auto; }
 .nav-links { display: flex; align-items: center; flex-wrap: nowrap; }
 .nav-links a { color: var(--muted); margin-left: 24px; font-size: 14px; transition: color 0.2s; }
 .nav-links a:hover { color: var(--text); text-decoration: none; }
@@ -83,5 +84,5 @@ footer .links a:hover { color: var(--text); text-decoration: none; }
   .compare-table th, .compare-table td { padding: 8px; }
 }
 @media (max-width: 420px) {
-  .nav-logo-text { display: none; }
+  .nav-logo img { width:136px; }
 }

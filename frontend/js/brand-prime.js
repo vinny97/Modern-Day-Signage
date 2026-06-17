@@ -40,6 +40,15 @@
       var span = document.getElementById('brandName');
       if (span) span.textContent = wl.brand_name;
     }
+    var logo = document.getElementById('brandLogo');
+    if (logo) {
+      if (wl.logo_url) {
+        logo.setAttribute('src', wl.logo_url);
+        logo.setAttribute('alt', wl.brand_name || 'Brand logo');
+      } else if (wl.brand_name) {
+        logo.setAttribute('alt', wl.brand_name);
+      }
+    }
     if (wl.favicon_url) {
       var links = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
       for (var i = 0; i < links.length; i++) links[i].setAttribute('href', wl.favicon_url);

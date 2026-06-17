@@ -47,6 +47,12 @@ export async function applyBranding() {
     if (span) span.textContent = wl.brand_name;
   }
 
+  const logo = document.getElementById('brandLogo');
+  if (logo) {
+    logo.setAttribute('src', wl.logo_url || '/assets/screenfizz-logo-wordmark.png');
+    logo.setAttribute('alt', wl.brand_name || 'ScreenFizz');
+  }
+
   if (wl.favicon_url) {
     document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(l => {
       l.setAttribute('href', wl.favicon_url);
