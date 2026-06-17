@@ -11,7 +11,7 @@ async function loadAuthConfig() {
 }
 
 // #15: resolve instance/default branding for the (pre-login) login page.
-// Public endpoint: custom-domain match -> platform default -> ScreenTinker.
+// Public endpoint: custom-domain match -> platform default -> ScreenFizz.
 async function loadLoginBranding() {
   try {
     const res = await fetch('/api/branding?domain=' + encodeURIComponent(location.hostname));
@@ -47,29 +47,24 @@ export async function render(container) {
   const canRegister = config.registration_enabled !== false;
 
   applyLoginBrandingDoc(branding);
-  const brandName = branding.brand_name || 'ScreenTinker';
-  // Branded logo if set, else the default ScreenTinker glyph.
-  const logoHtml = branding.logo_url
-    ? `<img src="${brandEsc(branding.logo_url)}" alt="${brandEsc(brandName)}" style="max-height:48px;max-width:200px;margin:0 auto 12px;display:block">`
-    : `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="margin:0 auto 12px">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-            <line x1="8" y1="21" x2="16" y2="21"/>
-            <line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>`;
+  const brandName = branding.brand_name || 'ScreenFizz';
+  const logoUrl = branding.logo_url || '/assets/screenfizz-logo-wordmark.png';
+  const logoHtml = `<img src="${brandEsc(logoUrl)}" alt="${brandEsc(brandName)}" style="width:220px;max-width:82%;height:auto;margin:0 auto 18px;display:block">`;
+  document.title = brandName;
 
   container.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px">
+    <div style="--bg-primary:#ffffff;--bg-secondary:#f8fafc;--bg-card:#ffffff;--bg-card-hover:#f3f4f6;--bg-input:#ffffff;--text-primary:#111827;--text-secondary:#4b5563;--text-muted:#6b7280;--border:#e5e7eb;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;background:#ffffff;color:#111827">
       <div style="width:400px;max-width:100%">
         <div style="text-align:center;margin-bottom:32px">
           ${logoHtml}
-          <h1 style="font-size:24px;font-weight:700;color:var(--accent)">${brandEsc(brandName)}</h1>
+          <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">${brandEsc(brandName)}</h1>
           <p style="color:var(--text-secondary);font-size:13px;margin-top:4px">
             ${isSetup ? t('auth.subtitle_setup') : t('auth.subtitle_signin')}
           </p>
           ${!isSetup && canRegister ? `<p style="color:var(--warning);font-size:12px;margin-top:8px">${t('auth.trial_notice')}</p>` : ''}
         </div>
 
-        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+        <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:var(--radius-lg);padding:24px;box-shadow:0 18px 50px rgba(15,23,42,0.08)">
           <!-- Local Auth Form -->
           <div id="localAuthForm">
             <div class="form-group">
