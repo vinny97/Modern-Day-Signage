@@ -3,44 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact ScreenFizz | Book a Demo</title>
-  <meta name="description" content="Book a ScreenFizz demo, request a callback, or get started with managed digital signage.">
+  <title>Get My Setup Plan | ScreenFizz</title>
+  <meta name="description" content="Get a ScreenFizz setup plan for your business screens. Tell us your business type, number of screens and goal for an instant estimate.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://screenfizz.com/contact.html">
-  <meta property="og:title" content="Contact ScreenFizz">
-  <meta property="og:description" content="Tell us how many screens you need and we will recommend the simplest setup.">
+  <meta property="og:title" content="Get My ScreenFizz Setup Plan">
+  <meta property="og:description" content="Tell us what you need and we will recommend the best managed digital signage setup.">
   <meta property="og:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
   <link rel="icon" href="/assets/screenfizz-logo.png">
   <link rel="stylesheet" href="/css/marketing.css">
 </head>
 <body>
   <nav class="site-nav" aria-label="Primary navigation">
-    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/managed-digital-signage.html">Services</a><div class="dropdown-menu"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/managed-digital-signage.html#pro-content">Pro Digital Content Service</a></div></div><div class="dropdown"><a class="nav-link" href="/self-service-software.html">Products</a><div class="dropdown-menu"><a href="/self-service-software.html">ScreenFizz Software</a><a href="/hardware.html">ScreenFizz Player</a></div></div><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact.html">Get Started</a></div></div>
+    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/managed-digital-signage.html">Services</a><div class="dropdown-menu"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/managed-digital-signage.html#pro-content">Pro Managed Content Service</a></div></div><div class="dropdown"><a class="nav-link" href="/self-service-software.html">Products</a><div class="dropdown-menu"><a href="/self-service-software.html">ScreenFizz Software</a><a href="/hardware.html">ScreenFizz Player</a></div></div><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact.html#setup-plan">Get My Setup Plan</a></div></div>
   </nav>
 
   <main>
-    <section class="section contact-layout">
+    <section class="section contact-layout" id="setup-plan">
       <div>
-        <div class="eyebrow">Contact / Demo</div>
-        <h1>Tell us about your screens.</h1>
-        <p>Book a demo, request a callback, or get started. Send a few details and we will help you choose the simplest route.</p>
+        <div class="eyebrow">Get My Setup Plan</div>
+        <h1>Tell us what your screen needs to do.</h1>
+        <p>Answer three quick questions and leave your details. We will give you an instant estimate, then review it properly and call within 24 hours.</p>
         <div class="hero-note">
-          <div class="check-line">Managed service is recommended for most local businesses.</div>
-          <div class="check-line">Self-service is available if you want complete control.</div>
+          <div class="check-line">We will review your requirements.</div>
+          <div class="check-line">We will recommend the best setup.</div>
+          <div class="check-line">We will call you within 24 hours.</div>
+        </div>
+        <div class="button-row" style="margin-top:26px">
+          <a class="whatsapp-link" id="whatsappLink" target="_blank" rel="noopener" href="https://wa.me/?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup.">Contact on WhatsApp</a>
         </div>
       </div>
+
       <form id="leadForm" novalidate>
-        <div class="form-grid">
+        <div class="eyebrow">Step 1</div>
+        <h3>Quick setup questions</h3>
+        <div class="form-grid" style="margin-top:18px">
+          <label>Business type
+            <select name="business_type" required>
+              <option value="">Select one</option>
+              <option>Barber / salon</option>
+              <option>Takeaway / restaurant</option>
+              <option>Cafe / bakery</option>
+              <option>Retail shop</option>
+              <option>Gym / fitness</option>
+              <option>Clinic / office</option>
+              <option>Other local business</option>
+            </select>
+          </label>
+          <label>Number of screens
+            <select name="screens" required>
+              <option value="">Select one</option>
+              <option value="1">1</option>
+              <option value="2-3">2–3</option>
+              <option value="4-10">4–10</option>
+              <option value="10+">10+</option>
+            </select>
+          </label>
+          <label class="full">Goal
+            <select name="goal" required>
+              <option value="">Select one</option>
+              <option>Promotions</option>
+              <option>Menu</option>
+              <option>Advertising</option>
+              <option>General info</option>
+            </select>
+          </label>
+        </div>
+
+        <h3 style="margin-top:28px">Your details</h3>
+        <div class="form-grid" style="margin-top:18px">
           <label>Business Name<input name="business_name" type="text" autocomplete="organization" maxlength="200" required></label>
           <label>Contact Name<input name="contact_name" type="text" autocomplete="name" maxlength="200" required></label>
           <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required></label>
           <label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="80" required></label>
-          <label>Number of Screens<input name="screens" type="number" min="1" max="10000" inputmode="numeric" required></label>
-          <label>Interested In<select name="interest" required><option value="">Select one</option><option>Managed Digital Signage</option><option>Pro Digital Content Service</option><option>Self-Service Software</option><option>ScreenFizz Player</option><option>Not sure yet</option></select></label>
-          <label class="full">Message<textarea name="message" maxlength="5000" placeholder="Tell us what you want your screens to show."></textarea></label>
+          <label class="full">Anything else?<textarea name="message" maxlength="5000" placeholder="Tell us what you want your screens to show."></textarea></label>
           <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label></div>
         </div>
-        <div class="form-actions"><button class="btn btn-primary" type="submit" id="leadSubmit">Send Request</button><span class="form-status" id="leadStatus" aria-live="polite"></span></div>
+        <div class="form-actions"><button class="btn btn-primary" type="submit" id="leadSubmit">Get My Setup Plan</button><span class="form-status" id="leadStatus" aria-live="polite"></span></div>
+        <div class="estimate-result hidden" id="estimateResult" aria-live="polite"></div>
       </form>
     </section>
   </main>
@@ -51,12 +91,33 @@
     const leadForm = document.getElementById('leadForm');
     const leadStatus = document.getElementById('leadStatus');
     const leadSubmit = document.getElementById('leadSubmit');
+    const estimateResult = document.getElementById('estimateResult');
+    const whatsappLink = document.getElementById('whatsappLink');
+
+    function likelyPlan(data) {
+      const screenText = data.screens === '1' ? '1 ScreenFizz Player' : `${data.screens} ScreenFizz Players`;
+      const wantsContent = data.goal === 'Advertising' || data.goal === 'Promotions';
+      const plan = wantsContent ? '£29/month Pro Managed Plan' : '£15/month Managed Plan';
+      return `${plan} + ${screenText}`;
+    }
+
+    function updateWhatsApp() {
+      const data = Object.fromEntries(new FormData(leadForm).entries());
+      const text = `Hi ScreenFizz, I would like a setup plan.\n\nBusiness type: ${data.business_type || 'Not selected'}\nScreens: ${data.screens || 'Not selected'}\nGoal: ${data.goal || 'Not selected'}`;
+      whatsappLink.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    }
+
+    leadForm.addEventListener('input', updateWhatsApp);
+    updateWhatsApp();
+
     leadForm.addEventListener('submit', async event => {
       event.preventDefault();
       leadStatus.className = 'form-status';
       leadStatus.textContent = '';
+      estimateResult.classList.add('hidden');
+
       const data = Object.fromEntries(new FormData(leadForm).entries());
-      const required = ['business_name', 'contact_name', 'email', 'phone', 'screens', 'interest'];
+      const required = ['business_type', 'screens', 'goal', 'business_name', 'contact_name', 'email', 'phone'];
       for (const field of required) {
         if (!data[field] || String(data[field]).trim() === '') {
           leadStatus.className = 'form-status error';
@@ -69,6 +130,12 @@
         leadStatus.textContent = 'Please enter a valid email address.';
         return;
       }
+
+      leadStatus.textContent = "We're building your setup plan...";
+      const estimate = likelyPlan(data);
+      estimateResult.innerHTML = `<h3>Based on your answers, your setup will likely be:</h3><p><strong>${estimate}</strong></p><ul><li>We'll review your requirements.</li><li>We'll recommend the best setup.</li><li>We'll call you within 24 hours.</li></ul>`;
+      estimateResult.classList.remove('hidden');
+
       const payload = {
         name: data.contact_name,
         email: data.email,
@@ -76,17 +143,19 @@
         screens: data.screens,
         multi_tenant: 'single',
         hosting: 'hosted',
-        message: `Phone: ${data.phone}\nInterested in: ${data.interest}\n\n${data.message || ''}`,
+        message: `Phone: ${data.phone}\nBusiness type: ${data.business_type}\nGoal: ${data.goal}\nInstant estimate: ${estimate}\n\n${data.message || ''}`,
         fax_number: data.fax_number
       };
+
       leadSubmit.disabled = true;
       leadSubmit.textContent = 'Sending...';
       try {
         const response = await fetch('/api/contact/enterprise', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(payload) });
         if (response.ok) {
           leadStatus.className = 'form-status success';
-          leadStatus.textContent = "Thanks, we'll be in touch shortly.";
+          leadStatus.textContent = 'Your setup plan request has been sent.';
           leadForm.reset();
+          updateWhatsApp();
         } else {
           leadStatus.className = 'form-status error';
           leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
@@ -96,7 +165,7 @@
         leadStatus.textContent = 'Network error. Please try again.';
       } finally {
         leadSubmit.disabled = false;
-        leadSubmit.textContent = 'Send Request';
+        leadSubmit.textContent = 'Get My Setup Plan';
       }
     });
   </script>

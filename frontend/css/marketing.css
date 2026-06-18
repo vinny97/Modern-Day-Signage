@@ -112,6 +112,12 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--red
 .form-status { min-height:20px; color:var(--muted); font-size:13px; }
 .form-status.success { color:var(--green); }
 .form-status.error { color:#b91c1c; }
+.hidden { display:none !important; }
+.estimate-result { margin-top:18px; border:1px solid #f5c6c1; background:#fff7f5; border-radius:14px; padding:20px; }
+.estimate-result h3 { color:var(--ink); }
+.estimate-result ul { margin:14px 0 0 18px; color:#444d5a; }
+.whatsapp-link { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:11px 18px; border-radius:10px; border:1px solid #b9e7ca; background:#f0fff5; color:#137f3f; font-weight:850; }
+.whatsapp-link:hover { border-color:#25d366; color:#0f6c35; transform:translateY(-1px); }
 .page-hero { background:#fff; }
 .page-hero .section { min-height:auto; padding-top:84px; padding-bottom:70px; }
 .page-hero h1 { max-width:900px; }
