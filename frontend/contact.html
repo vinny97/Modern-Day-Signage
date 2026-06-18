@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact ScreenFizz | Book a Demo</title>
+  <meta name="description" content="Book a ScreenFizz demo, request a callback, or get started with managed digital signage.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://screenfizz.com/contact.html">
+  <meta property="og:title" content="Contact ScreenFizz">
+  <meta property="og:description" content="Tell us how many screens you need and we will recommend the simplest setup.">
+  <meta property="og:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
+  <link rel="icon" href="/assets/screenfizz-logo.png">
+  <link rel="stylesheet" href="/css/marketing.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/managed-digital-signage.html">Services</a><div class="dropdown-menu"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/managed-digital-signage.html#pro-content">Pro Digital Content Service</a></div></div><div class="dropdown"><a class="nav-link" href="/self-service-software.html">Products</a><div class="dropdown-menu"><a href="/self-service-software.html">ScreenFizz Software</a><a href="/hardware.html">ScreenFizz Player</a></div></div><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact.html">Get Started</a></div></div>
+  </nav>
+
+  <main>
+    <section class="section contact-layout">
+      <div>
+        <div class="eyebrow">Contact / Demo</div>
+        <h1>Tell us about your screens.</h1>
+        <p>Book a demo, request a callback, or get started. Send a few details and we will help you choose the simplest route.</p>
+        <div class="hero-note">
+          <div class="check-line">Managed service is recommended for most local businesses.</div>
+          <div class="check-line">Self-service is available if you want complete control.</div>
+        </div>
+      </div>
+      <form id="leadForm" novalidate>
+        <div class="form-grid">
+          <label>Business Name<input name="business_name" type="text" autocomplete="organization" maxlength="200" required></label>
+          <label>Contact Name<input name="contact_name" type="text" autocomplete="name" maxlength="200" required></label>
+          <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required></label>
+          <label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="80" required></label>
+          <label>Number of Screens<input name="screens" type="number" min="1" max="10000" inputmode="numeric" required></label>
+          <label>Interested In<select name="interest" required><option value="">Select one</option><option>Managed Digital Signage</option><option>Pro Digital Content Service</option><option>Self-Service Software</option><option>ScreenFizz Player</option><option>Not sure yet</option></select></label>
+          <label class="full">Message<textarea name="message" maxlength="5000" placeholder="Tell us what you want your screens to show."></textarea></label>
+          <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-primary" type="submit" id="leadSubmit">Send Request</button><span class="form-status" id="leadStatus" aria-live="polite"></span></div>
+      </form>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a></div></div></footer>
+
+  <script>
+    const leadForm = document.getElementById('leadForm');
+    const leadStatus = document.getElementById('leadStatus');
+    const leadSubmit = document.getElementById('leadSubmit');
+    leadForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      leadStatus.className = 'form-status';
+      leadStatus.textContent = '';
+      const data = Object.fromEntries(new FormData(leadForm).entries());
+      const required = ['business_name', 'contact_name', 'email', 'phone', 'screens', 'interest'];
+      for (const field of required) {
+        if (!data[field] || String(data[field]).trim() === '') {
+          leadStatus.className = 'form-status error';
+          leadStatus.textContent = 'Please fill in the required details.';
+          return;
+        }
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        leadStatus.className = 'form-status error';
+        leadStatus.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      const payload = {
+        name: data.contact_name,
+        email: data.email,
+        company: data.business_name,
+        screens: data.screens,
+        multi_tenant: 'single',
+        hosting: 'hosted',
+        message: `Phone: ${data.phone}\nInterested in: ${data.interest}\n\n${data.message || ''}`,
+        fax_number: data.fax_number
+      };
+      leadSubmit.disabled = true;
+      leadSubmit.textContent = 'Sending...';
+      try {
+        const response = await fetch('/api/contact/enterprise', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(payload) });
+        if (response.ok) {
+          leadStatus.className = 'form-status success';
+          leadStatus.textContent = "Thanks, we'll be in touch shortly.";
+          leadForm.reset();
+        } else {
+          leadStatus.className = 'form-status error';
+          leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
+        }
+      } catch (error) {
+        leadStatus.className = 'form-status error';
+        leadStatus.textContent = 'Network error. Please try again.';
+      } finally {
+        leadSubmit.disabled = false;
+        leadSubmit.textContent = 'Send Request';
+      }
+    });
+  </script>
+</body>
+</html>

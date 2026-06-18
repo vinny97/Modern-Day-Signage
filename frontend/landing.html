@@ -3,512 +3,208 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern Day Displays | Digital Signage Made Simple</title>
-  <meta name="description" content="Simple digital signage for UK businesses. Choose ScreenFizz self-service from £5/month or a managed service from £15/month where we handle updates for you.">
-  <meta name="keywords" content="digital signage, managed digital signage, ScreenFizz, digital signage UK, signage screens, business displays">
-  <meta name="author" content="Modern Day Displays">
+  <title>ScreenFizz | Managed Digital Signage Made Simple</title>
+  <meta name="description" content="Managed digital signage for businesses that want screens updated without learning software. Buy a ScreenFizz Player, connect any TV, and we manage the rest.">
+  <meta name="keywords" content="managed digital signage, digital signage service, digital menu boards, TV advertising for businesses, ScreenFizz">
+  <meta name="author" content="ScreenFizz">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://screenfizz.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://screenfizz.com/">
-  <meta property="og:title" content="Modern Day Displays | Digital Signage Made Simple">
-  <meta property="og:description" content="Choose complete control with ScreenFizz or a fully managed service where we handle everything for you.">
-  <meta property="og:image" content="https://screenfizz.com/assets/dashboard-preview.png">
-  <meta property="og:site_name" content="Modern Day Displays">
+  <meta property="og:title" content="ScreenFizz | Managed Digital Signage Made Simple">
+  <meta property="og:description" content="We manage your screens, updates and support, so your business always has something useful on display.">
+  <meta property="og:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
+  <meta property="og:site_name" content="ScreenFizz">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Modern Day Displays | Digital Signage Made Simple">
-  <meta name="twitter:description" content="Self-service or managed digital signage for busy businesses.">
-  <meta name="twitter:image" content="https://screenfizz.com/assets/dashboard-preview.png">
+  <meta name="twitter:title" content="ScreenFizz | Managed Digital Signage Made Simple">
+  <meta name="twitter:description" content="Managed digital signage for busy shops, takeaways, salons, gyms and service counters.">
+  <meta name="twitter:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/assets/screenfizz-logo.png">
   <link rel="apple-touch-icon" href="/assets/screenfizz-logo.png">
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; }
-    :root {
-      --ink:#172033;
-      --muted:#5b6575;
-      --soft:#f6f8fb;
-      --line:#dfe5ee;
-      --blue:#2563eb;
-      --blue-dark:#1d4ed8;
-      --green:#12805c;
-      --red:#c2410c;
-      --gold:#f2b705;
-      --white:#ffffff;
-    }
-    html { scroll-behavior:smooth; }
-    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; color:var(--ink); background:var(--white); line-height:1.6; }
-    a { color:inherit; text-decoration:none; }
-    img { max-width:100%; display:block; }
-    nav { position:sticky; top:0; z-index:50; background:rgba(255,255,255,0.94); border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
-    .nav-inner { max-width:1180px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
-    .brand { display:flex; align-items:center; gap:12px; font-weight:900; color:var(--ink); min-width:0; }
-    .brand img { width:46px; height:46px; border-radius:8px; }
-    .brand-text { display:flex; flex-direction:column; line-height:1.1; }
-    .brand-main { font-size:16px; }
-    .brand-sub { font-size:12px; color:var(--muted); font-weight:700; }
-    .nav-links { display:flex; align-items:center; gap:20px; color:#3c4656; font-size:14px; font-weight:700; }
-    .nav-links a:hover { color:var(--blue); }
-    .nav-cta { display:flex; align-items:center; gap:10px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:10px 18px; border-radius:8px; border:1px solid transparent; font-weight:800; font-size:14px; cursor:pointer; transition:background 0.2s,border-color 0.2s,color 0.2s,transform 0.2s; font-family:inherit; }
-    .btn:hover { transform:translateY(-1px); }
-    .btn-primary { background:var(--blue); color:#fff; }
-    .btn-primary:hover { background:var(--blue-dark); }
-    .btn-outline { border-color:#b8c4d6; color:var(--ink); background:#fff; }
-    .btn-outline:hover { border-color:var(--blue); color:var(--blue); }
-    .btn-dark { background:var(--ink); color:#fff; }
-    .btn-dark:hover { background:#0f172a; }
-    .section { max-width:1180px; margin:0 auto; padding:86px 22px; }
-    .section-tight { padding-top:58px; padding-bottom:58px; }
-    .eyebrow { color:var(--blue); font-size:12px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
-    h1, h2, h3 { letter-spacing:0; line-height:1.08; }
-    h1 { font-size:clamp(42px,7vw,78px); max-width:860px; margin-bottom:24px; }
-    h2 { font-size:clamp(30px,4vw,48px); margin-bottom:14px; }
-    h3 { font-size:24px; margin-bottom:12px; }
-    p { color:var(--muted); }
-    .hero { position:relative; overflow:hidden; background:linear-gradient(180deg,#eef5ff 0%,#fff 78%); }
-    .hero .section { display:grid; grid-template-columns:minmax(0,1.03fr) minmax(360px,0.8fr); gap:46px; align-items:center; padding-top:96px; padding-bottom:70px; }
-    .hero-copy > p { font-size:clamp(17px,2vw,21px); max-width:720px; margin-bottom:30px; }
-    .hero-actions, .button-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-    .hero-proof { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:34px; max-width:720px; }
-    .proof-item { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px; }
-    .proof-item strong { display:block; color:var(--ink); font-size:20px; line-height:1.1; }
-    .proof-item span { color:var(--muted); font-size:13px; }
-    .screen-scene { position:relative; min-height:480px; }
-    .display-frame { position:absolute; inset:28px 0 auto 0; aspect-ratio:16/10; background:#101827; border:12px solid #182235; border-radius:18px; box-shadow:0 28px 70px rgba(23,32,51,0.22); overflow:hidden; }
-    .display-frame img { width:100%; height:100%; object-fit:cover; opacity:0.9; }
-    .display-banner { position:absolute; left:26px; right:26px; bottom:24px; background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.8); border-radius:8px; padding:16px; display:flex; justify-content:space-between; gap:16px; align-items:center; box-shadow:0 12px 34px rgba(15,23,42,0.18); }
-    .display-banner strong { display:block; color:var(--ink); }
-    .display-banner span { color:var(--muted); font-size:13px; }
-    .display-stand { position:absolute; left:50%; top:360px; width:90px; height:74px; transform:translateX(-50%); border-bottom:18px solid #182235; border-left:16px solid transparent; border-right:16px solid transparent; }
-    .display-base { position:absolute; left:50%; top:430px; width:210px; height:20px; transform:translateX(-50%); background:#182235; border-radius:999px; }
-    .split-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
-    .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:30px; box-shadow:0 18px 48px rgba(15,23,42,0.06); }
-    .solution-card { display:flex; flex-direction:column; min-height:100%; border-top:5px solid var(--green); }
-    .solution-card.managed { border-top-color:var(--blue); }
-    .card-kicker { display:inline-flex; width:max-content; border:1px solid #c8e8dc; background:#f0fdf7; color:var(--green); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:900; margin-bottom:18px; }
-    .managed .card-kicker { border-color:#c7d8ff; background:#eef4ff; color:var(--blue); }
-    .feature-list { list-style:none; display:flex; flex-direction:column; gap:12px; margin:24px 0 28px; }
-    .feature-list li { color:#3f4a5b; display:flex; gap:10px; align-items:flex-start; }
-    .feature-list li::before { content:""; width:8px; height:8px; margin-top:9px; border-radius:999px; background:var(--green); flex:0 0 8px; }
-    .managed .feature-list li::before, .pro-band .feature-list li::before { background:var(--blue); }
-    .solution-card .btn { margin-top:auto; width:max-content; }
-    .pro-band { background:#172033; color:#fff; }
-    .pro-band .section { display:grid; grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr); gap:36px; align-items:center; }
-    .pro-band p, .pro-band li { color:#d3dbe8; }
-    .pro-panel { background:#fff; color:var(--ink); border-radius:8px; padding:28px; }
-    .pro-panel p, .pro-panel li { color:var(--muted); }
-    .pricing-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin-top:34px; }
-    .price-card { display:flex; flex-direction:column; border-top:5px solid var(--green); }
-    .price-card.managed { border-top-color:var(--blue); }
-    .price-card.pro { border-top-color:var(--gold); }
-    .price { display:flex; align-items:flex-end; gap:7px; margin:20px 0 8px; }
-    .amount { color:var(--ink); font-size:52px; line-height:0.9; font-weight:900; }
-    .unit { color:var(--muted); padding-bottom:5px; font-weight:700; }
-    .hardware-note { margin-top:6px; color:#7b8493; font-size:14px; }
-    .price-card .btn { margin-top:auto; }
-    .hardware { background:var(--soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-    .hardware-layout { display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.05fr); gap:34px; align-items:center; }
-    .player-visual { background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px; min-height:340px; display:flex; align-items:center; justify-content:center; }
-    .player-box { width:min(100%,420px); aspect-ratio:16/10; background:#172033; border-radius:18px; position:relative; box-shadow:0 24px 60px rgba(23,32,51,0.22); }
-    .player-box::before { content:"ScreenFizz Player"; position:absolute; left:28px; top:24px; color:#fff; font-weight:900; font-size:20px; }
-    .player-box::after { content:"£60 one-time"; position:absolute; right:24px; bottom:22px; color:#172033; background:#fff; border-radius:999px; padding:8px 14px; font-weight:900; }
-    .player-light { position:absolute; left:30px; bottom:28px; width:12px; height:12px; border-radius:999px; background:#22c55e; box-shadow:0 0 0 8px rgba(34,197,94,0.14); }
-    .industries-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:30px; }
-    .industry { border:1px solid var(--line); background:#fff; border-radius:8px; padding:18px; }
-    .industry strong { display:block; margin-bottom:4px; }
-    .outcomes { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:30px; }
-    .outcome { background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:20px; }
-    .contact { background:#f8fbff; border-top:1px solid var(--line); }
-    .contact-layout { display:grid; grid-template-columns:minmax(0,0.85fr) minmax(360px,1fr); gap:34px; align-items:start; }
-    form { background:#fff; border:1px solid var(--line); border-radius:8px; padding:26px; box-shadow:0 18px 48px rgba(15,23,42,0.06); }
-    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    label { display:flex; flex-direction:column; gap:6px; color:#334155; font-size:13px; font-weight:800; }
-    input, select, textarea { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:11px 12px; min-height:44px; font:inherit; color:var(--ink); background:#fff; }
-    textarea { min-height:112px; resize:vertical; }
-    input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
-    .full { grid-column:1 / -1; }
-    .form-actions { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px; }
-    .form-status { min-height:20px; color:var(--muted); font-size:13px; }
-    .form-status.success { color:var(--green); }
-    .form-status.error { color:#b91c1c; }
-    footer { border-top:1px solid var(--line); }
-    .footer-inner { max-width:1180px; margin:0 auto; padding:34px 22px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
-    .footer-links { display:flex; gap:16px; flex-wrap:wrap; }
-    .footer-links a:hover { color:var(--blue); }
-    @media (max-width:980px) {
-      .nav-links { display:none; }
-      .hero .section, .pro-band .section, .hardware-layout, .contact-layout { grid-template-columns:1fr; }
-      .screen-scene { min-height:390px; }
-      .display-stand { top:300px; }
-      .display-base { top:370px; }
-      .pricing-grid, .industries-grid, .outcomes { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    }
-    @media (max-width:680px) {
-      .brand-sub { display:none; }
-      .nav-inner { padding:12px 14px; }
-      .nav-cta .btn-outline { display:none; }
-      .section { padding:62px 16px; }
-      .hero .section { padding-top:58px; }
-      .split-grid, .pricing-grid, .industries-grid, .outcomes, .hero-proof, .form-grid { grid-template-columns:1fr; }
-      .screen-scene { min-height:310px; }
-      .display-frame { inset:10px 0 auto 0; border-width:8px; border-radius:14px; }
-      .display-banner { left:14px; right:14px; bottom:14px; padding:12px; align-items:flex-start; flex-direction:column; }
-      .display-stand { top:230px; }
-      .display-base { top:296px; width:170px; }
-      .amount { font-size:46px; }
-      .card, form { padding:22px; }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/marketing.css">
 </head>
 <body>
-  <nav aria-label="Primary navigation">
+  <nav class="site-nav" aria-label="Primary navigation">
     <div class="nav-inner">
-      <a class="brand" href="#home" aria-label="Modern Day Displays home">
-        <img src="/assets/screenfizz-logo.png" alt="" width="512" height="512">
-        <span class="brand-text">
-          <span class="brand-main">Modern Day Displays</span>
-          <span class="brand-sub">Powered by ScreenFizz</span>
-        </span>
-      </a>
+      <a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a>
       <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#solutions">Solutions</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#hardware">Hardware</a>
-        <a href="#industries">Industries</a>
-        <a href="#contact">Contact</a>
+        <a href="/">Home</a>
+        <div class="dropdown">
+          <a class="nav-link" href="/managed-digital-signage.html">Services</a>
+          <div class="dropdown-menu">
+            <a href="/managed-digital-signage.html">Managed Digital Signage</a>
+            <a href="/managed-digital-signage.html#pro-content">Pro Digital Content Service</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <a class="nav-link" href="/self-service-software.html">Products</a>
+          <div class="dropdown-menu">
+            <a href="/self-service-software.html">ScreenFizz Software</a>
+            <a href="/hardware.html">ScreenFizz Player</a>
+          </div>
+        </div>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/contact.html">Contact</a>
       </div>
-      <div class="nav-cta">
-        <a class="btn btn-outline" href="#contact">Book Demo</a>
-        <a class="btn btn-primary" href="#pricing">View Pricing</a>
+      <div class="nav-actions">
+        <a class="btn btn-outline" href="/app#/login">Client Portal</a>
+        <a class="btn btn-primary" href="/contact.html">Get Started</a>
       </div>
     </div>
   </nav>
 
-  <main id="home">
+  <main>
     <section class="hero">
       <div class="section">
         <div class="hero-copy">
-          <div class="eyebrow">Simple digital signage for busy teams</div>
-          <h1>Digital Signage Made Simple</h1>
-          <p>Choose between complete control with ScreenFizz or a fully managed service where we handle everything for you.</p>
+          <div class="eyebrow">Fully managed digital signage</div>
+          <h1>Your screens. Always updated. Always noticed.</h1>
+          <p>We put your offers, menus and promotions on your TVs, then keep them updated for you. No software to learn. No extra job for your team.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#pricing">View Pricing</a>
-            <a class="btn btn-outline" href="#contact">Book Demo</a>
+            <a class="btn btn-primary" href="/contact.html">Get Started</a>
+            <a class="btn btn-outline" href="/managed-digital-signage.html">Learn More</a>
           </div>
-          <div class="hero-proof" aria-label="Key benefits">
-            <div class="proof-item"><strong>Save time</strong><span>Update offers without chasing print deadlines.</span></div>
-            <div class="proof-item"><strong>Sell more</strong><span>Promote deals, menus, events, and services.</span></div>
-            <div class="proof-item"><strong>Stay current</strong><span>Change screens remotely whenever you need.</span></div>
+          <div class="hero-note">
+            <div class="check-line">Built for barbers, takeaways, shops, salons, gyms and service counters.</div>
+            <div class="check-line">Send us the content. We handle updates, timing and monitoring.</div>
           </div>
         </div>
-        <div class="screen-scene" aria-label="Digital signage preview">
-          <div class="display-frame">
-            <img src="/assets/dashboard-preview.png" alt="ScreenFizz display management preview" width="2500" height="1314">
-            <div class="display-banner">
-              <div><strong>Today&apos;s offer is live</strong><span>Fresh promotions across every screen</span></div>
-              <a class="btn btn-dark" href="#contact">Get Started</a>
+        <div class="showcase-card">
+          <img src="/assets/screenfizz-screens-showcase.jpeg" alt="Examples of digital signage screens in cafes, shops, bakeries, salons, food counters and service desks" width="1024" height="1024">
+          <div class="showcase-caption">
+            <div>
+              <strong>Real uses customers understand</strong>
+              <span>Menus, offers, services, order updates and window promotions.</span>
             </div>
+            <span class="showcase-pill">Managed for you</span>
           </div>
-          <div class="display-stand"></div>
-          <div class="display-base"></div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="solutions">
-      <div class="eyebrow">Solutions</div>
-      <h2>Choose how hands-on you want to be</h2>
-      <p>Both options help you keep customers informed, promote offers, and change your screens without fuss.</p>
-      <div class="split-grid" style="margin-top:34px">
-        <article class="card solution-card" id="self-service-digital-signage">
-          <span class="card-kicker">Self-Service</span>
-          <h3>Manage Your Own Screens</h3>
-          <p>Upload and schedule content yourself using our easy-to-use ScreenFizz platform.</p>
-          <ul class="feature-list">
-            <li>&pound;5/month</li>
-            <li>Buy player once (&pound;60)</li>
-            <li>Full control</li>
-            <li>Unlimited updates</li>
-            <li>Remote management</li>
-          </ul>
-          <a class="btn btn-outline" href="#pricing">Learn More</a>
+    <section class="section" id="how-it-works">
+      <div class="eyebrow">How It Works</div>
+      <h2>From blank TV to live business screen</h2>
+      <p>Simple setup, then we take care of the day-to-day screen work.</p>
+      <div class="how-it-works">
+        <article class="step">
+          <h3>Purchase a ScreenFizz Player</h3>
+          <p>Small plug-and-play device, prepared for your business.</p>
         </article>
-        <article class="card solution-card managed" id="managed-digital-signage">
-          <span class="card-kicker">Managed Service</span>
+        <article class="step">
+          <h3>Connect Any TV</h3>
+          <p>Use an existing TV or add a new display where customers can see it.</p>
+        </article>
+        <article class="step">
+          <h3>Send Us Your Content</h3>
+          <p>Offers, menus, promotions, price lists and announcements.</p>
+        </article>
+        <article class="step">
           <h3>We Manage Everything</h3>
-          <p>Send us your promotions, menus and announcements. We upload and manage everything for you.</p>
-          <ul class="feature-list">
-            <li>&pound;15/month</li>
-            <li>Content updates handled by us</li>
-            <li>Screen monitoring</li>
-            <li>Priority support</li>
-            <li>No software training required</li>
-          </ul>
-          <a class="btn btn-primary" href="#contact">Learn More</a>
+          <p>Updates, timing, monitoring and technical support handled for you.</p>
         </article>
       </div>
     </section>
 
-    <section class="pro-band" id="ai-content-service">
-      <div class="section section-tight">
-        <div>
-          <div class="eyebrow" style="color:#93c5fd">AI Content Service</div>
-          <h2>Need Content Created Too?</h2>
-          <p>Our Pro service generates promotional and seasonal content for your business, so your screens keep feeling fresh without extra work from your team.</p>
-          <div class="button-row" style="margin-top:24px">
-            <a class="btn btn-primary" href="#contact">Get Started</a>
-            <a class="btn btn-outline" href="#pricing" style="background:transparent;color:#fff;border-color:#687489">View Plans</a>
-          </div>
-        </div>
-        <div class="pro-panel">
-          <h3>Pro Digital</h3>
-          <div class="price"><span class="amount">&pound;29</span><span class="unit">/month</span></div>
-          <ul class="feature-list">
-            <li>AI-generated promotions</li>
-            <li>Seasonal campaigns</li>
-            <li>Holiday content</li>
-            <li>Monthly refreshes</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="pricing">
-      <div class="eyebrow">Pricing</div>
-      <h2>Simple monthly plans</h2>
-      <p>Start with one screen and grow when you are ready. Each plan uses the ScreenFizz Player, purchased once for &pound;60.</p>
-      <div class="pricing-grid">
-        <article class="card price-card">
-          <h3>Self-Service</h3>
-          <div class="price"><span class="amount">&pound;5</span><span class="unit">/month</span></div>
-          <p>For businesses that want control over their own screen updates.</p>
-          <ul class="feature-list">
-            <li>ScreenFizz platform</li>
-            <li>Remote screen management</li>
-            <li>Software updates</li>
-            <li>Email support</li>
-          </ul>
-          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
-          <a class="btn btn-outline" href="#contact">Get Started</a>
-        </article>
-        <article class="card price-card managed">
-          <h3>Managed</h3>
-          <div class="price"><span class="amount">&pound;15</span><span class="unit">/month</span></div>
-          <p>For businesses that want updates handled by a real person.</p>
-          <ul class="feature-list">
-            <li>Everything in Self-Service</li>
-            <li>Content uploaded for you</li>
-            <li>Screen monitoring</li>
-            <li>Priority support</li>
-          </ul>
-          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
-          <a class="btn btn-primary" href="#contact">Request a Callback</a>
-        </article>
-        <article class="card price-card pro">
-          <h3>Pro Digital</h3>
-          <div class="price"><span class="amount">&pound;29</span><span class="unit">/month</span></div>
-          <p>For businesses that also need fresh promotional content.</p>
-          <ul class="feature-list">
-            <li>Everything in Managed</li>
-            <li>Promotional content creation</li>
-            <li>Seasonal campaigns</li>
-            <li>Monthly content refreshes</li>
-          </ul>
-          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
-          <a class="btn btn-dark" href="#contact">Book Demo</a>
-        </article>
-      </div>
-    </section>
-
-    <section class="hardware" id="hardware">
-      <div class="section hardware-layout">
-        <div>
-          <div class="eyebrow">Hardware</div>
-          <h2>ScreenFizz Player</h2>
-          <p>A simple plug-and-play player that connects your screen to your service. We prepare it before it arrives, so setup is straightforward.</p>
-          <ul class="feature-list">
-            <li>Plug and play</li>
-            <li>Raspberry Pi based</li>
-            <li>Pre-configured</li>
-            <li>Connects automatically</li>
-            <li>One-time &pound;60 purchase</li>
-          </ul>
-          <a class="btn btn-primary" href="#contact">Order Player</a>
-        </div>
-        <div class="player-visual" aria-label="ScreenFizz Player illustration">
-          <div class="player-box"><span class="player-light"></span></div>
+    <section class="band">
+      <div class="section">
+        <div class="eyebrow">Services</div>
+        <h2>Most businesses want the managed service</h2>
+        <p>A barber does not want signage software. A takeaway does not want another dashboard. They want something on the TV that advertises the business, and they do not want to think about it.</p>
+        <div class="panel-grid" style="margin-top:34px">
+          <article class="card service-card recommended">
+            <span class="tag">⭐ Recommended</span>
+            <h3>Fully Managed Service</h3>
+            <p>We handle everything. Send us your content and we keep your screens useful, current and on-brand.</p>
+            <ul class="feature-list">
+              <li>Content updates</li>
+              <li>Screen monitoring</li>
+              <li>Technical support</li>
+              <li>No login required</li>
+            </ul>
+            <a class="btn btn-primary" href="/managed-digital-signage.html">Learn More</a>
+          </article>
+          <article class="card service-card self">
+            <span class="tag blue">Self-Service</span>
+            <h3>Want complete control?</h3>
+            <p>Use ScreenFizz software to manage your screens yourself. Best if your team already creates content and wants direct control.</p>
+            <ul class="feature-list">
+              <li>£5/month</li>
+              <li>Remote updates</li>
+              <li>Full control</li>
+              <li>ScreenFizz Player available for £60</li>
+            </ul>
+            <a class="btn btn-outline" href="/self-service-software.html">Learn More</a>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="industries">
-      <div class="eyebrow">Industries</div>
-      <h2>Built for everyday business updates</h2>
-      <p>Use your screens to keep customers moving, informed, and interested.</p>
+    <section class="section">
+      <div class="eyebrow">Who It Helps</div>
+      <h2>Useful screens for everyday businesses</h2>
+      <p>Put the right message where customers already look.</p>
       <div class="industries-grid">
-        <div class="industry"><strong>Cafes</strong><p>Menus, specials, loyalty offers, opening times.</p></div>
-        <div class="industry"><strong>Takeaways</strong><p>Meal deals, collection updates, delivery promos.</p></div>
-        <div class="industry"><strong>Salons</strong><p>Treatments, price lists, new services, gift cards.</p></div>
-        <div class="industry"><strong>Retail</strong><p>Promotions, launches, window offers, seasonal sales.</p></div>
-        <div class="industry"><strong>Gyms</strong><p>Classes, memberships, trainer notices, events.</p></div>
-        <div class="industry"><strong>Clinics</strong><p>Patient notices, services, wayfinding, reminders.</p></div>
-        <div class="industry"><strong>Offices</strong><p>Visitor welcomes, announcements, team updates.</p></div>
-        <div class="industry"><strong>Venues</strong><p>Event times, bar offers, directions, sponsor messages.</p></div>
-      </div>
-      <div class="outcomes">
-        <div class="outcome"><strong>Save time</strong><p>Update screens without redesigning everything from scratch.</p></div>
-        <div class="outcome"><strong>Promote offers</strong><p>Put the right deal in front of customers at the right moment.</p></div>
-        <div class="outcome"><strong>Update remotely</strong><p>Make changes without visiting the screen.</p></div>
-        <div class="outcome"><strong>Skip the technical side</strong><p>Choose Managed or Pro and we handle the day-to-day work.</p></div>
+        <div class="industry"><strong>Barbers</strong><p>Price lists, walk-in availability, products and seasonal offers.</p></div>
+        <div class="industry"><strong>Takeaways</strong><p>Menus, meal deals, collection updates and delivery promotions.</p></div>
+        <div class="industry"><strong>Retail Shops</strong><p>Window offers, launches, discounts and customer notices.</p></div>
+        <div class="industry"><strong>Gyms</strong><p>Class times, memberships, trainer notices and event promotions.</p></div>
       </div>
     </section>
 
-    <section class="contact" id="contact">
-      <div class="section contact-layout">
-        <div>
-          <div class="eyebrow">Contact</div>
-          <h2>Tell us about your screens</h2>
-          <p>Book a demo, request a callback, or get started. Send us a few details and we&apos;ll help you choose the simplest route.</p>
-          <div class="button-row" style="margin-top:24px">
-            <a class="btn btn-primary" href="#leadForm">Book a Demo</a>
-            <a class="btn btn-outline" href="#leadForm">Request a Callback</a>
+    <section class="section section-tight">
+      <div class="eyebrow">What Customers Say</div>
+      <h2>Businesses like yours, already live.</h2>
+      <div class="reviews">
+        <article class="card review">
+          <div>
+            <div class="stars">★★★★★</div>
+            <p class="quote">“We just send our offers over and the screen changes. It looks professional and we do not have to touch anything.”</p>
           </div>
+          <div class="reviewer"><div class="avatar">JB</div><div><strong>Jay Barbers</strong><span>Barber shop, Birmingham</span></div></div>
+        </article>
+        <article class="card review">
+          <div>
+            <div class="stars">★★★★★</div>
+            <p class="quote">“Our meal deals are finally visible in the shop. Customers ask about the offers because they can actually see them.”</p>
+          </div>
+          <div class="reviewer"><div class="avatar">TF</div><div><strong>TFC Shop</strong><span>Food shop, London</span></div></div>
+        </article>
+        <article class="card review">
+          <div>
+            <div class="stars">★★★★★</div>
+            <p class="quote">“Simple, fast and no training needed. We wanted the TV to advertise the business, and that is exactly what it does.”</p>
+          </div>
+          <div class="reviewer"><div class="avatar">MG</div><div><strong>Motion Gym</strong><span>Fitness studio, Manchester</span></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dark-band">
+      <div class="section section-tight">
+        <div class="eyebrow">Ready When You Are</div>
+        <h2>Get your first screen live without the hassle.</h2>
+        <p>Tell us what you want to show and how many screens you need. We will recommend the simplest setup.</p>
+        <div class="button-row" style="margin-top:26px">
+          <a class="btn btn-primary" href="/contact.html">Book Demo</a>
+          <a class="btn btn-outline" href="/pricing.html" style="background:transparent;color:#fff;border-color:#424750">View Pricing</a>
         </div>
-        <form id="leadForm" novalidate>
-          <div class="form-grid">
-            <label>Business Name
-              <input name="business_name" type="text" autocomplete="organization" maxlength="200" required>
-            </label>
-            <label>Contact Name
-              <input name="contact_name" type="text" autocomplete="name" maxlength="200" required>
-            </label>
-            <label>Email
-              <input name="email" type="email" autocomplete="email" maxlength="200" required>
-            </label>
-            <label>Phone Number
-              <input name="phone" type="tel" autocomplete="tel" maxlength="80" required>
-            </label>
-            <label>Number of Screens
-              <input name="screens" type="number" min="1" max="10000" inputmode="numeric" required>
-            </label>
-            <label>Interested In
-              <select name="interest" required>
-                <option value="">Select one</option>
-                <option>Self-Service Digital Signage</option>
-                <option>Managed Digital Signage</option>
-                <option>Pro Digital Content</option>
-                <option>Hardware Only</option>
-                <option>Not sure yet</option>
-              </select>
-            </label>
-            <label class="full">Message
-              <textarea name="message" maxlength="5000" placeholder="Tell us what you want your screens to show."></textarea>
-            </label>
-            <div style="position:absolute;left:-9999px" aria-hidden="true">
-              <label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" type="submit" id="leadSubmit">Get Started</button>
-            <span class="form-status" id="leadStatus" aria-live="polite"></span>
-          </div>
-        </form>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="footer-inner">
-      <div>&copy; 2026 Modern Day Displays. ScreenFizz is our self-service platform.</div>
+      <div>&copy; 2026 ScreenFizz.</div>
       <div class="footer-links">
-        <a href="#solutions">Solutions</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#hardware">Hardware</a>
-        <a href="/legal/terms.html">Terms</a>
-        <a href="/legal/privacy.html">Privacy</a>
-        <a href="/app#/login">Sign In</a>
+        <a href="/managed-digital-signage.html">Managed Digital Signage</a>
+        <a href="/self-service-software.html">Self-Service Software</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/hardware.html">Hardware</a>
+        <a href="/contact.html">Contact</a>
       </div>
     </div>
   </footer>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Modern Day Displays",
-    "url": "https://screenfizz.com/",
-    "description": "Simple digital signage with ScreenFizz self-service and managed digital signage services.",
-    "brand": { "@type": "Brand", "name": "ScreenFizz" },
-    "offers": [
-      { "@type": "Offer", "name": "Self-Service Digital Signage", "price": "5", "priceCurrency": "GBP" },
-      { "@type": "Offer", "name": "Managed Digital Signage", "price": "15", "priceCurrency": "GBP" },
-      { "@type": "Offer", "name": "Pro Digital", "price": "29", "priceCurrency": "GBP" },
-      { "@type": "Offer", "name": "ScreenFizz Player", "price": "60", "priceCurrency": "GBP" }
-    ]
-  }
-  </script>
-
-  <script>
-    const leadForm = document.getElementById('leadForm');
-    const leadStatus = document.getElementById('leadStatus');
-    const leadSubmit = document.getElementById('leadSubmit');
-
-    leadForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      leadStatus.className = 'form-status';
-      leadStatus.textContent = '';
-      const data = Object.fromEntries(new FormData(leadForm).entries());
-      const required = ['business_name', 'contact_name', 'email', 'phone', 'screens', 'interest'];
-      for (const field of required) {
-        if (!data[field] || String(data[field]).trim() === '') {
-          leadStatus.className = 'form-status error';
-          leadStatus.textContent = 'Please fill in the required details.';
-          return;
-        }
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        leadStatus.className = 'form-status error';
-        leadStatus.textContent = 'Please enter a valid email address.';
-        return;
-      }
-
-      const payload = {
-        name: data.contact_name,
-        email: data.email,
-        company: data.business_name,
-        screens: data.screens,
-        multi_tenant: 'single',
-        hosting: 'hosted',
-        message: `Phone: ${data.phone}\nInterested in: ${data.interest}\n\n${data.message || ''}`,
-        fax_number: data.fax_number
-      };
-
-      leadSubmit.disabled = true;
-      leadSubmit.textContent = 'Sending...';
-      try {
-        const response = await fetch('/api/contact/enterprise', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (response.ok) {
-          leadStatus.className = 'form-status success';
-          leadStatus.textContent = "Thanks, we'll be in touch shortly.";
-          leadForm.reset();
-        } else {
-          leadStatus.className = 'form-status error';
-          leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
-        }
-      } catch (error) {
-        leadStatus.className = 'form-status error';
-        leadStatus.textContent = 'Network error. Please try again.';
-      } finally {
-        leadSubmit.disabled = false;
-        leadSubmit.textContent = 'Get Started';
-      }
-    });
-  </script>
 </body>
 </html>
