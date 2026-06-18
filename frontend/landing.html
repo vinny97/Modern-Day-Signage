@@ -3,829 +3,510 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Primary SEO -->
-  <title>ScreenTinker - Fully Managed Digital Signage for Small Businesses in the UK</title>
-  <meta name="description" content="Fully managed digital signage for small businesses across the UK. Screens, graphics, and scheduling from £30/month. Manage TVs, video walls, kiosks, and schedules from anywhere.">
-  <meta name="keywords" content="digital signage, managed digital signage, UK digital signage, small business digital signage, signage screens, digital signage graphics, digital signage scheduling, digital signage cms, video wall software, kiosk software, screen management">
-  <meta name="author" content="Screenfizz">
+  <title>Modern Day Displays | Digital Signage Made Simple</title>
+  <meta name="description" content="Simple digital signage for UK businesses. Choose ScreenFizz self-service from £5/month or a managed service from £15/month where we handle updates for you.">
+  <meta name="keywords" content="digital signage, managed digital signage, ScreenFizz, digital signage UK, signage screens, business displays">
+  <meta name="author" content="Modern Day Displays">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://screenfizzcom/">
-
-  <!-- Open Graph / Facebook -->
+  <link rel="canonical" href="https://screenfizz.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://screenfizz.com/">
-  <meta property="og:title" content="ScreenTinker - Fully Managed Digital Signage for UK Small Businesses">
-  <meta property="og:description" content="Screens, graphics, and scheduling from £30/month. Fully managed digital signage for small businesses across the UK.">
-  <meta property="og:image" content="https://screentinker.com/assets/dashboard-preview.png">
-  <meta property="og:image:width" content="2500">
-  <meta property="og:image:height" content="1314">
-  <meta property="og:image:alt" content="ScreenTinker digital signage dashboard showing four online displays with playlist assignments">
-  <meta property="og:site_name" content="ScreenTinker">
-
-  <!-- Twitter -->
+  <meta property="og:title" content="Modern Day Displays | Digital Signage Made Simple">
+  <meta property="og:description" content="Choose complete control with ScreenFizz or a fully managed service where we handle everything for you.">
+  <meta property="og:image" content="https://screenfizz.com/assets/dashboard-preview.png">
+  <meta property="og:site_name" content="Modern Day Displays">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ScreenFizz - Fully Managed Digital Signage for UK Small Businesses">
-  <meta name="twitter:description" content="Screens, graphics, and scheduling from £30/month. Fully managed digital signage for small businesses across the UK.">
-  <meta name="twitter:image" content="https://screentinker.com/assets/dashboard-preview.png">
-  <meta name="twitter:image:alt" content="ScreenTinker digital signage dashboard showing four online displays with playlist assignments">
-
-  <!-- Theme -->
+  <meta name="twitter:title" content="Modern Day Displays | Digital Signage Made Simple">
+  <meta name="twitter:description" content="Self-service or managed digital signage for busy businesses.">
+  <meta name="twitter:image" content="https://screenfizz.com/assets/dashboard-preview.png">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/assets/screenfizz-logo.png">
   <link rel="apple-touch-icon" href="/assets/screenfizz-logo.png">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    :root { --accent:#3b82f6; --bg:#ffffff; --card:#f8fafc; --border:#e5e7eb; --text:#111827; --muted:#4b5563; --dim:#6b7280; }
-    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
-    a { color:var(--accent); text-decoration:none; }
-
-    /* Nav */
-    nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-    .nav-inner { max-width:1200px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
-    .nav-logo { display:flex; align-items:center; flex-shrink:0; }
-    .nav-logo img { display:block; width:184px; height:auto; }
-    .nav-links a { color:var(--muted); margin-left:24px; font-size:14px; transition:color 0.2s; }
-    .nav-links a:hover { color:var(--text); }
-    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:8px; font-weight:600; font-size:14px; transition:all 0.2s; border:none; cursor:pointer; }
-    .btn-primary { background:var(--accent); color:white; }
-    .btn-primary:hover { background:#2563eb; }
-    .btn-outline { background:transparent; color:var(--accent); border:1px solid var(--accent); }
-    .btn-outline:hover { background:rgba(59,130,246,0.1); }
-
-    /* Hero */
-    .hero { padding:140px 24px 80px; text-align:center; max-width:900px; margin:0 auto; }
-    .hero h1 { font-size:clamp(36px,5vw,64px); font-weight:800; line-height:1.1; margin-bottom:20px; }
-    .hero h1 span { background:linear-gradient(135deg,#3b82f6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .hero p { font-size:clamp(16px,2vw,20px); color:var(--muted); max-width:600px; margin:0 auto 32px; }
-    .hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .hero-badge { display:inline-block; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:6px 16px; font-size:13px; color:var(--muted); margin-bottom:24px; }
-
-    /* Screenshot */
-    .screenshot { max-width:1100px; margin:0 auto 80px; padding:0 24px; }
-    .screenshot img, .screenshot .mock { width:100%; max-width:100%; height:auto; display:block; border-radius:12px; border:1px solid var(--border); box-shadow:0 20px 60px rgba(0,0,0,0.5); }
-    .mock { background:var(--card); aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:18px; }
-
-    /* Features */
-    .features { max-width:1200px; margin:0 auto; padding:80px 24px; }
-    .features h2 { text-align:center; font-size:36px; margin-bottom:12px; }
-    .features .subtitle { text-align:center; color:var(--muted); margin-bottom:48px; font-size:18px; }
-    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
-    .feature-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:28px; transition:border-color 0.2s; }
-    .feature-card:hover { border-color:var(--accent); }
-    .feature-icon { font-size:32px; margin-bottom:12px; }
-    .feature-card h3 { font-size:18px; margin-bottom:8px; }
-    .feature-card p { color:var(--muted); font-size:14px; }
-
-    /* Platforms */
-    .platforms { max-width:1200px; margin:0 auto; padding:80px 24px; text-align:center; }
-    .platforms h2 { font-size:36px; margin-bottom:12px; }
-    .platforms .subtitle { color:var(--muted); margin-bottom:40px; font-size:18px; }
-    .platform-grid { display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
-    .platform-item { text-align:center; width:100px; }
-    .platform-item .icon { font-size:40px; margin-bottom:8px; }
-    .platform-item .name { font-size:13px; color:var(--muted); }
-
-    /* Modal (mirrors frontend/css/main.css conventions so screenshots look
-       consistent across landing and dashboard; copied inline since
-       landing.html doesn't import main.css). */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; padding:16px; }
-    .modal { background:var(--card); border:1px solid var(--border); border-radius:12px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; }
-    .modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
-    .modal-header h3 { font-size:18px; margin:0; }
-    .modal-close { background:none; border:none; color:var(--muted); font-size:24px; cursor:pointer; padding:0; line-height:1; }
-    .modal-body { padding:20px 24px; }
-    .modal-description { color:var(--muted); font-size:14px; margin-bottom:16px; }
-    .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:12px; justify-content:flex-end; }
-    .modal-body label { display:block; margin-bottom:12px; font-size:13px; color:var(--text); }
-    .modal-body input, .modal-body select, .modal-body textarea { width:100%; margin-top:4px; padding:8px 10px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:14px; font-family:inherit; box-sizing:border-box; }
-    .modal-body input:focus, .modal-body select:focus, .modal-body textarea:focus { outline:none; border-color:var(--accent); }
-    .modal-body textarea { resize:vertical; }
-    .contact-status-success { color:#10b981; font-size:13px; }
-    .contact-status-error { color:#f87171; font-size:13px; }
-
-    /* Pricing */
-    .pricing { max-width:1200px; margin:0 auto; padding:80px 24px; }
-    .pricing h2 { text-align:center; font-size:36px; margin-bottom:12px; }
-    .pricing .subtitle { text-align:center; color:var(--muted); margin:0 auto 32px; font-size:18px; max-width:720px; }
-    .pricing-shell { background:#f8fafc; color:#111827; border:1px solid rgba(148,163,184,0.35); border-radius:18px; padding:28px; box-shadow:0 24px 80px rgba(0,0,0,0.28); }
-    .pricing-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; max-width:760px; margin:0 auto 42px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:16px; }
-    .pricing-tab { appearance:none; border:0; background:transparent; color:#6b7280; border-radius:12px; padding:13px 16px; font:inherit; font-weight:800; cursor:pointer; }
-    .pricing-tab.active { background:#fff; color:#111827; box-shadow:0 4px 18px rgba(15,23,42,0.12); }
-    .pricing-panel { display:none; }
-    .pricing-panel.active { display:block; }
-    .managed-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
-    .service-card { background:#fff; border:1px solid #e5e7eb; border-top:4px solid #dc2626; border-radius:22px; padding:30px; display:flex; flex-direction:column; min-height:660px; box-shadow:0 14px 40px rgba(15,23,42,0.08); }
-    .service-card.featured { border-color:#fecaca; border-top-color:#dc2626; }
-    .service-card.value { border-color:#bbf7d0; border-top-color:#16a34a; }
-    .plan-badge { display:inline-flex; align-items:center; border-radius:999px; border:1px solid #fecaca; background:#fef2f2; color:#991b1b; padding:7px 16px; font-size:12px; font-weight:900; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:24px; }
-    .plan-badge.green { border-color:#bbf7d0; background:#f0fdf4; color:#166534; }
-    .service-card h3, .self-card h3 { font-size:26px; line-height:1.15; margin-bottom:14px; }
-    .plan-copy { color:#6b7280; font-size:16px; line-height:1.6; margin-bottom:24px; }
-    .price-box { border:1px solid #e5e7eb; background:#f9fafb; border-radius:14px; padding:24px; margin-bottom:26px; }
-    .price-line { display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap; }
-    .amount { font-size:56px; line-height:0.95; font-weight:900; letter-spacing:0; color:#030712; }
-    .price-unit { color:#6b7280; font-size:16px; padding-bottom:7px; }
-    .vat { color:#9ca3af; font-size:13px; margin-top:8px; }
-    .price-note { margin-top:14px; color:#b91c1c; font-size:14px; font-weight:800; }
-    .price-note.green { color:#15803d; }
-    .feature-list { list-style:none; margin:0 0 28px; padding:0; display:flex; flex-direction:column; gap:14px; }
-    .feature-list li { color:#4b5563; font-size:15px; line-height:1.45; display:flex; gap:12px; align-items:flex-start; }
-    .feature-list li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:999px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:13px; font-weight:900; flex:0 0 20px; margin-top:1px; }
-    .feature-list.green li::before { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
-    .custom-builder { display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
-    .custom-row { display:grid; grid-template-columns:1fr 86px; gap:12px; align-items:center; border:1px solid #e5e7eb; background:#fff; border-radius:12px; padding:14px; }
-    .custom-row label { color:#111827; font-size:14px; font-weight:800; }
-    .custom-rate { color:#6b7280; font-size:12px; margin-top:2px; }
-    .custom-row input { width:100%; min-height:44px; border:1px solid #d1d5db; border-radius:10px; padding:8px 10px; color:#111827; font:inherit; font-weight:800; text-align:center; }
-    .custom-total { border:1px solid #bbf7d0; background:#f0fdf4; border-radius:14px; padding:16px; margin-bottom:22px; }
-    .custom-total-line { display:flex; justify-content:space-between; gap:12px; color:#166534; font-size:14px; margin-bottom:6px; }
-    .custom-total-line.muted { color:#6b7280; }
-    .custom-total-line.final { color:#052e16; font-size:20px; font-weight:900; margin:10px 0 0; padding-top:10px; border-top:1px solid #bbf7d0; }
-    .plan-action { margin-top:auto; width:100%; justify-content:center; padding:14px 20px; font-size:16px; background:#dc2626; color:#fff; border-color:#dc2626; }
-    .plan-action:hover { background:#b91c1c; }
-    .plan-action.ghost { background:#fff; color:#991b1b; border-color:#fecaca; }
-    .plan-action.green { background:#16a34a; border-color:#16a34a; }
-    .self-layout { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:24px; align-items:start; }
-    .self-card, .tier-explainer, .tier-compare-card { background:#fff; border:1px solid #e5e7eb; border-top:4px solid #dc2626; border-radius:18px; padding:30px; }
-    .self-card .plan-badge { border-color:#bbf7d0; background:#f0fdf4; color:#166534; }
-    .tier-explainer { border-top:0; background:#fbfbfb; }
-    .eyebrow { color:#8b8b8b; font-size:11px; font-weight:900; letter-spacing:2px; text-transform:uppercase; margin-bottom:22px; }
-    .comparison-list { list-style:none; margin:26px 0 0; padding:0; }
-    .comparison-list li { display:grid; grid-template-columns:22px 1fr auto; gap:12px; align-items:start; padding:14px 0; border-bottom:1px solid #e5e7eb; color:#4b5563; font-size:14px; }
-    .comparison-list li::before { content:'✓'; display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:6px; background:#fef2f2; color:#b91c1c; font-weight:900; }
-    .comparison-list li.unavailable::before { content:'×'; background:#f3f4f6; color:#9ca3af; }
-    .tier-only { color:#991b1b; background:#fee2e2; border-radius:4px; padding:3px 6px; font-size:10px; font-weight:900; white-space:nowrap; }
-    .managed-nudge { margin-top:28px; padding:18px; border:1px solid #e5e7eb; border-radius:14px; background:#fff; }
-    .compare-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
-    .tier-compare-card { border-top-color:#16a34a; }
-    .tier-compare-card.self { border-top-color:#dc2626; }
-    .tier-compare-table { width:100%; border-collapse:collapse; margin-top:24px; font-size:14px; }
-    .tier-compare-table th, .tier-compare-table td { border-bottom:1px solid #e5e7eb; padding:13px 12px; text-align:left; color:#4b5563; vertical-align:top; }
-    .tier-compare-table th { color:#111827; font-weight:900; background:#f9fafb; }
-    .tier-compare-table td:first-child { font-weight:800; color:#111827; }
-    .compare-page-link { text-align:center; margin-top:24px; }
-
-    /* CTA */
-    .cta { text-align:center; padding:80px 24px; background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1)); border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:80px 0; }
-    .cta h2 { font-size:36px; margin-bottom:12px; }
-    .cta p { color:var(--muted); margin-bottom:24px; font-size:18px; }
-
-    /* Footer */
-    footer { max-width:1200px; margin:0 auto; padding:40px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; border-top:1px solid var(--border); }
-    footer .links a { color:var(--dim); margin-left:16px; font-size:13px; }
-
-    /* Horizontal-scroll wrapper for wide tables on mobile */
-    .table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-
-    .nav-links { display:flex; align-items:center; flex-wrap:nowrap; }
-    .btn-short { display:none; }
-    @media (max-width:768px) {
-      /* Hide section anchor links on mobile; keep Try Free + Sign In */
-      .nav-links a:not(.btn) { display:none; }
-      .nav-inner { padding:12px 14px; gap:8px; }
-      .nav-links .btn { padding:8px 12px; font-size:13px; margin-left:8px !important; flex-shrink:0; min-height:0; }
-      .btn-full { display:none; }
-      .btn-short { display:inline; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --ink:#172033;
+      --muted:#5b6575;
+      --soft:#f6f8fb;
+      --line:#dfe5ee;
+      --blue:#2563eb;
+      --blue-dark:#1d4ed8;
+      --green:#12805c;
+      --red:#c2410c;
+      --gold:#f2b705;
+      --white:#ffffff;
     }
-    @media (max-width:420px) {
-      .nav-logo img { width:136px; }
+    html { scroll-behavior:smooth; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; color:var(--ink); background:var(--white); line-height:1.6; }
+    a { color:inherit; text-decoration:none; }
+    img { max-width:100%; display:block; }
+    nav { position:sticky; top:0; z-index:50; background:rgba(255,255,255,0.94); border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
+    .nav-inner { max-width:1180px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:900; color:var(--ink); min-width:0; }
+    .brand img { width:46px; height:46px; border-radius:8px; }
+    .brand-text { display:flex; flex-direction:column; line-height:1.1; }
+    .brand-main { font-size:16px; }
+    .brand-sub { font-size:12px; color:var(--muted); font-weight:700; }
+    .nav-links { display:flex; align-items:center; gap:20px; color:#3c4656; font-size:14px; font-weight:700; }
+    .nav-links a:hover { color:var(--blue); }
+    .nav-cta { display:flex; align-items:center; gap:10px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:10px 18px; border-radius:8px; border:1px solid transparent; font-weight:800; font-size:14px; cursor:pointer; transition:background 0.2s,border-color 0.2s,color 0.2s,transform 0.2s; font-family:inherit; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--blue); color:#fff; }
+    .btn-primary:hover { background:var(--blue-dark); }
+    .btn-outline { border-color:#b8c4d6; color:var(--ink); background:#fff; }
+    .btn-outline:hover { border-color:var(--blue); color:var(--blue); }
+    .btn-dark { background:var(--ink); color:#fff; }
+    .btn-dark:hover { background:#0f172a; }
+    .section { max-width:1180px; margin:0 auto; padding:86px 22px; }
+    .section-tight { padding-top:58px; padding-bottom:58px; }
+    .eyebrow { color:var(--blue); font-size:12px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+    h1, h2, h3 { letter-spacing:0; line-height:1.08; }
+    h1 { font-size:clamp(42px,7vw,78px); max-width:860px; margin-bottom:24px; }
+    h2 { font-size:clamp(30px,4vw,48px); margin-bottom:14px; }
+    h3 { font-size:24px; margin-bottom:12px; }
+    p { color:var(--muted); }
+    .hero { position:relative; overflow:hidden; background:linear-gradient(180deg,#eef5ff 0%,#fff 78%); }
+    .hero .section { display:grid; grid-template-columns:minmax(0,1.03fr) minmax(360px,0.8fr); gap:46px; align-items:center; padding-top:96px; padding-bottom:70px; }
+    .hero-copy > p { font-size:clamp(17px,2vw,21px); max-width:720px; margin-bottom:30px; }
+    .hero-actions, .button-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .hero-proof { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:34px; max-width:720px; }
+    .proof-item { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px; }
+    .proof-item strong { display:block; color:var(--ink); font-size:20px; line-height:1.1; }
+    .proof-item span { color:var(--muted); font-size:13px; }
+    .screen-scene { position:relative; min-height:480px; }
+    .display-frame { position:absolute; inset:28px 0 auto 0; aspect-ratio:16/10; background:#101827; border:12px solid #182235; border-radius:18px; box-shadow:0 28px 70px rgba(23,32,51,0.22); overflow:hidden; }
+    .display-frame img { width:100%; height:100%; object-fit:cover; opacity:0.9; }
+    .display-banner { position:absolute; left:26px; right:26px; bottom:24px; background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.8); border-radius:8px; padding:16px; display:flex; justify-content:space-between; gap:16px; align-items:center; box-shadow:0 12px 34px rgba(15,23,42,0.18); }
+    .display-banner strong { display:block; color:var(--ink); }
+    .display-banner span { color:var(--muted); font-size:13px; }
+    .display-stand { position:absolute; left:50%; top:360px; width:90px; height:74px; transform:translateX(-50%); border-bottom:18px solid #182235; border-left:16px solid transparent; border-right:16px solid transparent; }
+    .display-base { position:absolute; left:50%; top:430px; width:210px; height:20px; transform:translateX(-50%); background:#182235; border-radius:999px; }
+    .split-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:30px; box-shadow:0 18px 48px rgba(15,23,42,0.06); }
+    .solution-card { display:flex; flex-direction:column; min-height:100%; border-top:5px solid var(--green); }
+    .solution-card.managed { border-top-color:var(--blue); }
+    .card-kicker { display:inline-flex; width:max-content; border:1px solid #c8e8dc; background:#f0fdf7; color:var(--green); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:900; margin-bottom:18px; }
+    .managed .card-kicker { border-color:#c7d8ff; background:#eef4ff; color:var(--blue); }
+    .feature-list { list-style:none; display:flex; flex-direction:column; gap:12px; margin:24px 0 28px; }
+    .feature-list li { color:#3f4a5b; display:flex; gap:10px; align-items:flex-start; }
+    .feature-list li::before { content:""; width:8px; height:8px; margin-top:9px; border-radius:999px; background:var(--green); flex:0 0 8px; }
+    .managed .feature-list li::before, .pro-band .feature-list li::before { background:var(--blue); }
+    .solution-card .btn { margin-top:auto; width:max-content; }
+    .pro-band { background:#172033; color:#fff; }
+    .pro-band .section { display:grid; grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr); gap:36px; align-items:center; }
+    .pro-band p, .pro-band li { color:#d3dbe8; }
+    .pro-panel { background:#fff; color:var(--ink); border-radius:8px; padding:28px; }
+    .pro-panel p, .pro-panel li { color:var(--muted); }
+    .pricing-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin-top:34px; }
+    .price-card { display:flex; flex-direction:column; border-top:5px solid var(--green); }
+    .price-card.managed { border-top-color:var(--blue); }
+    .price-card.pro { border-top-color:var(--gold); }
+    .price { display:flex; align-items:flex-end; gap:7px; margin:20px 0 8px; }
+    .amount { color:var(--ink); font-size:52px; line-height:0.9; font-weight:900; }
+    .unit { color:var(--muted); padding-bottom:5px; font-weight:700; }
+    .hardware-note { margin-top:6px; color:#7b8493; font-size:14px; }
+    .price-card .btn { margin-top:auto; }
+    .hardware { background:var(--soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .hardware-layout { display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.05fr); gap:34px; align-items:center; }
+    .player-visual { background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px; min-height:340px; display:flex; align-items:center; justify-content:center; }
+    .player-box { width:min(100%,420px); aspect-ratio:16/10; background:#172033; border-radius:18px; position:relative; box-shadow:0 24px 60px rgba(23,32,51,0.22); }
+    .player-box::before { content:"ScreenFizz Player"; position:absolute; left:28px; top:24px; color:#fff; font-weight:900; font-size:20px; }
+    .player-box::after { content:"£60 one-time"; position:absolute; right:24px; bottom:22px; color:#172033; background:#fff; border-radius:999px; padding:8px 14px; font-weight:900; }
+    .player-light { position:absolute; left:30px; bottom:28px; width:12px; height:12px; border-radius:999px; background:#22c55e; box-shadow:0 0 0 8px rgba(34,197,94,0.14); }
+    .industries-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:30px; }
+    .industry { border:1px solid var(--line); background:#fff; border-radius:8px; padding:18px; }
+    .industry strong { display:block; margin-bottom:4px; }
+    .outcomes { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:30px; }
+    .outcome { background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:20px; }
+    .contact { background:#f8fbff; border-top:1px solid var(--line); }
+    .contact-layout { display:grid; grid-template-columns:minmax(0,0.85fr) minmax(360px,1fr); gap:34px; align-items:start; }
+    form { background:#fff; border:1px solid var(--line); border-radius:8px; padding:26px; box-shadow:0 18px 48px rgba(15,23,42,0.06); }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    label { display:flex; flex-direction:column; gap:6px; color:#334155; font-size:13px; font-weight:800; }
+    input, select, textarea { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:11px 12px; min-height:44px; font:inherit; color:var(--ink); background:#fff; }
+    textarea { min-height:112px; resize:vertical; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+    .full { grid-column:1 / -1; }
+    .form-actions { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px; }
+    .form-status { min-height:20px; color:var(--muted); font-size:13px; }
+    .form-status.success { color:var(--green); }
+    .form-status.error { color:#b91c1c; }
+    footer { border-top:1px solid var(--line); }
+    .footer-inner { max-width:1180px; margin:0 auto; padding:34px 22px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
+    .footer-links { display:flex; gap:16px; flex-wrap:wrap; }
+    .footer-links a:hover { color:var(--blue); }
+    @media (max-width:980px) {
+      .nav-links { display:none; }
+      .hero .section, .pro-band .section, .hardware-layout, .contact-layout { grid-template-columns:1fr; }
+      .screen-scene { min-height:390px; }
+      .display-stand { top:300px; }
+      .display-base { top:370px; }
+      .pricing-grid, .industries-grid, .outcomes { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
-
-    @media (max-width:768px) {
-      .feature-grid { grid-template-columns:1fr; }
-      .pricing-tabs { grid-template-columns:1fr; margin-bottom:24px; }
-      .pricing-shell { padding:16px; }
-      .managed-grid, .self-layout, .compare-grid { grid-template-columns:1fr; }
-      .service-card { min-height:auto; padding:24px; }
+    @media (max-width:680px) {
+      .brand-sub { display:none; }
+      .nav-inner { padding:12px 14px; }
+      .nav-cta .btn-outline { display:none; }
+      .section { padding:62px 16px; }
+      .hero .section { padding-top:58px; }
+      .split-grid, .pricing-grid, .industries-grid, .outcomes, .hero-proof, .form-grid { grid-template-columns:1fr; }
+      .screen-scene { min-height:310px; }
+      .display-frame { inset:10px 0 auto 0; border-width:8px; border-radius:14px; }
+      .display-banner { left:14px; right:14px; bottom:14px; padding:12px; align-items:flex-start; flex-direction:column; }
+      .display-stand { top:230px; }
+      .display-base { top:296px; width:170px; }
       .amount { font-size:46px; }
-      .tier-compare-table { min-width:680px; }
-      footer { flex-direction:column; text-align:center; }
-
-      /* 44px tap targets for all buttons on mobile */
-      .btn { min-height:44px; }
-      .hero { padding:110px 16px 60px; }
-      .features, .platforms, .pricing, .compare { padding:60px 16px; }
-      .cta { padding:60px 16px; }
-      .screenshot { padding:0 16px; margin-bottom:60px; }
+      .card, form { padding:22px; }
     }
   </style>
 </head>
 <body>
-  <nav>
+  <nav aria-label="Primary navigation">
     <div class="nav-inner">
-      <div class="nav-logo">
-        <img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613">
-      </div>
+      <a class="brand" href="#home" aria-label="Modern Day Displays home">
+        <img src="/assets/screenfizz-logo.png" alt="" width="512" height="512">
+        <span class="brand-text">
+          <span class="brand-main">Modern Day Displays</span>
+          <span class="brand-sub">Powered by ScreenFizz</span>
+        </span>
+      </a>
       <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#platforms">Platforms</a>
+        <a href="#home">Home</a>
+        <a href="#solutions">Solutions</a>
         <a href="#pricing">Pricing</a>
-        <a href="/compare/pricing-tiers.html">Compare</a>
-        <a href="/app#/login" class="btn btn-outline" style="margin-left:16px">Sign In</a>
-        <a href="/app#/login" class="btn btn-primary" style="margin-left:8px"><span class="btn-full">Start Your Setup</span><span class="btn-short">Start</span></a>
+        <a href="#hardware">Hardware</a>
+        <a href="#industries">Industries</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="nav-cta">
+        <a class="btn btn-outline" href="#contact">Book Demo</a>
+        <a class="btn btn-primary" href="#pricing">View Pricing</a>
       </div>
     </div>
   </nav>
 
-  <main>
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-badge">&#9889; Fully managed &middot; UK small businesses &middot; From &pound;30/month</div>
-    <h1>Fully Managed Digital Signage<br>for <span>UK Small Businesses</span></h1>
-    <p>Screens, graphics &amp; scheduling from &pound;30/month. We help you get content on TVs, displays, and kiosks without the technical hassle.</p>
-    <div class="hero-btns">
-      <a href="/app#/login" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Start Your Setup</a>
-      <a href="/compare/pricing-tiers.html" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Compare Both Tiers</a>
-    </div>
-  </section>
-
-  <!-- Dashboard preview -->
-  <div class="screenshot">
-    <img src="/assets/dashboard-preview.png" alt="ScreenTinker digital signage dashboard showing 4 online displays with playlist assignments" loading="lazy" width="2500" height="1314">
-  </div>
-
-  <!-- Managed service callout -->
-  <section class="managed-service" id="managed-service" style="max-width:900px;margin:0 auto;padding:40px 24px;text-align:center">
-    <h2 style="font-size:28px;margin-bottom:12px">A Done-For-You Signage Service</h2>
-    <p style="color:var(--muted);font-size:16px;margin-bottom:20px">We handle the screens, graphics, scheduling, monitoring, and support, so your displays stay current without adding another job to your day.</p>
-    <a href="/app#/login" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px">Start Your Setup</a>
-  </section>
-
-  <!-- Features -->
-  <section class="features" id="features">
-    <h2>Everything You Need</h2>
-    <p class="subtitle">One platform to manage all your digital signage</p>
-    <div class="feature-grid">
-      <div class="feature-card"><div class="feature-icon">&#128250;</div><h3>Multi-Zone Layouts</h3><p>Split screens into zones with a drag-and-drop editor. 7 built-in templates or create your own.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#127916;</div><h3>Video Wall</h3><p>Combine multiple displays into one giant screen. Automatic bezel compensation. Any grid size.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128421;</div><h3>Remote Control</h3><p>See what's on screen in real-time. Send key presses, navigate menus, power on/off remotely.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128197;</div><h3>Scheduling</h3><p>Visual weekly calendar with recurrence rules. Schedule per device or for whole groups — device rules override the group.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#127926;</div><h3>Playlists</h3><p>Share one playlist across many displays. Draft changes, preview, then publish — or revert to the last published version.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#127970;</div><h3>Directory Board</h3><p>Scrolling lobby, building, and staff directories. Categories, dark &amp; light themes, anti-burn-in.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128295;</div><h3>Content Designer</h3><p>Built-in editor with live clocks, weather, RSS tickers, countdowns, QR codes, and more.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128433;</div><h3>Kiosk Mode</h3><p>Create interactive touchscreen interfaces. Wayfinding, directories, check-in screens.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128202;</div><h3>Proof-of-Play</h3><p>Track what played, when, and on which device. Export CSV reports for ad verification.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128276;</div><h3>Alerts & Monitoring</h3><p>Email alerts when devices go offline. Full telemetry: battery, storage, WiFi, uptime.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128268;</div><h3>Offline Resilience</h3><p>Displays keep playing cached content when the internet or your server drops. They catch up automatically when you're back.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128241;</div><h3>Mobile Dashboard</h3><p>Manage everything from your phone. The full dashboard works on any mobile browser — no separate app needed.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128274;</div><h3>Managed Setup</h3><p>We help configure your screens, schedules, and content so your display network is ready to run.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#127912;</div><h3>White Label</h3><p>Custom branding, colors, logo, and domain. Resell under your own brand.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128101;</div><h3>Teams</h3><p>Multi-user accounts with owner, editor, and viewer roles. Invite by email.</p></div>
-      <div class="feature-card"><div class="feature-icon">&#128260;</div><h3>Auto-Update</h3><p>Devices automatically update when you push a new version. Zero manual intervention.</p></div>
-    </div>
-  </section>
-
-  <!-- Platforms -->
-  <section class="platforms" id="platforms">
-    <h2>Runs on Everything</h2>
-    <p class="subtitle">No hardware lock-in. Use any screen you already have.</p>
-    <div class="platform-grid">
-      <div class="platform-item"><div class="icon">&#129302;</div><div class="name">Android TV</div></div>
-      <div class="platform-item"><div class="icon">&#128293;</div><div class="name">Fire TV</div></div>
-      <div class="platform-item"><div class="icon">&#129359;</div><div class="name">Raspberry Pi</div></div>
-      <div class="platform-item"><div class="icon">&#128187;</div><div class="name">Windows</div></div>
-      <div class="platform-item"><div class="icon">&#127760;</div><div class="name">ChromeOS</div></div>
-      <div class="platform-item"><div class="icon">&#128250;</div><div class="name">LG webOS</div></div>
-      <div class="platform-item"><div class="icon">&#128250;</div><div class="name">Samsung Tizen</div></div>
-      <div class="platform-item"><div class="icon">&#127758;</div><div class="name">Any Browser</div></div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
-  <section class="pricing" id="pricing">
-    <h2>Choose How Hands-On You Want To Be</h2>
-    <p class="subtitle">Two simple tiers: fully managed signage where we handle everything, or a self-service account where you manage your own screens.</p>
-    <div class="pricing-shell">
-      <div class="pricing-tabs" role="tablist" aria-label="Pricing tiers">
-        <button class="pricing-tab active" type="button" data-pricing-tab="managed" role="tab" aria-selected="true">Tier 1 — We manage everything</button>
-        <button class="pricing-tab" type="button" data-pricing-tab="self" role="tab" aria-selected="false">Tier 2 — You manage your screens</button>
-        <button class="pricing-tab" type="button" data-pricing-tab="compare" role="tab" aria-selected="false">Compare both tiers</button>
-      </div>
-
-      <div class="pricing-panel active" id="pricing-managed" role="tabpanel">
-        <div class="managed-grid">
-          <article class="service-card">
-            <h3>Starter</h3>
-            <p class="plan-copy">Indoor menu or price display. We update it whenever your items or prices change — you submit the request, we handle the rest.</p>
-            <div class="price-box">
-              <div class="price-line"><span class="amount">&pound;30</span><span class="price-unit">/ screen / month</span></div>
-              <div class="vat">inc. VAT &middot; &pound;25.00 ex. VAT</div>
-              <div class="price-note">Regular content updates included</div>
-            </div>
-            <ul class="feature-list">
-              <li>Remote scheduling &amp; management</li>
-              <li>Graphics designed by our team</li>
-              <li>Requests via your customer portal</li>
-              <li>You approve before anything goes live</li>
-            </ul>
-            <a href="/app#/login" class="btn plan-action ghost">Get Started</a>
-          </article>
-
-          <article class="service-card featured">
-            <div class="plan-badge">Most Popular</div>
-            <h3>Pro Digital</h3>
-            <p class="plan-copy">High-brightness screen for your window. Stops people outside and brings them in — we create, you approve, we schedule.</p>
-            <div class="price-box">
-              <div class="price-line"><span class="amount">&pound;75</span><span class="price-unit">/ screen / month</span></div>
-              <div class="vat">inc. VAT &middot; &pound;62.50 ex. VAT</div>
-              <div class="price-note">Monthly creative refresh included</div>
-            </div>
-            <ul class="feature-list">
-              <li>Remote scheduling &amp; management</li>
-              <li>Graphics designed by our team</li>
-              <li>Requests via your customer portal</li>
-              <li>You approve before anything goes live</li>
-            </ul>
-            <a href="/app#/login" class="btn plan-action">Get Started</a>
-          </article>
-
-          <article class="service-card value">
-            <div class="plan-badge green">Custom</div>
-            <h3>Custom</h3>
-            <p class="plan-copy">Build the fully managed setup around your space. Choose how many menu screens and shop/window screens you need, then get 10% off the monthly total.</p>
-            <div class="custom-builder">
-              <div class="custom-row">
-                <div>
-                  <label for="customMenuScreens">Menu screens</label>
-                  <div class="custom-rate">&pound;20 per screen / month</div>
-                </div>
-                <input id="customMenuScreens" class="custom-price-input" type="number" min="0" max="99" step="1" value="1" inputmode="numeric">
-              </div>
-              <div class="custom-row">
-                <div>
-                  <label for="customWindowScreens">Shop/window screens</label>
-                  <div class="custom-rate">&pound;40 per screen / month</div>
-                </div>
-                <input id="customWindowScreens" class="custom-price-input" type="number" min="0" max="99" step="1" value="1" inputmode="numeric">
-              </div>
-            </div>
-            <div class="custom-total" aria-live="polite">
-              <div class="custom-total-line muted"><span>Subtotal</span><strong id="customSubtotal">&pound;60/month</strong></div>
-              <div class="custom-total-line"><span>Custom discount (10%)</span><strong id="customDiscount">-&pound;6/month</strong></div>
-              <div class="custom-total-line final"><span>Total</span><strong id="customTotal">&pound;54/month</strong></div>
-            </div>
-            <ul class="feature-list green">
-              <li>10% discount applied to your custom package</li>
-              <li>Fully managed scheduling across every screen</li>
-              <li>Graphics designed by our team</li>
-              <li>You approve before anything goes live</li>
-            </ul>
-            <a href="/app#/login" class="btn plan-action green">Get Started</a>
-          </article>
-        </div>
-      </div>
-
-      <div class="pricing-panel" id="pricing-self" role="tabpanel">
-        <div class="self-layout">
-          <article class="self-card">
-            <div class="plan-badge">Self-Managed Account</div>
-            <h3>Self-manage account</h3>
-            <p class="plan-copy">Log in to your ScreenFizz account, upload your own graphics, and schedule your content — on any screen, any time.</p>
-            <div class="price-box">
-              <div class="price-line"><span class="amount">&pound;5</span><span class="price-unit">/ screen / month</span></div>
-              <div class="vat">inc. VAT &middot; &pound;4.17 ex. VAT</div>
-              <div class="price-note">&pound;50 one-time media player fee — yours to keep</div>
-            </div>
-            <ul class="feature-list">
-              <li>Account login &amp; scheduling dashboard</li>
-              <li>Unlimited content uploads</li>
-              <li>Pre-built template library included</li>
-              <li>AI assistant for help &amp; guidance</li>
-              <li>&pound;50 upfront Pi media player included — yours to keep</li>
-              <li>5GB storage — add more for &pound;5/month</li>
-            </ul>
-            <a href="/app#/login" class="btn plan-action">Get Started</a>
-          </article>
-
-          <aside class="tier-explainer">
-            <div class="eyebrow">How Tier 2 compares to Tier 1</div>
-            <h3>You're in the driving seat.</h3>
-            <p class="plan-copy">Full control at a lower monthly cost. Here's what you manage yourself — and what Tier 1 handles for you.</p>
-            <ul class="comparison-list">
-              <li><span><strong>You upload your own graphics.</strong> Your team creates the content — you upload directly to your portal.</span></li>
-              <li><span><strong>You schedule your own content.</strong> Choose what plays, when, and for how long — from your dashboard.</span></li>
-              <li><span><strong>Ready-to-use templates.</strong> Pre-built designs you can customise — no design experience needed.</span></li>
-              <li class="unavailable"><span>Graphics created by our team</span><span class="tier-only">Tier 1 only</span></li>
-              <li class="unavailable"><span>Scheduling managed entirely by ScreenTinker</span><span class="tier-only">Tier 1 only</span></li>
-              <li class="unavailable"><span>Monthly design requests with approval workflow</span><span class="tier-only">Tier 1 only</span></li>
-            </ul>
-            <div class="managed-nudge">
-              <p style="margin-bottom:12px;color:#4b5563">Want it fully managed? <strong>Tier 1 starts from &pound;30/month.</strong></p>
-              <button class="btn plan-action" type="button" data-pricing-tab="managed">View Tier 1</button>
-            </div>
-          </aside>
-        </div>
-      </div>
-
-      <div class="pricing-panel" id="pricing-compare" role="tabpanel">
-        <div class="compare-grid">
-          <article class="tier-compare-card">
-            <div class="plan-badge green">Tier 1</div>
-            <h3>Fully managed service</h3>
-            <p class="plan-copy">Best when you want the screens, graphics, scheduling, updates, and support handled for you.</p>
-          </article>
-          <article class="tier-compare-card self">
-            <div class="plan-badge">Tier 2</div>
-            <h3>Self-service account</h3>
-            <p class="plan-copy">Best when you already have graphics or a team member who can upload, schedule, and update screens.</p>
-          </article>
-        </div>
-        <div class="table-scroll">
-          <table class="tier-compare-table">
-            <thead><tr><th>What you get</th><th>Tier 1 — Fully managed</th><th>Tier 2 — Self-service</th></tr></thead>
-            <tbody>
-              <tr><td>Starting price</td><td>&pound;30/screen/month inc. VAT</td><td>&pound;5/screen/month inc. VAT + &pound;50 media player</td></tr>
-              <tr><td>Content creation</td><td>Graphics designed by our team</td><td>You upload your own graphics</td></tr>
-              <tr><td>Scheduling</td><td>We schedule updates for you</td><td>You schedule content from the dashboard</td></tr>
-              <tr><td>Approvals</td><td>You approve before anything goes live</td><td>You publish your own changes</td></tr>
-              <tr><td>Best for</td><td>Busy cafes, salons, takeaways, clinics, and shops that want everything handled</td><td>Businesses with their own content or staff who want direct control</td></tr>
-              <tr><td>Support</td><td>Managed requests, monitoring, and help included</td><td>Account support and help guidance included</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="compare-page-link">
-          <a href="/compare/pricing-tiers.html" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Open Full Tier Compare Page</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Resources / internal linking for SEO -->
-  <section class="resources" id="resources" style="max-width:1000px;margin:0 auto;padding:60px 24px;">
-    <h2 style="text-align:center;font-size:32px;margin-bottom:8px">Resources</h2>
-    <p style="text-align:center;color:var(--muted);margin-bottom:32px">Setup guides and honest comparisons.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
-      <a href="/guides/raspberry-pi-digital-signage.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Guide</div>
-        <div style="font-weight:600;margin-bottom:4px">How to set up digital signage on Raspberry Pi</div>
-        <div style="font-size:13px;color:var(--muted)">Hardware, OS, install script, pairing.</div>
-      </a>
-      <a href="/guides/digital-signage-android-tv.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Guide</div>
-        <div style="font-weight:600;margin-bottom:4px">Free digital signage for Android TV &amp; Fire TV</div>
-        <div style="font-size:13px;color:var(--muted)">APK sideload, kiosk mode, hardware tips.</div>
-      </a>
-      <a href="#managed-service" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Service</div>
-        <div style="font-weight:600;margin-bottom:4px">Fully managed signage setup</div>
-        <div style="font-size:13px;color:var(--muted)">Screens, graphics, scheduling, and support.</div>
-      </a>
-      <a href="/compare/pricing-tiers.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Compare</div>
-        <div style="font-weight:600;margin-bottom:4px">Fully managed vs self-service</div>
-        <div style="font-size:13px;color:var(--muted)">Which tier is right for your business.</div>
-      </a>
-      <a href="/compare/screencloud-alternative.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Compare</div>
-        <div style="font-weight:600;margin-bottom:4px">ScreenTinker vs ScreenCloud</div>
-        <div style="font-size:13px;color:var(--muted)">Pricing breakdown at scale.</div>
-      </a>
-      <a href="/compare/optisigns-alternative.html" style="display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;color:var(--text);transition:border-color 0.2s">
-        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Compare</div>
-        <div style="font-weight:600;margin-bottom:4px">ScreenTinker vs OptiSigns</div>
-        <div style="font-size:13px;color:var(--muted)">Side by side feature and price comparison.</div>
-      </a>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="cta">
-    <h2>Ready to Get Started?</h2>
-    <p>Tell us what screens you need, or start with a self-service account from &pound;5/screen/month plus a &pound;50 media player.</p>
-    <a href="/app#/login" class="btn btn-primary" style="padding:14px 32px;font-size:16px">Get Started</a>
-  </section>
-  </main>
-
-  <!-- Footer -->
-  <div style="border-top:1px solid var(--border);background:#f8fafc">
-    <div style="max-width:1200px;margin:0 auto;padding:48px 24px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px">
-      <div>
-        <img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613" style="display:block;width:184px;height:auto;margin-bottom:12px">
-        <div style="font-size:13px;color:var(--muted);line-height:1.6">Fully managed digital signage for small businesses across the UK. Screens, graphics, and scheduling from &pound;30/month.</div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Guides</div>
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
-          <a href="/guides/raspberry-pi-digital-signage.html" style="color:var(--muted)">Raspberry Pi setup</a>
-          <a href="/guides/digital-signage-android-tv.html" style="color:var(--muted)">Android TV &amp; Fire TV</a>
-          <a href="#managed-service" style="color:var(--muted)">Managed setup</a>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Compare</div>
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
-          <a href="/compare/pricing-tiers.html" style="color:var(--muted)">Tier comparison</a>
-          <a href="/compare/yodeck-alternative.html" style="color:var(--muted)">vs Yodeck</a>
-          <a href="/compare/screencloud-alternative.html" style="color:var(--muted)">vs ScreenCloud</a>
-          <a href="/compare/optisigns-alternative.html" style="color:var(--muted)">vs OptiSigns</a>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Project</div>
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
-          <a href="https://discord.gg/utTdsrqq4Z" target="_blank" rel="noopener" style="color:var(--muted)">Discord</a>
-          <a href="https://www.youtube.com/@ScreenTinker" target="_blank" rel="noopener" style="color:var(--muted)">YouTube</a>
-          <a href="/api/status" target="_blank" style="color:var(--muted)">Status</a>
-          <a href="/app#/login" style="color:var(--muted)">Sign in</a>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Legal</div>
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
-          <a href="/legal/terms.html" style="color:var(--muted)">Terms</a>
-          <a href="/legal/privacy.html" style="color:var(--muted)">Privacy</a>
-          <a href="/legal/third-party.html" style="color:var(--muted)">Licenses</a>
-        </div>
-      </div>
-    </div>
-    <div style="max-width:1200px;margin:0 auto;padding:16px 24px 32px;border-top:1px solid var(--border);color:var(--dim);font-size:13px;text-align:center">
-      &copy; 2026 ScreenTinker. All rights reserved.
-    </div>
-  </div>
-
-  <!-- Enterprise contact form modal. Opened by the Enterprise / Custom card's
-       Contact Us button. Submits to POST /api/contact/enterprise which sends
-       the inquiry via Microsoft Graph to dan@bytetinker.net. -->
-  <div class="modal-overlay" id="contactModal" style="display:none">
-    <div class="modal" role="dialog" aria-labelledby="contactModalTitle" aria-modal="true">
-      <div class="modal-header">
-        <h3 id="contactModalTitle">Enterprise Inquiry</h3>
-        <button type="button" class="modal-close" onclick="closeContactModal()" aria-label="Close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p class="modal-description">Tell us about your deployment and we'll get back to you within one business day.</p>
-        <form id="contactForm" novalidate>
-          <label>Name *<input name="name" type="text" required autocomplete="name" maxlength="200"></label>
-          <label>Email *<input name="email" type="email" required autocomplete="email" maxlength="200"></label>
-          <label>Company / organization *<input name="company" type="text" required autocomplete="organization" maxlength="200"></label>
-          <label>Estimated number of screens *<input name="screens" type="number" min="1" max="100000" required></label>
-          <label>Multi-tenant? *
-            <select name="multi_tenant" required>
-              <option value="">Select one</option>
-              <option value="single">Single organization</option>
-              <option value="multi">Multiple organizations / managing screens for multiple clients</option>
-            </select>
-          </label>
-          <label>Hosting preference *
-            <select name="hosting" required>
-              <option value="">Select one</option>
-              <option value="hosted">Hosted for me</option>
-              <option value="self">Custom hosting</option>
-              <option value="unsure">Not sure yet</option>
-            </select>
-          </label>
-          <label>Message<textarea name="message" rows="4" maxlength="5000"></textarea></label>
-          <!-- Honeypot: hidden from real users (off-screen + aria-hidden +
-               tabindex=-1), bots fill anything they see. If this comes back
-               populated, the server returns success but drops the submission.
-               Field name 'fax_number' is plausible enough to fool mid-tier
-               bots that explicitly skip the obvious 'website' name. -->
-          <div style="position:absolute;left:-9999px" aria-hidden="true">
-            <label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label>
+  <main id="home">
+    <section class="hero">
+      <div class="section">
+        <div class="hero-copy">
+          <div class="eyebrow">Simple digital signage for busy teams</div>
+          <h1>Digital Signage Made Simple</h1>
+          <p>Choose between complete control with ScreenFizz or a fully managed service where we handle everything for you.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#pricing">View Pricing</a>
+            <a class="btn btn-outline" href="#contact">Book Demo</a>
           </div>
-          <div id="contactFormStatus" style="min-height:20px;margin-top:8px"></div>
+          <div class="hero-proof" aria-label="Key benefits">
+            <div class="proof-item"><strong>Save time</strong><span>Update offers without chasing print deadlines.</span></div>
+            <div class="proof-item"><strong>Sell more</strong><span>Promote deals, menus, events, and services.</span></div>
+            <div class="proof-item"><strong>Stay current</strong><span>Change screens remotely whenever you need.</span></div>
+          </div>
+        </div>
+        <div class="screen-scene" aria-label="Digital signage preview">
+          <div class="display-frame">
+            <img src="/assets/dashboard-preview.png" alt="ScreenFizz display management preview" width="2500" height="1314">
+            <div class="display-banner">
+              <div><strong>Today&apos;s offer is live</strong><span>Fresh promotions across every screen</span></div>
+              <a class="btn btn-dark" href="#contact">Get Started</a>
+            </div>
+          </div>
+          <div class="display-stand"></div>
+          <div class="display-base"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="solutions">
+      <div class="eyebrow">Solutions</div>
+      <h2>Choose how hands-on you want to be</h2>
+      <p>Both options help you keep customers informed, promote offers, and change your screens without fuss.</p>
+      <div class="split-grid" style="margin-top:34px">
+        <article class="card solution-card" id="self-service-digital-signage">
+          <span class="card-kicker">Self-Service</span>
+          <h3>Manage Your Own Screens</h3>
+          <p>Upload and schedule content yourself using our easy-to-use ScreenFizz platform.</p>
+          <ul class="feature-list">
+            <li>&pound;5/month</li>
+            <li>Buy player once (&pound;60)</li>
+            <li>Full control</li>
+            <li>Unlimited updates</li>
+            <li>Remote management</li>
+          </ul>
+          <a class="btn btn-outline" href="#pricing">Learn More</a>
+        </article>
+        <article class="card solution-card managed" id="managed-digital-signage">
+          <span class="card-kicker">Managed Service</span>
+          <h3>We Manage Everything</h3>
+          <p>Send us your promotions, menus and announcements. We upload and manage everything for you.</p>
+          <ul class="feature-list">
+            <li>&pound;15/month</li>
+            <li>Content updates handled by us</li>
+            <li>Screen monitoring</li>
+            <li>Priority support</li>
+            <li>No software training required</li>
+          </ul>
+          <a class="btn btn-primary" href="#contact">Learn More</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="pro-band" id="ai-content-service">
+      <div class="section section-tight">
+        <div>
+          <div class="eyebrow" style="color:#93c5fd">AI Content Service</div>
+          <h2>Need Content Created Too?</h2>
+          <p>Our Pro service generates promotional and seasonal content for your business, so your screens keep feeling fresh without extra work from your team.</p>
+          <div class="button-row" style="margin-top:24px">
+            <a class="btn btn-primary" href="#contact">Get Started</a>
+            <a class="btn btn-outline" href="#pricing" style="background:transparent;color:#fff;border-color:#687489">View Plans</a>
+          </div>
+        </div>
+        <div class="pro-panel">
+          <h3>Pro Digital</h3>
+          <div class="price"><span class="amount">&pound;29</span><span class="unit">/month</span></div>
+          <ul class="feature-list">
+            <li>AI-generated promotions</li>
+            <li>Seasonal campaigns</li>
+            <li>Holiday content</li>
+            <li>Monthly refreshes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="eyebrow">Pricing</div>
+      <h2>Simple monthly plans</h2>
+      <p>Start with one screen and grow when you are ready. Each plan uses the ScreenFizz Player, purchased once for &pound;60.</p>
+      <div class="pricing-grid">
+        <article class="card price-card">
+          <h3>Self-Service</h3>
+          <div class="price"><span class="amount">&pound;5</span><span class="unit">/month</span></div>
+          <p>For businesses that want control over their own screen updates.</p>
+          <ul class="feature-list">
+            <li>ScreenFizz platform</li>
+            <li>Remote screen management</li>
+            <li>Software updates</li>
+            <li>Email support</li>
+          </ul>
+          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
+          <a class="btn btn-outline" href="#contact">Get Started</a>
+        </article>
+        <article class="card price-card managed">
+          <h3>Managed</h3>
+          <div class="price"><span class="amount">&pound;15</span><span class="unit">/month</span></div>
+          <p>For businesses that want updates handled by a real person.</p>
+          <ul class="feature-list">
+            <li>Everything in Self-Service</li>
+            <li>Content uploaded for you</li>
+            <li>Screen monitoring</li>
+            <li>Priority support</li>
+          </ul>
+          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
+          <a class="btn btn-primary" href="#contact">Request a Callback</a>
+        </article>
+        <article class="card price-card pro">
+          <h3>Pro Digital</h3>
+          <div class="price"><span class="amount">&pound;29</span><span class="unit">/month</span></div>
+          <p>For businesses that also need fresh promotional content.</p>
+          <ul class="feature-list">
+            <li>Everything in Managed</li>
+            <li>Promotional content creation</li>
+            <li>Seasonal campaigns</li>
+            <li>Monthly content refreshes</li>
+          </ul>
+          <p class="hardware-note">Hardware: Player &pound;60 one-time</p>
+          <a class="btn btn-dark" href="#contact">Book Demo</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="hardware" id="hardware">
+      <div class="section hardware-layout">
+        <div>
+          <div class="eyebrow">Hardware</div>
+          <h2>ScreenFizz Player</h2>
+          <p>A simple plug-and-play player that connects your screen to your service. We prepare it before it arrives, so setup is straightforward.</p>
+          <ul class="feature-list">
+            <li>Plug and play</li>
+            <li>Raspberry Pi based</li>
+            <li>Pre-configured</li>
+            <li>Connects automatically</li>
+            <li>One-time &pound;60 purchase</li>
+          </ul>
+          <a class="btn btn-primary" href="#contact">Order Player</a>
+        </div>
+        <div class="player-visual" aria-label="ScreenFizz Player illustration">
+          <div class="player-box"><span class="player-light"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="industries">
+      <div class="eyebrow">Industries</div>
+      <h2>Built for everyday business updates</h2>
+      <p>Use your screens to keep customers moving, informed, and interested.</p>
+      <div class="industries-grid">
+        <div class="industry"><strong>Cafes</strong><p>Menus, specials, loyalty offers, opening times.</p></div>
+        <div class="industry"><strong>Takeaways</strong><p>Meal deals, collection updates, delivery promos.</p></div>
+        <div class="industry"><strong>Salons</strong><p>Treatments, price lists, new services, gift cards.</p></div>
+        <div class="industry"><strong>Retail</strong><p>Promotions, launches, window offers, seasonal sales.</p></div>
+        <div class="industry"><strong>Gyms</strong><p>Classes, memberships, trainer notices, events.</p></div>
+        <div class="industry"><strong>Clinics</strong><p>Patient notices, services, wayfinding, reminders.</p></div>
+        <div class="industry"><strong>Offices</strong><p>Visitor welcomes, announcements, team updates.</p></div>
+        <div class="industry"><strong>Venues</strong><p>Event times, bar offers, directions, sponsor messages.</p></div>
+      </div>
+      <div class="outcomes">
+        <div class="outcome"><strong>Save time</strong><p>Update screens without redesigning everything from scratch.</p></div>
+        <div class="outcome"><strong>Promote offers</strong><p>Put the right deal in front of customers at the right moment.</p></div>
+        <div class="outcome"><strong>Update remotely</strong><p>Make changes without visiting the screen.</p></div>
+        <div class="outcome"><strong>Skip the technical side</strong><p>Choose Managed or Pro and we handle the day-to-day work.</p></div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="section contact-layout">
+        <div>
+          <div class="eyebrow">Contact</div>
+          <h2>Tell us about your screens</h2>
+          <p>Book a demo, request a callback, or get started. Send us a few details and we&apos;ll help you choose the simplest route.</p>
+          <div class="button-row" style="margin-top:24px">
+            <a class="btn btn-primary" href="#leadForm">Book a Demo</a>
+            <a class="btn btn-outline" href="#leadForm">Request a Callback</a>
+          </div>
+        </div>
+        <form id="leadForm" novalidate>
+          <div class="form-grid">
+            <label>Business Name
+              <input name="business_name" type="text" autocomplete="organization" maxlength="200" required>
+            </label>
+            <label>Contact Name
+              <input name="contact_name" type="text" autocomplete="name" maxlength="200" required>
+            </label>
+            <label>Email
+              <input name="email" type="email" autocomplete="email" maxlength="200" required>
+            </label>
+            <label>Phone Number
+              <input name="phone" type="tel" autocomplete="tel" maxlength="80" required>
+            </label>
+            <label>Number of Screens
+              <input name="screens" type="number" min="1" max="10000" inputmode="numeric" required>
+            </label>
+            <label>Interested In
+              <select name="interest" required>
+                <option value="">Select one</option>
+                <option>Self-Service Digital Signage</option>
+                <option>Managed Digital Signage</option>
+                <option>Pro Digital Content</option>
+                <option>Hardware Only</option>
+                <option>Not sure yet</option>
+              </select>
+            </label>
+            <label class="full">Message
+              <textarea name="message" maxlength="5000" placeholder="Tell us what you want your screens to show."></textarea>
+            </label>
+            <div style="position:absolute;left:-9999px" aria-hidden="true">
+              <label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="leadSubmit">Get Started</button>
+            <span class="form-status" id="leadStatus" aria-live="polite"></span>
+          </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeContactModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" id="contactSubmitBtn" onclick="submitContactForm()">Send</button>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>&copy; 2026 Modern Day Displays. ScreenFizz is our self-service platform.</div>
+      <div class="footer-links">
+        <a href="#solutions">Solutions</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#hardware">Hardware</a>
+        <a href="/legal/terms.html">Terms</a>
+        <a href="/legal/privacy.html">Privacy</a>
+        <a href="/app#/login">Sign In</a>
       </div>
     </div>
-  </div>
+  </footer>
 
-  <!-- Structured Data for Google -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "ScreenTinker",
-    "applicationCategory": "BusinessApplication",
-    "applicationSubCategory": "DigitalSignage",
-    "operatingSystem": "Android, Web, Windows, Linux, ChromeOS",
-    "description": "Fully managed digital signage for small businesses across the UK. Screens, graphics, and scheduling from £30/month. Manage TVs, video walls, kiosks, and content schedules across Android, Raspberry Pi, Windows, ChromeOS, and any browser.",
-    "url": "https://screentinker.com",
+    "@type": "LocalBusiness",
+    "name": "Modern Day Displays",
+    "url": "https://screenfizz.com/",
+    "description": "Simple digital signage with ScreenFizz self-service and managed digital signage services.",
+    "brand": { "@type": "Brand", "name": "ScreenFizz" },
     "offers": [
-      {
-        "@type": "Offer",
-        "price": "30",
-        "priceCurrency": "GBP",
-        "name": "Starter",
-        "description": "Fully managed menu screen with graphics, scheduling, and regular content updates"
-      },
-      {
-        "@type": "Offer",
-        "price": "75",
-        "priceCurrency": "GBP",
-        "priceValidUntil": "2027-12-31",
-        "name": "Pro Digital",
-        "description": "Fully managed high-brightness window display with monthly creative refresh"
-      },
-      {
-        "@type": "Offer",
-        "priceValidUntil": "2027-12-31",
-        "name": "Custom",
-        "description": "Custom fully managed package with menu screens at £20/month, shop/window screens at £40/month, and a 10% package discount"
-      },
-      {
-        "@type": "Offer",
-        "price": "25",
-        "priceCurrency": "GBP",
-        "priceValidUntil": "2027-12-31",
-        "name": "Self-manage account",
-        "description": "Self-service digital signage account with dashboard scheduling, 5GB media storage, and a one-time £50 media player"
-      }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "50"
-    },
-    "featureList": [
-      "Multi-zone screen layouts",
-      "Video wall support",
-      "Remote control with live view",
-      "Content scheduling with calendar (device and group level)",
-      "Playlists with draft/publish workflow",
-      "Directory Board widget for lobby and staff directories",
-      "Built-in content designer",
-      "Interactive kiosk/touchscreen mode",
-      "Proof-of-play analytics",
-      "Device monitoring and alerts",
-      "Offline resilience with cached playback",
-      "Mobile-responsive dashboard",
-      "White-label/reseller support",
-      "Managed setup support",
-      "9 platform support",
-      "Auto-update OTA"
-    ]
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "ScreenTinker",
-    "url": "https://screentinker.com",
-    "logo": "https://screentinker.com/assets/screenfizz-logo.png",
-    "sameAs": [
-      "https://discord.gg/utTdsrqq4Z"
-    ]
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What platforms does ScreenTinker support?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "ScreenTinker works on Android TV, Fire TV, Raspberry Pi, Windows, ChromeOS, LG webOS, Samsung Tizen, and any device with a web browser."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What does ScreenTinker cost?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Fully managed menu screens start from £30 per screen per month including VAT. Self-service accounts start from £5 per screen per month including VAT, plus a one-time £50 media player fee."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Is ScreenTinker fully managed?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, ScreenTinker offers a fully managed digital signage service for small businesses across the UK, including screens, graphics, scheduling, monitoring, and support."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Does ScreenTinker support video walls?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, you can combine multiple displays into a single video wall with automatic bezel compensation. Configure any grid size (2x2, 3x3, etc.)."
-        }
-      }
+      { "@type": "Offer", "name": "Self-Service Digital Signage", "price": "5", "priceCurrency": "GBP" },
+      { "@type": "Offer", "name": "Managed Digital Signage", "price": "15", "priceCurrency": "GBP" },
+      { "@type": "Offer", "name": "Pro Digital", "price": "29", "priceCurrency": "GBP" },
+      { "@type": "Offer", "name": "ScreenFizz Player", "price": "60", "priceCurrency": "GBP" }
     ]
   }
   </script>
 
   <script>
-    function showPricingTab(name) {
-      document.querySelectorAll('.pricing-tab').forEach(tab => {
-        const isActive = tab.dataset.pricingTab === name;
-        tab.classList.toggle('active', isActive);
-        tab.setAttribute('aria-selected', String(isActive));
-      });
-      document.querySelectorAll('.pricing-panel').forEach(panel => {
-        panel.classList.toggle('active', panel.id === `pricing-${name}`);
-      });
-    }
+    const leadForm = document.getElementById('leadForm');
+    const leadStatus = document.getElementById('leadStatus');
+    const leadSubmit = document.getElementById('leadSubmit');
 
-    document.querySelectorAll('[data-pricing-tab]').forEach(tab => {
-      tab.addEventListener('click', () => showPricingTab(tab.dataset.pricingTab));
-    });
-
-    function updateCustomPricing() {
-      const menuInput = document.getElementById('customMenuScreens');
-      const windowInput = document.getElementById('customWindowScreens');
-      if (!menuInput || !windowInput) return;
-
-      const menuScreens = Math.max(0, parseInt(menuInput.value, 10) || 0);
-      const windowScreens = Math.max(0, parseInt(windowInput.value, 10) || 0);
-      const subtotal = (menuScreens * 20) + (windowScreens * 40);
-      const discount = subtotal * 0.1;
-      const total = subtotal - discount;
-      const formatPrice = value => `&pound;${Number.isInteger(value) ? value : value.toFixed(2)}/month`;
-
-      document.getElementById('customSubtotal').innerHTML = formatPrice(subtotal);
-      document.getElementById('customDiscount').innerHTML = `-${formatPrice(discount)}`;
-      document.getElementById('customTotal').innerHTML = formatPrice(total);
-    }
-
-    document.querySelectorAll('.custom-price-input').forEach(input => {
-      input.addEventListener('input', updateCustomPricing);
-    });
-    updateCustomPricing();
-
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      if (a.getAttribute('href').startsWith('#/')) return; // Skip app routes
-      a.addEventListener('click', e => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-      });
-    });
-
-    // Contact modal: open/close, submit, validation. Functions are attached
-    // to window so inline onclick handlers can find them.
-    window.openContactModal = function() {
-      document.getElementById('contactModal').style.display = 'flex';
-      setTimeout(() => document.querySelector('#contactForm input[name="name"]')?.focus(), 50);
-    };
-    window.closeContactModal = function() {
-      document.getElementById('contactModal').style.display = 'none';
-      const status = document.getElementById('contactFormStatus');
-      status.className = '';
-      status.textContent = '';
-    };
-    window.submitContactForm = async function() {
-      const form = document.getElementById('contactForm');
-      const status = document.getElementById('contactFormStatus');
-      const btn = document.getElementById('contactSubmitBtn');
-      status.className = '';
-      status.textContent = '';
-      const data = Object.fromEntries(new FormData(form).entries());
-      const required = ['name', 'email', 'company', 'screens', 'multi_tenant', 'hosting'];
-      for (const f of required) {
-        if (!data[f] || String(data[f]).trim() === '') {
-          status.className = 'contact-status-error';
-          status.textContent = 'Please fill all required fields.';
+    leadForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      leadStatus.className = 'form-status';
+      leadStatus.textContent = '';
+      const data = Object.fromEntries(new FormData(leadForm).entries());
+      const required = ['business_name', 'contact_name', 'email', 'phone', 'screens', 'interest'];
+      for (const field of required) {
+        if (!data[field] || String(data[field]).trim() === '') {
+          leadStatus.className = 'form-status error';
+          leadStatus.textContent = 'Please fill in the required details.';
           return;
         }
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        status.className = 'contact-status-error';
-        status.textContent = 'Please enter a valid email address.';
+        leadStatus.className = 'form-status error';
+        leadStatus.textContent = 'Please enter a valid email address.';
         return;
       }
-      btn.disabled = true;
+
+      const payload = {
+        name: data.contact_name,
+        email: data.email,
+        company: data.business_name,
+        screens: data.screens,
+        multi_tenant: 'single',
+        hosting: 'hosted',
+        message: `Phone: ${data.phone}\nInterested in: ${data.interest}\n\n${data.message || ''}`,
+        fax_number: data.fax_number
+      };
+
+      leadSubmit.disabled = true;
+      leadSubmit.textContent = 'Sending...';
       try {
-        const res = await fetch('/api/contact/enterprise', {
+        const response = await fetch('/api/contact/enterprise', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload)
         });
-        if (res.ok) {
-          status.className = 'contact-status-success';
-          status.textContent = "Thanks! We'll be in touch within one business day.";
-          form.reset();
-          setTimeout(() => window.closeContactModal(), 3000);
+        if (response.ok) {
+          leadStatus.className = 'form-status success';
+          leadStatus.textContent = "Thanks, we'll be in touch shortly.";
+          leadForm.reset();
         } else {
-          const err = await res.json().catch(() => ({}));
-          status.className = 'contact-status-error';
-          status.textContent = err.error || "Sorry, something went wrong. Try emailing dan@bytetinker.net directly.";
+          leadStatus.className = 'form-status error';
+          leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
         }
-      } catch (e) {
-        status.className = 'contact-status-error';
-        status.textContent = "Network error. Try emailing dan@bytetinker.net directly.";
+      } catch (error) {
+        leadStatus.className = 'form-status error';
+        leadStatus.textContent = 'Network error. Please try again.';
       } finally {
-        btn.disabled = false;
-      }
-    };
-    // Close on background click + Escape
-    document.getElementById('contactModal').addEventListener('click', e => {
-      if (e.target.id === 'contactModal') window.closeContactModal();
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && document.getElementById('contactModal').style.display === 'flex') {
-        window.closeContactModal();
+        leadSubmit.disabled = false;
+        leadSubmit.textContent = 'Get Started';
       }
     });
   </script>
