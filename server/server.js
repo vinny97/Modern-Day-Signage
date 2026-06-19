@@ -105,6 +105,26 @@ const dashboardCsp = helmet.contentSecurityPolicy({
   },
 });
 
+const marketingCsp = helmet.contentSecurityPolicy({
+  useDefaults: true,
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'"],
+    scriptSrcAttr: ["'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    styleSrcAttr: ["'unsafe-inline'"],
+    imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+    mediaSrc: ["'self'", 'blob:', 'https:'],
+    connectSrc: ["'self'", 'https://wa.me'],
+    fontSrc: ["'self'", 'data:'],
+    frameSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    upgradeInsecureRequests: config.selfHosted ? null : [],
+  },
+});
+
 app.use(helmet({
   contentSecurityPolicy: false,        // we apply our own below, scoped to non-render paths
   crossOriginEmbedderPolicy: false,    // allow loading external widget content
@@ -117,7 +137,15 @@ app.use(helmet({
 // - /         (landing page has inline JSON-LD + a pricing fetch script)
 // The dashboard at /app uses ES modules only and gets the strict policy.
 app.use((req, res, next) => {
-  if (req.path === '/' || req.path === '/landing.html') return next();
+  if (req.path === '/' || req.path === '/landing.html') return marketingCsp(req, res, next);
+  if ([
+    '/managed-digital-signage.html',
+    '/self-service-software.html',
+    '/pricing.html',
+    '/hardware.html',
+    '/contact.html',
+    '/compare/pricing-tiers.html',
+  ].includes(req.path)) return marketingCsp(req, res, next);
   if (req.path.startsWith('/player')) return next();
   if (req.path === '/docs') return next(); // Redoc API reference needs a relaxed CSP
   if (req.path.startsWith('/api/widgets/') && req.path.endsWith('/render')) return next();
