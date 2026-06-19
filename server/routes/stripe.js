@@ -5,6 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const config = require('../config');
 
 const appUrl = process.env.APP_URL || '';
+const jsonParser = express.json();
 
 let stripe = null;
 if (config.stripeSecretKey) {
@@ -12,7 +13,7 @@ if (config.stripeSecretKey) {
 }
 
 // Create checkout session - user clicks "Upgrade" on a plan
-router.post('/checkout', requireAuth, async (req, res) => {
+router.post('/checkout', jsonParser, requireAuth, async (req, res) => {
   if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
 
   const { plan_id, interval } = req.body; // interval: 'monthly' or 'yearly'
@@ -67,7 +68,7 @@ router.post('/checkout', requireAuth, async (req, res) => {
 });
 
 // Customer portal - manage existing subscription (change plan, cancel, update payment)
-router.post('/portal', requireAuth, async (req, res) => {
+router.post('/portal', jsonParser, requireAuth, async (req, res) => {
   if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
 
   const customerId = req.user.stripe_customer_id;

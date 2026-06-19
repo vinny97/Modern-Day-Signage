@@ -9,19 +9,19 @@ CREATE TABLE IF NOT EXISTS plans (
     priority_support INTEGER NOT NULL DEFAULT 0,
     price_monthly   REAL NOT NULL DEFAULT 0,
     price_yearly    REAL NOT NULL DEFAULT 0,
-    stripe_monthly_id TEXT,
-    stripe_yearly_id  TEXT,
+    stripe_price_monthly TEXT,
+    stripe_price_yearly  TEXT,
     sort_order      INTEGER NOT NULL DEFAULT 0,
     active          INTEGER NOT NULL DEFAULT 1
 );
 
 -- Default plans
-INSERT OR IGNORE INTO plans (id, name, display_name, max_devices, max_storage_mb, remote_control, remote_url, priority_support, price_monthly, price_yearly, sort_order)
+INSERT OR IGNORE INTO plans (id, name, display_name, max_devices, max_storage_mb, remote_control, remote_url, priority_support, price_monthly, price_yearly, stripe_price_monthly, stripe_price_yearly, sort_order)
 VALUES
-  ('free',       'free',       'Free',       2,    500,   0, 0, 0, 0,     0,     0),
-  ('starter',    'starter',    'Starter',    8,    2048,  1, 0, 0, 9.99,  99,    1),
-  ('pro',        'pro',        'Pro',        25,   10240, 1, 1, 0, 24.99, 249,   2),
-  ('enterprise', 'enterprise', 'Enterprise', -1,   -1,    1, 1, 1, 49.99, 499,   3);
+  ('free',       'free',       'Free',        2,    500,   0, 0, 0, 0,     0,   NULL,                                NULL, 0),
+  ('starter',    'starter',    'Self Service',8,    2048,  1, 0, 0, 9.99,  0,   'price_1TjLALAVaFQgDIvTTNuBRMXM', NULL, 1),
+  ('pro',        'pro',        'Managed',     25,   10240, 1, 1, 0, 24.99, 0,   'price_1TjLAxAVaFQgDIvTiV2PKI2V', NULL, 2),
+  ('enterprise', 'enterprise', 'Managed Pro', -1,   -1,    1, 1, 1, 49.99, 0,   'price_1TjLE5AVaFQgDIvTCt7hl2w6', NULL, 3);
 
 CREATE TABLE IF NOT EXISTS users (
     id              TEXT PRIMARY KEY,

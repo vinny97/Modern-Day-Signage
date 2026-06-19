@@ -183,9 +183,10 @@ app.use(cors({
   origin: corsOriginCheck,
   credentials: true,
 }));
-// Stripe webhook needs raw body (before express.json parses it)
+// Stripe routes are mounted before express.json so webhook signature verification
+// receives the raw body. Non-webhook Stripe routes parse JSON inside the router.
 const stripeRouter = require('./routes/stripe');
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeRouter);
+app.use('/api/stripe', stripeRouter);
 
 // 12mb so AI-designed signs with embedded generated images (base64 data URLs)
 // can be published. #41 follow-up: upload generated images to the content store
@@ -396,10 +397,6 @@ app.get('/api/branding', (req, res) => {
   // /timestamps) so this unauthenticated endpoint only exposes presentational fields.
   res.json(publicBranding(resolveBranding(db, { domain })));
 });
-
-// Stripe billing routes (checkout, portal)
-app.use('/api/stripe', stripeRouter);
-
 
 // Screenshot route (before protected routes - needs custom auth for img tags)
 const { verifyToken } = require('./middleware/auth');
