@@ -12,6 +12,9 @@ const certsDir = process.env.CERTS_DIR || path.join(DATA_DIR, 'certs');
 module.exports = {
   port: process.env.PORT || 3001,
   httpsPort: process.env.HTTPS_PORT || 3443,
+  dbClient: (process.env.DB_CLIENT || 'sqlite').toLowerCase(),
+  databaseUrl: process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || '',
+  pgSsl: !['false', '0', 'off'].includes(String(process.env.PGSSL || process.env.PG_SSL || 'true').toLowerCase()),
   dataDir: DATA_DIR,
   dbPath: process.env.DB_PATH || path.join(DATA_DIR, 'db', 'remote_display.db'),
   uploadsDir,

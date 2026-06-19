@@ -3,6 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 
+if (config.dbClient !== 'sqlite') {
+  throw new Error(`DB_CLIENT=${config.dbClient} is not wired into the runtime yet. Use the Supabase migration scripts for import, or leave DB_CLIENT=sqlite until route/service DB calls are converted.`);
+}
+
 const dbDir = path.dirname(config.dbPath);
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
