@@ -643,6 +643,10 @@ startAlertService(io);
 const { startActivationNudge } = require('./services/activationNudge');
 startActivationNudge();
 
+// Start trial lifecycle emails (day 5 / 7 / 10; gated on HOSTED_INSTANCE)
+const { startTrialLifecycle } = require('./services/trialLifecycle');
+startTrialLifecycle();
+
 // #73: agency-upload digest flush (batched draft/published notifications to admins + owner)
 const { startAgencyDigest } = require('./services/agency-digest');
 startAgencyDigest();

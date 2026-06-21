@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/client');
 const { requireAuth } = require('../middleware/auth');
+const { PAST_DUE_GRACE_DAYS, DAY_SECONDS } = require('../services/subscriptionAccess');
 const config = require('../config');
 
 const appUrl = process.env.APP_URL || '';
@@ -10,6 +11,40 @@ const jsonParser = express.json();
 let stripe = null;
 if (config.stripeSecretKey) {
   stripe = require('stripe')(config.stripeSecretKey);
+}
+
+// Idempotency: mark a Stripe event as processed so duplicate deliveries are no-ops.
+function markEventProcessed(eventId, eventType) {
+  try {
+    db.prepare('INSERT OR IGNORE INTO stripe_events (event_id, event_type) VALUES (?, ?)')
+      .run(eventId, eventType);
+  } catch { /* non-fatal */ }
+}
+
+function isEventAlreadyProcessed(eventId) {
+  try {
+    return !!db.prepare('SELECT 1 FROM stripe_events WHERE event_id = ?').get(eventId);
+  } catch { return false; }
+}
+
+// After a user's subscription becomes active, push a playlist update to all
+// their currently-connected devices so suspended screens resume without waiting
+// for the next heartbeat.
+async function resumeUserDevices(req, userId) {
+  try {
+    const io = req.app.get('io');
+    if (!io) return;
+    const deviceSocket = require('../ws/deviceSocket');
+    const commandQueue = require('../lib/command-queue');
+    if (!deviceSocket.buildPlaylistPayload) return;
+    const deviceNs = io.of('/device');
+    const devices = db.prepare('SELECT id FROM devices WHERE user_id = ?').all(userId);
+    for (const d of devices) {
+      await commandQueue.queueOrEmitPlaylistUpdate(deviceNs, d.id, deviceSocket.buildPlaylistPayload);
+    }
+  } catch (e) {
+    console.error('resumeUserDevices error:', e.message);
+  }
 }
 
 // Create checkout session - user clicks "Upgrade" on a plan
@@ -37,11 +72,11 @@ router.post('/checkout', jsonParser, requireAuth, async (req, res) => {
       await db.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').run(customerId, req.user.id);
     }
 
-    // If user already has an active subscription, create a portal session to manage it
+    // If user already has an active subscription, redirect to billing portal
     if (req.user.stripe_subscription_id) {
       const portal = await stripe.billingPortal.sessions.create({
         customer: customerId,
-        return_url: `${req.headers.origin || appUrl}/#/settings`,
+        return_url: `${appUrl}/#/settings`,
       });
       return res.json({ url: portal.url, type: 'portal' });
     }
@@ -52,8 +87,8 @@ router.post('/checkout', jsonParser, requireAuth, async (req, res) => {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${req.headers.origin || appUrl}/#/settings?payment=success`,
-      cancel_url: `${req.headers.origin || appUrl}/#/settings?payment=cancelled`,
+      success_url: `${appUrl}/#/settings?payment=success`,
+      cancel_url: `${appUrl}/#/settings?payment=cancelled`,
       metadata: { user_id: req.user.id, plan_id },
       subscription_data: {
         metadata: { user_id: req.user.id, plan_id },
@@ -77,7 +112,7 @@ router.post('/portal', jsonParser, requireAuth, async (req, res) => {
   try {
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${req.headers.origin || appUrl}/#/settings`,
+      return_url: `${appUrl}/#/settings`,
     });
     res.json({ url: session.url });
   } catch (err) {
@@ -104,6 +139,13 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
   console.log(`Stripe webhook: ${event.type}`);
 
+  // Idempotency: skip events we've already processed (handles Stripe retries and
+  // duplicate deliveries without double-updating the DB or double-sending emails).
+  if (isEventAlreadyProcessed(event.id)) {
+    console.log(`Stripe webhook: ${event.id} already processed, skipping`);
+    return res.json({ received: true });
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -111,9 +153,12 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         const userId = session.metadata?.user_id;
         const planId = session.metadata?.plan_id;
         if (userId && session.subscription) {
-          await db.prepare(`UPDATE users SET stripe_subscription_id = ?, plan_id = ?, subscription_status = 'active', updated_at = strftime('%s','now') WHERE id = ?`)
+          await db.prepare(`UPDATE users SET stripe_subscription_id = ?, plan_id = ?,
+            subscription_status = 'active', past_due_grace_ends_at = NULL,
+            updated_at = strftime('%s','now') WHERE id = ?`)
             .run(session.subscription, planId || 'starter', userId);
           console.log(`User ${userId} subscribed to ${planId} (sub: ${session.subscription})`);
+          await resumeUserDevices(req, userId);
         }
         break;
       }
@@ -123,7 +168,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         const userId = sub.metadata?.user_id;
         if (!userId) break;
 
-        // Find plan by stripe price ID
         const priceId = sub.items?.data?.[0]?.price?.id;
         let planId = sub.metadata?.plan_id;
         if (priceId && !planId) {
@@ -131,12 +175,15 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
           if (plan) planId = plan.id;
         }
 
-        const status = sub.status === 'active' ? 'active' : sub.status === 'past_due' ? 'past_due' : sub.status;
+        const newStatus = sub.status === 'active' ? 'active' : sub.status === 'past_due' ? 'past_due' : sub.status;
         const ends = sub.current_period_end || null;
 
-        await db.prepare(`UPDATE users SET plan_id = COALESCE(?, plan_id), subscription_status = ?, subscription_ends = ?, updated_at = strftime('%s','now') WHERE id = ?`)
-          .run(planId, status, ends, userId);
-        console.log(`Subscription updated for ${userId}: ${planId} (${status})`);
+        await db.prepare(`UPDATE users SET plan_id = COALESCE(?, plan_id), subscription_status = ?,
+          subscription_ends = ?, updated_at = strftime('%s','now') WHERE id = ?`)
+          .run(planId, newStatus, ends, userId);
+        console.log(`Subscription updated for ${userId}: ${planId} (${newStatus})`);
+
+        if (newStatus === 'active') await resumeUserDevices(req, userId);
         break;
       }
 
@@ -144,9 +191,27 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         const sub = event.data.object;
         const userId = sub.metadata?.user_id;
         if (userId) {
-          await db.prepare(`UPDATE users SET plan_id = 'free', subscription_status = 'cancelled', stripe_subscription_id = NULL, updated_at = strftime('%s','now') WHERE id = ?`)
+          await db.prepare(`UPDATE users SET plan_id = 'free', subscription_status = 'cancelled',
+            stripe_subscription_id = NULL, updated_at = strftime('%s','now') WHERE id = ?`)
             .run(userId);
           console.log(`Subscription cancelled for ${userId}`);
+        }
+        break;
+      }
+
+      case 'invoice.payment_succeeded': {
+        // Clears past_due state when a recovery payment goes through.
+        const invoice = event.data.object;
+        const subId = invoice.subscription;
+        if (subId && invoice.billing_reason !== 'subscription_create') {
+          const user = await db.prepare('SELECT id FROM users WHERE stripe_subscription_id = ?').get(subId);
+          if (user) {
+            await db.prepare(`UPDATE users SET subscription_status = 'active',
+              past_due_grace_ends_at = NULL, updated_at = strftime('%s','now') WHERE id = ?`)
+              .run(user.id);
+            console.log(`Payment recovered for user ${user.id}`);
+            await resumeUserDevices(req, user.id);
+          }
         }
         break;
       }
@@ -157,8 +222,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         if (subId) {
           const user = await db.prepare('SELECT id FROM users WHERE stripe_subscription_id = ?').get(subId);
           if (user) {
-            await db.prepare("UPDATE users SET subscription_status = 'past_due', updated_at = strftime('%s','now') WHERE id = ?").run(user.id);
-            console.log(`Payment failed for user ${user.id}`);
+            const graceEndsAt = Math.floor(Date.now() / 1000) + (PAST_DUE_GRACE_DAYS * DAY_SECONDS);
+            await db.prepare(`UPDATE users SET subscription_status = 'past_due',
+              past_due_grace_ends_at = ?, updated_at = strftime('%s','now') WHERE id = ?`)
+              .run(graceEndsAt, user.id);
+            console.log(`Payment failed for user ${user.id}, grace ends at ${graceEndsAt}`);
           }
         }
         break;
@@ -166,8 +234,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     }
   } catch (err) {
     console.error('Webhook processing error:', err.message);
+    // Don't mark as processed if we errored — allow Stripe to retry.
+    return res.status(500).json({ error: 'Webhook processing failed' });
   }
 
+  markEventProcessed(event.id, event.type);
   res.json({ received: true });
 });
 

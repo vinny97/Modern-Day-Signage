@@ -22,6 +22,7 @@ import * as playlists from './views/playlists.js';
 import * as workspaceMembers from './views/workspace-members.js';
 import * as forcePasswordChange from './views/force-password-change.js';
 import * as noWorkspace from './views/no-workspace.js';
+import * as subscribe from './views/subscribe.js';
 import { applyBranding } from './branding.js';
 import { t } from './i18n.js';
 import { isPlatformAdmin } from './utils.js';
@@ -239,6 +240,7 @@ async function refreshCurrentUser() {
     // Re-render the workspace switcher on every /me refresh - cheap, and keeps
     // the dropdown in sync if a workspace was added/removed in another tab.
     renderWorkspaceSwitcher(fresh);
+    updateTrialBanner(fresh);
     window.dispatchEvent(new CustomEvent('user-refreshed', { detail: fresh }));
     // #12: /me is the first place accessible_workspaces is known. If it resolves
     // to zero (org-less user), send them to the empty state now - on a fresh
@@ -469,10 +471,40 @@ function route() {
       currentView = billing;
       billing.render(app);
     }
+  } else if (hash === '#/subscribe') {
+    currentView = subscribe;
+    subscribe.render(app);
   } else {
     currentView = dashboard;
     dashboard.render(app);
   }
+}
+
+function updateTrialBanner(user) {
+  const access = user?.access;
+  const isTrialActive = access?.state === 'trial' && access?.allowed;
+
+  let banner = document.getElementById('trial-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'trial-banner';
+    banner.style.cssText = 'display:none;background:var(--warning-dim);border-bottom:1px solid var(--warning);padding:8px 16px;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0';
+    const appEl = document.getElementById('app');
+    appEl?.parentNode?.insertBefore(banner, appEl);
+  }
+
+  if (!isTrialActive) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const days = access.trial_days_remaining ?? 0;
+  const dayWord = days === 1 ? 'day' : 'days';
+  banner.style.display = 'flex';
+  banner.innerHTML = `
+    <span>&#9201;&nbsp; <strong>${days} ${dayWord}</strong> left in your free trial</span>
+    <a href="#/subscribe" style="background:var(--warning);color:#000;padding:4px 12px;border-radius:4px;font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap">Upgrade</a>
+  `;
 }
 
 function updateSidebarUser() {
