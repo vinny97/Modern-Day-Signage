@@ -1,57 +1,58 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { PLATFORM_ROLES, ELEVATED_ROLES } = require('../middleware/auth');
 // Phase 2.2h: workspace-aware access. Templates (is_template=1) are the
 // platform-shared pair (NULL user_id, NULL workspace_id) and are visible
 // everywhere, writable only by platform_admin.
-const { accessContext } = require('../lib/tenancy');
+const { accessContextAsync } = require('../lib/tenancy');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // List layouts in the caller's current workspace plus all templates.
 // Phase 2.2h: workspace-scoped. Templates (is_template=1) remain visible to
 // everyone; cross-workspace owned-layout visibility comes from switch-workspace.
-router.get('/', (req, res) => {
+router.get('/', routeAsync(async (req, res) => {
   const showTemplates = req.query.templates === 'true';
 
   let layouts;
   if (showTemplates) {
-    layouts = db.prepare('SELECT * FROM layouts WHERE is_template = 1 ORDER BY template_category, name').all();
+    layouts = await db.prepare('SELECT * FROM layouts WHERE is_template = 1 ORDER BY template_category, name').all();
   } else if (!req.workspaceId) {
     // No workspace context -> only templates are visible.
-    layouts = db.prepare('SELECT * FROM layouts WHERE is_template = 1 ORDER BY template_category, name').all();
+    layouts = await db.prepare('SELECT * FROM layouts WHERE is_template = 1 ORDER BY template_category, name').all();
   } else {
-    layouts = db.prepare(
+    layouts = await db.prepare(
       'SELECT * FROM layouts WHERE (workspace_id = ? OR is_template = 1) ORDER BY is_template DESC, created_at DESC'
     ).all(req.workspaceId);
   }
 
   // Attach zones to each layout
   const zonesStmt = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order');
-  layouts.forEach(l => { l.zones = zonesStmt.all(l.id); });
+  for (const layout of layouts) layout.zones = await zonesStmt.all(layout.id);
 
   res.json(layouts);
-});
+}));
 
 // Phase 2.2h: workspace-aware access. Mirrors content/widget/kiosk helpers.
 // Templates (is_template=1) are readable by anyone authenticated; writable
 // only by platform_admin (kept layered with the existing L78/L94 guards).
-function checkLayoutRead(req, res) {
-  const layout = db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
+async function checkLayoutRead(req, res) {
+  const layout = await db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
   if (!layout) { res.status(404).json({ error: 'Layout not found' }); return null; }
   if (layout.is_template) return layout;
   if (!layout.workspace_id) {
     // Owned row with no workspace - treat as inaccessible (shouldn't exist post-migration).
     res.status(403).json({ error: 'Layout not assigned to a workspace' }); return null;
   }
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(layout.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(layout.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   return layout;
 }
 
-function checkLayoutWrite(req, res) {
-  const layout = db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
+async function checkLayoutWrite(req, res) {
+  const layout = await db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
   if (!layout) { res.status(404).json({ error: 'Layout not found' }); return null; }
   if (layout.is_template) {
     // Templates: only platform_admin may write. Existing L78/L94 also check
@@ -64,8 +65,8 @@ function checkLayoutWrite(req, res) {
   if (!layout.workspace_id) {
     res.status(403).json({ error: 'Layout not assigned to a workspace' }); return null;
   }
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(layout.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(layout.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   if (!ctx.actingAs && ctx.workspaceRole === 'workspace_viewer') {
     res.status(403).json({ error: 'Read-only access' }); return null;
@@ -74,22 +75,22 @@ function checkLayoutWrite(req, res) {
 }
 
 // Get layout with zones
-router.get('/:id', (req, res) => {
-  const layout = checkLayoutRead(req, res);
+router.get('/:id', routeAsync(async (req, res) => {
+  const layout = await checkLayoutRead(req, res);
   if (!layout) return;
 
-  layout.zones = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(layout.id);
+  layout.zones = await db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(layout.id);
   res.json(layout);
-});
+}));
 
 // Create layout in the caller's current workspace.
-router.post('/', (req, res) => {
+router.post('/', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before creating layouts.' });
   const { name, width, height, zones } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
 
   const id = uuidv4();
-  db.prepare('INSERT INTO layouts (id, user_id, workspace_id, name, width, height) VALUES (?, ?, ?, ?, ?, ?)')
+  await db.prepare('INSERT INTO layouts (id, user_id, workspace_id, name, width, height) VALUES (?, ?, ?, ?, ?, ?)')
     .run(id, req.user.id, req.workspaceId, name, width || 1920, height || 1080);
 
   // Create zones if provided
@@ -98,94 +99,101 @@ router.post('/', (req, res) => {
       INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    zones.forEach((z, i) => {
-      stmt.run(uuidv4(), id, z.name || `Zone ${i + 1}`, z.x_percent || 0, z.y_percent || 0,
+    for (const [i, z] of zones.entries()) {
+      await stmt.run(uuidv4(), id, z.name || `Zone ${i + 1}`, z.x_percent || 0, z.y_percent || 0,
         z.width_percent || 100, z.height_percent || 100, z.z_index || 0,
         z.zone_type || 'content', z.fit_mode || 'contain', z.background_color || '#000000', i);
-    });
+    }
   }
 
-  const layout = db.prepare('SELECT * FROM layouts WHERE id = ?').get(id);
-  layout.zones = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(id);
+  const layout = await db.prepare('SELECT * FROM layouts WHERE id = ?').get(id);
+  layout.zones = await db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(id);
   res.status(201).json(layout);
-});
+}));
 
 // Update layout
-router.put('/:id', (req, res) => {
-  const layout = checkLayoutWrite(req, res);
+router.put('/:id', routeAsync(async (req, res) => {
+  const layout = await checkLayoutWrite(req, res);
   if (!layout) return;
   if (layout.is_template && !PLATFORM_ROLES.includes(req.user.role)) return res.status(403).json({ error: 'Cannot edit templates' });
 
   const { name, width, height, zones } = req.body;
-  const txn = db.transaction(() => {
-    if (name) db.prepare('UPDATE layouts SET name = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(name, req.params.id);
-    if (width) db.prepare('UPDATE layouts SET width = ? WHERE id = ?').run(width, req.params.id);
-    if (height) db.prepare('UPDATE layouts SET height = ? WHERE id = ?').run(height, req.params.id);
+  const txn = db.transaction(async () => {
+    if (name) await db.prepare('UPDATE layouts SET name = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(name, req.params.id);
+    if (width) await db.prepare('UPDATE layouts SET width = ? WHERE id = ?').run(width, req.params.id);
+    if (height) await db.prepare('UPDATE layouts SET height = ? WHERE id = ?').run(height, req.params.id);
 
     // Atomic zone replace: the editor sends the FULL desired set, so the layout
     // ends up with EXACTLY those zones - no accumulation from a per-zone
     // delete/add loop. Reuse each zone's id when supplied so device->zone
     // assignments survive an edit (a fresh uuid per save would orphan them).
     if (Array.isArray(zones)) {
-      db.prepare('DELETE FROM layout_zones WHERE layout_id = ?').run(req.params.id);
+      await db.prepare('DELETE FROM layout_zones WHERE layout_id = ?').run(req.params.id);
       const stmt = db.prepare(`
         INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-      zones.forEach((z, i) => {
-        stmt.run(z.id || uuidv4(), req.params.id, z.name || `Zone ${i + 1}`,
+      for (const [i, z] of zones.entries()) {
+        await stmt.run(z.id || uuidv4(), req.params.id, z.name || `Zone ${i + 1}`,
           z.x_percent || 0, z.y_percent || 0, z.width_percent || 100, z.height_percent || 100,
           z.z_index || 0, z.zone_type || 'content', z.fit_mode || 'contain',
           z.background_color || '#000000', i);
-      });
-      db.prepare('UPDATE layouts SET updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(req.params.id);
+      }
+      await db.prepare('UPDATE layouts SET updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(req.params.id);
     }
   });
-  txn();
+  await txn();
 
-  const updated = db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
-  updated.zones = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(req.params.id);
+  const updated = await db.prepare('SELECT * FROM layouts WHERE id = ?').get(req.params.id);
+  updated.zones = await db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(req.params.id);
   res.json(updated);
-});
+}));
 
 // Delete layout
-router.delete('/:id', (req, res) => {
-  const layout = checkLayoutWrite(req, res);
+router.delete('/:id', routeAsync(async (req, res) => {
+  const layout = await checkLayoutWrite(req, res);
   if (!layout) return;
   if (layout.is_template && !PLATFORM_ROLES.includes(req.user.role)) return res.status(403).json({ error: 'Cannot delete templates' });
 
-  db.prepare('DELETE FROM layouts WHERE id = ?').run(req.params.id);
+  const remove = db.transaction(async () => {
+    await db.prepare('UPDATE devices SET layout_id = NULL WHERE layout_id = ?').run(req.params.id);
+    await db.prepare('UPDATE schedules SET layout_id = NULL WHERE layout_id = ?').run(req.params.id);
+    await db.prepare('UPDATE playlist_items SET zone_id = NULL WHERE zone_id IN (SELECT id FROM layout_zones WHERE layout_id = ?)').run(req.params.id);
+    await db.prepare('DELETE FROM layout_zones WHERE layout_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM layouts WHERE id = ?').run(req.params.id);
+  });
+  await remove();
   res.json({ success: true });
-});
+}));
 
 // Add zone to layout. Phase 2.2h: tightened to write-access; workspace_viewer
 // can read the layout via GET but cannot add zones.
-router.post('/:id/zones', (req, res) => {
-  const layout = checkLayoutWrite(req, res);
+router.post('/:id/zones', routeAsync(async (req, res) => {
+  const layout = await checkLayoutWrite(req, res);
   if (!layout) return;
 
   const { name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color } = req.body;
-  const maxOrder = db.prepare('SELECT MAX(sort_order) as m FROM layout_zones WHERE layout_id = ?').get(req.params.id).m || 0;
+  const maxOrder = (await db.prepare('SELECT MAX(sort_order) as m FROM layout_zones WHERE layout_id = ?').get(req.params.id)).m || 0;
 
   const id = uuidv4();
-  db.prepare(`
+  await db.prepare(`
     INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(id, req.params.id, name || 'New Zone', x_percent || 0, y_percent || 0,
     width_percent || 50, height_percent || 50, z_index || 0,
     zone_type || 'content', fit_mode || 'contain', background_color || '#000000', maxOrder + 1);
 
-  db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
+  await db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
 
-  const zone = db.prepare('SELECT * FROM layout_zones WHERE id = ?').get(id);
+  const zone = await db.prepare('SELECT * FROM layout_zones WHERE id = ?').get(id);
   res.status(201).json(zone);
-});
+}));
 
 // Update zone
-router.put('/:id/zones/:zoneId', (req, res) => {
-  const layout = checkLayoutWrite(req, res);
+router.put('/:id/zones/:zoneId', routeAsync(async (req, res) => {
+  const layout = await checkLayoutWrite(req, res);
   if (!layout) return;
-  const zone = db.prepare('SELECT * FROM layout_zones WHERE id = ? AND layout_id = ?').get(req.params.zoneId, req.params.id);
+  const zone = await db.prepare('SELECT * FROM layout_zones WHERE id = ? AND layout_id = ?').get(req.params.zoneId, req.params.id);
   if (!zone) return res.status(404).json({ error: 'Zone not found' });
 
   const fields = ['name', 'x_percent', 'y_percent', 'width_percent', 'height_percent', 'z_index', 'zone_type', 'fit_mode', 'background_color', 'sort_order'];
@@ -197,51 +205,52 @@ router.put('/:id/zones/:zoneId', (req, res) => {
 
   if (updates.length > 0) {
     values.push(req.params.zoneId);
-    db.prepare(`UPDATE layout_zones SET ${updates.join(', ')} WHERE id = ?`).run(...values);
-    db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
+    await db.prepare(`UPDATE layout_zones SET ${updates.join(', ')} WHERE id = ?`).run(...values);
+    await db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
   }
 
-  const updated = db.prepare('SELECT * FROM layout_zones WHERE id = ?').get(req.params.zoneId);
+  const updated = await db.prepare('SELECT * FROM layout_zones WHERE id = ?').get(req.params.zoneId);
   res.json(updated);
-});
+}));
 
 // Delete zone
-router.delete('/:id/zones/:zoneId', (req, res) => {
-  const layout = checkLayoutWrite(req, res);
+router.delete('/:id/zones/:zoneId', routeAsync(async (req, res) => {
+  const layout = await checkLayoutWrite(req, res);
   if (!layout) return;
-  db.prepare('DELETE FROM layout_zones WHERE id = ? AND layout_id = ?').run(req.params.zoneId, req.params.id);
-  db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
+  await db.prepare('UPDATE playlist_items SET zone_id = NULL WHERE zone_id = ?').run(req.params.zoneId);
+  await db.prepare('DELETE FROM layout_zones WHERE id = ? AND layout_id = ?').run(req.params.zoneId, req.params.id);
+  await db.prepare("UPDATE layouts SET updated_at = strftime('%s','now') WHERE id = ?").run(req.params.id);
   res.json({ success: true });
-});
+}));
 
 // Duplicate layout (for using templates). Source needs read-access only;
 // destination lands in the caller's current workspace.
-router.post('/:id/duplicate', (req, res) => {
+router.post('/:id/duplicate', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before duplicating a layout.' });
-  const source = checkLayoutRead(req, res);
+  const source = await checkLayoutRead(req, res);
   if (!source) return;
 
   const newId = uuidv4();
   const name = req.body.name || `${source.name} (Copy)`;
 
-  db.prepare('INSERT INTO layouts (id, user_id, workspace_id, name, width, height) VALUES (?, ?, ?, ?, ?, ?)')
+  await db.prepare('INSERT INTO layouts (id, user_id, workspace_id, name, width, height) VALUES (?, ?, ?, ?, ?, ?)')
     .run(newId, req.user.id, req.workspaceId, name, source.width, source.height);
 
   // Copy zones
-  const zones = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ?').all(req.params.id);
+  const zones = await db.prepare('SELECT * FROM layout_zones WHERE layout_id = ?').all(req.params.id);
   const stmt = db.prepare(`
     INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  zones.forEach(z => {
-    stmt.run(uuidv4(), newId, z.name, z.x_percent, z.y_percent, z.width_percent, z.height_percent,
+  for (const z of zones) {
+    await stmt.run(uuidv4(), newId, z.name, z.x_percent, z.y_percent, z.width_percent, z.height_percent,
       z.z_index, z.zone_type, z.fit_mode, z.background_color, z.sort_order);
-  });
+  }
 
-  const layout = db.prepare('SELECT * FROM layouts WHERE id = ?').get(newId);
-  layout.zones = db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(newId);
+  const layout = await db.prepare('SELECT * FROM layouts WHERE id = ?').get(newId);
+  layout.zones = await db.prepare('SELECT * FROM layout_zones WHERE layout_id = ? ORDER BY sort_order').all(newId);
   res.status(201).json(layout);
-});
+}));
 
 // Assign layout to device.
 // Phase 2.2h: closes a pre-existing cross-tenant leak. Today the route only
@@ -253,13 +262,13 @@ router.post('/:id/duplicate', (req, res) => {
 //   1. Caller must have write access to the DEVICE's workspace.
 //   2. The layout must be either a template (is_template=1) or live in the
 //      same workspace as the device.
-router.put('/device/:deviceId', (req, res) => {
-  const device = db.prepare('SELECT user_id, workspace_id FROM devices WHERE id = ?').get(req.params.deviceId);
+router.put('/device/:deviceId', routeAsync(async (req, res) => {
+  const device = await db.prepare('SELECT user_id, workspace_id FROM devices WHERE id = ?').get(req.params.deviceId);
   if (!device) return res.status(404).json({ error: 'Device not found' });
   if (!device.workspace_id) return res.status(403).json({ error: 'Device not assigned to a workspace' });
 
-  const deviceWs = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
-  const ctx = deviceWs && accessContext(req.user.id, req.user.role, deviceWs);
+  const deviceWs = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
+  const ctx = deviceWs && await accessContextAsync(req.user.id, req.user.role, deviceWs);
   if (!ctx) return res.status(403).json({ error: 'Access denied' });
   if (!ctx.actingAs && ctx.workspaceRole === 'workspace_viewer') {
     return res.status(403).json({ error: 'Read-only access' });
@@ -267,7 +276,7 @@ router.put('/device/:deviceId', (req, res) => {
 
   const { layout_id } = req.body;
   if (layout_id) {
-    const layout = db.prepare('SELECT is_template, workspace_id FROM layouts WHERE id = ?').get(layout_id);
+    const layout = await db.prepare('SELECT is_template, workspace_id FROM layouts WHERE id = ?').get(layout_id);
     if (!layout) return res.status(400).json({ error: 'Invalid layout_id' });
     // Layout must be a template, or live in the device's workspace.
     if (!layout.is_template && layout.workspace_id !== device.workspace_id) {
@@ -275,9 +284,9 @@ router.put('/device/:deviceId', (req, res) => {
     }
   }
 
-  db.prepare("UPDATE devices SET layout_id = ?, updated_at = strftime('%s','now') WHERE id = ?")
+  await db.prepare("UPDATE devices SET layout_id = ?, updated_at = strftime('%s','now') WHERE id = ?")
     .run(layout_id || null, req.params.deviceId);
   res.json({ success: true });
-});
+}));
 
 module.exports = router;

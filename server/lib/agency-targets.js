@@ -26,4 +26,8 @@ function isZonedPlaylist(db, playlistId) {
   return !!db.prepare('SELECT 1 FROM playlist_items WHERE playlist_id = ? AND zone_id IS NOT NULL LIMIT 1').get(playlistId);
 }
 
-module.exports = { listDesignatedPlaylists, isZonedPlaylist };
+async function isZonedPlaylistAsync(db, playlistId) {
+  return !!await db.prepare('SELECT 1 FROM playlist_items WHERE playlist_id = ? AND zone_id IS NOT NULL LIMIT 1').get(playlistId);
+}
+
+module.exports = { listDesignatedPlaylists, isZonedPlaylist, isZonedPlaylistAsync };

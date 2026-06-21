@@ -68,7 +68,7 @@ router.post('/content', checkStorageLimit, upload.single('file'), async (req, re
 // Add a date-bounded item to a DESIGNATED playlist (#74/#75 schedule block). The playlist
 // is already gate-verified. Lands as DRAFT (markDraft) so the admin's re-publish is the
 // approval gate for external-party content - same draft-on-change behavior as the dashboard.
-router.post('/playlists/:playlistId/items', (req, res) => {
+router.post('/playlists/:playlistId/items', async (req, res) => {
   const { content_id } = req.body;
   if (!content_id) return res.status(400).json({ error: 'content_id required' });
 
@@ -113,7 +113,7 @@ router.post('/playlists/:playlistId/items', (req, res) => {
   // 0 -> draft for admin re-publish. 1 -> the SHARED publishPlaylist path (snapshot + push).
   let published = false;
   if (req.apiToken.auto_publish) {
-    publishPlaylist(req.params.playlistId, req);
+    await publishPlaylist(req.params.playlistId, req);
     published = true;
   } else {
     db.prepare("UPDATE playlists SET status = 'draft', updated_at = strftime('%s','now') WHERE id = ?").run(req.params.playlistId);

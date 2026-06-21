@@ -78,6 +78,15 @@ async function initSchema() {
   const schemaPath = path.join(__dirname, 'schema.postgres.sql');
   const schema = fs.readFileSync(schemaPath, 'utf8');
   await query(schema);
+
+  const migrationsDir = path.join(__dirname, 'migrations');
+  if (!fs.existsSync(migrationsDir)) return;
+  const migrations = fs.readdirSync(migrationsDir)
+    .filter(file => file.endsWith('.sql'))
+    .sort();
+  for (const file of migrations) {
+    await query(fs.readFileSync(path.join(migrationsDir, file), 'utf8'));
+  }
 }
 
 async function close() {

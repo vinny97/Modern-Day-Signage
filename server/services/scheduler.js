@@ -1,4 +1,4 @@
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { _localParts } = require('../lib/schedule-eval');
 
 let io = null;
@@ -13,15 +13,15 @@ function startScheduler(socketIo) {
 // Track which devices have a schedule override active so we can revert
 const activeOverrides = new Map(); // deviceId -> { playlist_id, layout_id }
 
-function evaluateSchedules() {
+async function evaluateSchedules() {
   const deviceNs = io?.of('/device');
   if (!deviceNs) return;
 
   const now = new Date();
-  const onlineDevices = db.prepare("SELECT * FROM devices WHERE status = 'online'").all();
+  const onlineDevices = await db.prepare("SELECT * FROM devices WHERE status = 'online'").all();
 
   for (const device of onlineDevices) {
-    const schedules = db.prepare(`
+    const schedules = await db.prepare(`
       SELECT s.*
       FROM schedules s
       WHERE s.enabled = 1
@@ -45,24 +45,24 @@ function evaluateSchedules() {
       // Apply layout override if schedule has one
       if (active.layout_id && active.layout_id !== device.layout_id) {
         if (!override) activeOverrides.set(device.id, { layout_id: device.layout_id, playlist_id: device.playlist_id });
-        db.prepare("UPDATE devices SET layout_id = ? WHERE id = ?").run(active.layout_id, device.id);
+        await db.prepare("UPDATE devices SET layout_id = ? WHERE id = ?").run(active.layout_id, device.id);
         changed = true;
       }
       // Apply playlist override if schedule has one
       if (active.playlist_id && active.playlist_id !== device.playlist_id) {
         if (!override) activeOverrides.set(device.id, { layout_id: device.layout_id, playlist_id: device.playlist_id });
-        db.prepare("UPDATE devices SET playlist_id = ? WHERE id = ?").run(active.playlist_id, device.id);
+        await db.prepare("UPDATE devices SET playlist_id = ? WHERE id = ?").run(active.playlist_id, device.id);
         changed = true;
       }
     } else if (override) {
       // No active schedule — revert to original playlist/layout
-      db.prepare("UPDATE devices SET playlist_id = ?, layout_id = ? WHERE id = ?")
+      await db.prepare("UPDATE devices SET playlist_id = ?, layout_id = ? WHERE id = ?")
         .run(override.playlist_id, override.layout_id, device.id);
       activeOverrides.delete(device.id);
       changed = true;
     }
 
-    if (changed) pushPlaylistToDevice(device.id, deviceNs);
+    if (changed) await pushPlaylistToDevice(device.id, deviceNs);
   }
 }
 
@@ -118,11 +118,11 @@ function parseSimpleRRule(rrule) {
   return rule;
 }
 
-function pushPlaylistToDevice(deviceId, deviceNs) {
+async function pushPlaylistToDevice(deviceId, deviceNs) {
   // Use the single-source buildPlaylistPayload from deviceSocket
   const { buildPlaylistPayload } = require('../ws/deviceSocket');
   const commandQueue = require('../lib/command-queue');
-  commandQueue.queueOrEmitPlaylistUpdate(deviceNs, deviceId, buildPlaylistPayload);
+  await commandQueue.queueOrEmitPlaylistUpdate(deviceNs, deviceId, buildPlaylistPayload);
 }
 
 module.exports = { startScheduler, pushPlaylistToDevice };

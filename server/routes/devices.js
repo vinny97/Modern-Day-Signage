@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { PLATFORM_ROLES, ELEVATED_ROLES, isPlatformStaff } = require('../middleware/auth');
 // Phase 2.2a: workspace-aware access. accessContext returns { workspaceRole, actingAs }
 // or null based on the caller's reach into a specific workspace.
-const { accessContext } = require('../lib/tenancy');
+const { accessContextAsync } = require('../lib/tenancy');
 const { stripDeviceSecrets } = require('../lib/device-sanitize');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // List devices in the caller's current workspace.
 // Phase 2.2a: filter by workspace_id instead of user_id. The caller's current
@@ -13,11 +14,11 @@ const { stripDeviceSecrets } = require('../lib/device-sanitize');
 // override. Platform_admin and org_owner/admin see whichever workspace they
 // are currently switched into (cross-workspace visibility comes from
 // switch-workspace, not from a special list filter).
-router.get('/', (req, res) => {
+router.get('/', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.json([]);
   const limit = Math.min(parseInt(req.query.limit) || 100, 500);
   const offset = parseInt(req.query.offset) || 0;
-  const devices = db.prepare(`
+  const devices = await db.prepare(`
     SELECT d.*,
       t.battery_level, t.battery_charging, t.storage_free_mb, t.storage_total_mb,
       t.ram_free_mb, t.ram_total_mb, t.wifi_ssid, t.wifi_rssi, t.uptime_seconds,
@@ -41,7 +42,7 @@ router.get('/', (req, res) => {
     LIMIT ? OFFSET ?
   `).all(req.workspaceId, limit, offset);
   res.json(devices.map(stripDeviceSecrets));
-});
+}));
 
 // #106: reorder display tiles (cosmetic, within-section). Writes devices.sort_order
 // = position in the given id array. Workspace-scoped: the UPDATE matches WHERE
@@ -50,7 +51,7 @@ router.get('/', (req, res) => {
 // Write-gated: workspace_viewer (non-acting) is read-only. Ordering affects ONLY the
 // dashboard listing — nothing the device/player reads (grouping/pairing/playback
 // are independent). Mirrors the playlist items reorder.
-router.post('/reorder', (req, res) => {
+router.post('/reorder', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.status(403).json({ error: 'No workspace' });
   if (!req.actingAs && req.workspaceRole === 'workspace_viewer') {
     return res.status(403).json({ error: 'Read-only access' });
@@ -58,48 +59,48 @@ router.post('/reorder', (req, res) => {
   const { order } = req.body;
   if (!Array.isArray(order)) return res.status(400).json({ error: 'order must be an array of device IDs' });
   const stmt = db.prepare("UPDATE devices SET sort_order = ?, updated_at = strftime('%s','now') WHERE id = ? AND workspace_id = ?");
-  const tx = db.transaction(() => {
-    order.forEach((id, index) => stmt.run(index, id, req.workspaceId));
+  const tx = db.transaction(async () => {
+    for (const [index, id] of order.entries()) await stmt.run(index, id, req.workspaceId);
   });
-  tx();
+  await tx();
   res.json({ success: true });
-});
+}));
 
 // List unclaimed provisioning devices (admin only).
 // #13: read-only, so platform_operator may view the pool too (cross-org staff
 // troubleshooting). Claiming a device is a separate workspace-scoped mutation.
-router.get('/unassigned', (req, res) => {
+router.get('/unassigned', routeAsync(async (req, res) => {
   if (!ELEVATED_ROLES.includes(req.user.role) && !isPlatformStaff(req.user.role)) {
     return res.status(403).json({ error: 'Admin access required' });
   }
-  const devices = db.prepare(`
+  const devices = await db.prepare(`
     SELECT id, pairing_code, status, ip_address, android_version, app_version,
       screen_width, screen_height, created_at, last_heartbeat
     FROM devices WHERE user_id IS NULL
     ORDER BY created_at DESC
   `).all();
   res.json(devices);
-});
+}));
 
 // Get single device with telemetry history
-router.get('/:id', (req, res) => {
-  const device = db.prepare('SELECT d.*, u.email as owner_email, u.name as owner_name FROM devices d LEFT JOIN users u ON d.user_id = u.id WHERE d.id = ?').get(req.params.id);
+router.get('/:id', routeAsync(async (req, res) => {
+  const device = await db.prepare('SELECT d.*, u.email as owner_email, u.name as owner_name FROM devices d LEFT JOIN users u ON d.user_id = u.id WHERE d.id = ?').get(req.params.id);
   if (!device) return res.status(404).json({ error: 'Device not found' });
   // Phase 2.2a: workspace-aware read check. accessContext returns null when
   // the caller has no path (direct member, org-level acting-as, or platform_admin)
   // to the device's workspace.
   if (!device.workspace_id) return res.status(403).json({ error: 'Device not assigned to a workspace' });
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) return res.status(403).json({ error: 'Access denied' });
   if (ctx.workspaceRole) device._workspaceRole = ctx.workspaceRole; // Pass to frontend
   if (ctx.actingAs) device._actingAs = true;
 
-  const telemetry = db.prepare(
+  const telemetry = await db.prepare(
     'SELECT * FROM device_telemetry WHERE device_id = ? ORDER BY reported_at DESC LIMIT 20'
   ).all(req.params.id);
 
-  const screenshot = db.prepare(
+  const screenshot = await db.prepare(
     'SELECT * FROM screenshots WHERE device_id = ? ORDER BY captured_at DESC LIMIT 1'
   ).get(req.params.id);
 
@@ -108,7 +109,7 @@ router.get('/:id', (req, res) => {
   let playlist_status = null;
   let playlist_has_published = false;
   if (device.playlist_id) {
-    assignments = db.prepare(`
+    assignments = await db.prepare(`
       SELECT pi.id, pi.content_id, pi.widget_id, pi.zone_id, pi.sort_order, pi.duration_sec,
              pi.created_at, pi.updated_at,
              COALESCE(c.filename, w.name) as filename, c.mime_type, c.filepath, c.thumbnail_path,
@@ -120,7 +121,7 @@ router.get('/:id', (req, res) => {
       WHERE pi.playlist_id = ?
       ORDER BY pi.sort_order ASC
     `).all(device.playlist_id);
-    const pl = db.prepare('SELECT status, published_snapshot FROM playlists WHERE id = ?').get(device.playlist_id);
+    const pl = await db.prepare('SELECT status, published_snapshot FROM playlists WHERE id = ?').get(device.playlist_id);
     if (pl) {
       playlist_status = pl.status;
       playlist_has_published = pl.published_snapshot !== null;
@@ -131,29 +132,29 @@ router.get('/:id', (req, res) => {
   const dayAgo = Math.floor(Date.now() / 1000) - 86400;
   let statusLog = [];
   try {
-    statusLog = db.prepare(
+    statusLog = await db.prepare(
       'SELECT status, timestamp FROM device_status_log WHERE device_id = ? AND timestamp > ? ORDER BY timestamp ASC'
     ).all(req.params.id, dayAgo);
   } catch (_) {}
 
   // Also get telemetry timestamps as heartbeat proof (fills gaps between status events)
-  const uptimeData = db.prepare(
+  const uptimeData = (await db.prepare(
     'SELECT reported_at FROM device_telemetry WHERE device_id = ? AND reported_at > ? ORDER BY reported_at ASC'
-  ).all(req.params.id, dayAgo).map(r => r.reported_at);
+  ).all(req.params.id, dayAgo)).map(r => r.reported_at);
 
   res.json({ ...stripDeviceSecrets(device), telemetry, screenshot, assignments, playlist_status, playlist_has_published, uptimeData, statusLog });
-});
+}));
 
 // Helper: check device write access via the workspace the device belongs to.
 // Phase 2.2a: replaces user_id + team_members check. Allows: platform_admin,
 // org_owner/admin of the device's org (acting-as), workspace_admin/editor of
 // the device's workspace. Denies workspace_viewer and non-members.
-function checkDeviceOwnership(req, res) {
-  const device = db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
+async function checkDeviceOwnership(req, res) {
+  const device = await db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
   if (!device) { res.status(404).json({ error: 'Device not found' }); return null; }
   if (!device.workspace_id) { res.status(403).json({ error: 'Device not assigned to a workspace' }); return null; }
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   // ctx.actingAs covers platform_admin and org_owner/admin paths (always writable).
   // Direct workspace members: workspace_viewer is read-only.
@@ -171,22 +172,22 @@ function checkDeviceOwnership(req, res) {
 // FOLLOWER would otherwise freeze waiting for leader wall:sync that a socket-free
 // preview can't deliver, so wall members preview full-frame. Device-READ gated
 // (mirrors GET /:id — viewers allowed); NOT requirePlaylistRead, NOT the write gate.
-router.get('/:id/preview-payload', (req, res) => {
-  const device = db.prepare('SELECT id, workspace_id FROM devices WHERE id = ?').get(req.params.id);
+router.get('/:id/preview-payload', routeAsync(async (req, res) => {
+  const device = await db.prepare('SELECT id, workspace_id FROM devices WHERE id = ?').get(req.params.id);
   if (!device) return res.status(404).json({ error: 'Device not found' });
   if (!device.workspace_id) return res.status(403).json({ error: 'Device not assigned to a workspace' });
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) return res.status(403).json({ error: 'Access denied' });
   const { buildPlaylistPayload } = require('../ws/deviceSocket');
-  const payload = buildPlaylistPayload(req.params.id);
+  const payload = await buildPlaylistPayload(req.params.id);
   payload.wall_config = null; // v1: wall members preview full-frame (no socket-free follower freeze)
   res.json(payload);
-});
+}));
 
 // Update device
-router.put('/:id', (req, res) => {
-  const device = checkDeviceOwnership(req, res);
+router.put('/:id', routeAsync(async (req, res) => {
+  const device = await checkDeviceOwnership(req, res);
   if (!device) return;
 
   const { name, notes, timezone, orientation, default_content_id, layout_id } = req.body;
@@ -205,31 +206,34 @@ router.put('/:id', (req, res) => {
   // workspace; null clears it (fullscreen).
   if (layout_id !== undefined) {
     if (layout_id !== null) {
-      const layout = db.prepare('SELECT id FROM layouts WHERE id = ? AND (is_template = 1 OR workspace_id = ?)').get(layout_id, device.workspace_id);
+      const layout = await db.prepare('SELECT id FROM layouts WHERE id = ? AND (is_template = 1 OR workspace_id = ?)').get(layout_id, device.workspace_id);
       if (!layout) return res.status(400).json({ error: 'layout_id not found in this workspace' });
     }
     updates.push('layout_id = ?'); values.push(layout_id || null);
   }
   if (updates.length > 0) {
     values.push(req.params.id);
-    db.prepare(`UPDATE devices SET ${updates.join(', ')}, updated_at = strftime('%s','now') WHERE id = ?`).run(...values);
+    await db.prepare(`UPDATE devices SET ${updates.join(', ')}, updated_at = strftime('%s','now') WHERE id = ?`).run(...values);
   }
 
-  const updated = db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
+  const updated = await db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
   res.json(stripDeviceSecrets(updated));
-});
+}));
 
 // Delete device
-router.delete('/:id', (req, res) => {
-  const device = checkDeviceOwnership(req, res);
+router.delete('/:id', routeAsync(async (req, res) => {
+  const device = await checkDeviceOwnership(req, res);
   if (!device) return;
 
   // Clean up related data (playlist is NOT deleted — may be shared with other devices)
-  db.prepare('DELETE FROM schedules WHERE device_id = ?').run(req.params.id);
-  db.prepare('DELETE FROM screenshots WHERE device_id = ?').run(req.params.id);
-  db.prepare('DELETE FROM device_telemetry WHERE device_id = ?').run(req.params.id);
-  db.prepare('DELETE FROM video_wall_devices WHERE device_id = ?').run(req.params.id);
-  db.prepare('DELETE FROM devices WHERE id = ?').run(req.params.id);
+  const remove = db.transaction(async () => {
+    await db.prepare('DELETE FROM schedules WHERE device_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM screenshots WHERE device_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM device_telemetry WHERE device_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM video_wall_devices WHERE device_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM devices WHERE id = ?').run(req.params.id);
+  });
+  await remove();
 
   // Notify dashboard in real-time. Phase 2.3: scope to the device's
   // (now-deleted but still-known) workspace room. `device.workspace_id`
@@ -241,6 +245,6 @@ router.delete('/:id', (req, res) => {
   }
 
   res.json({ success: true });
-});
+}));
 
 module.exports = router;

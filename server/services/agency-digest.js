@@ -7,7 +7,7 @@
 // rules: (1) never let the queue balloon when SMTP is off; (2) a failed send retries next
 // cycle instead of silently dropping.
 
-const { db: defaultDb } = require('../db/database');
+const { db: defaultDb } = require('../db/client');
 const defaultEmail = require('./email');
 
 const FLUSH_MS = 15 * 60 * 1000; // the digest window
@@ -42,15 +42,24 @@ function composeDigest(db, g) {
   };
 }
 
+async function composeDigestAsync(db, g) {
+  const agency = (await db.prepare('SELECT name FROM api_tokens WHERE id = ?').get(g.token_id))?.name || 'An agency';
+  const playlist = (await db.prepare('SELECT name FROM playlists WHERE id = ?').get(g.playlist_id))?.name || 'a playlist';
+  const n = g.n;
+  return g.action === 'draft'
+    ? { subject: `${agency} added ${n} item${n === 1 ? '' : 's'} to "${playlist}" — awaiting your approval`, text: `${agency} added ${n} item${n === 1 ? '' : 's'} to the playlist "${playlist}".\n\nThey are saved as drafts and will NOT appear on screens until you publish the playlist.` }
+    : { subject: `${agency} updated "${playlist}"`, text: `${agency} added ${n} item${n === 1 ? '' : 's'} to the playlist "${playlist}", now live (this token is set to auto-publish).` };
+}
+
 // Core flush - testable: pass a db and an email impl ({ isConfigured, sendEmail }).
 async function flushAgencyDigests(db = defaultDb, email = defaultEmail) {
   if (!email.isConfigured()) {
     // SMTP off -> drain-and-discard so the queue can't grow unbounded on self-hosters
     // who never set up email. (The endpoint also skips enqueue when off; this is the backstop.)
-    db.prepare('DELETE FROM agency_notifications WHERE sent_at IS NULL').run();
+    await db.prepare('DELETE FROM agency_notifications WHERE sent_at IS NULL').run();
     return;
   }
-  const groups = db.prepare(`
+  const groups = await db.prepare(`
     SELECT workspace_id, token_id, playlist_id, action, COUNT(*) AS n, GROUP_CONCAT(id) AS ids
     FROM agency_notifications WHERE sent_at IS NULL
     GROUP BY token_id, playlist_id, action
@@ -58,9 +67,17 @@ async function flushAgencyDigests(db = defaultDb, email = defaultEmail) {
 
   for (const g of groups) {
     try {
-      const recipients = resolveRecipients(db, g.workspace_id, g.playlist_id);
+      const recipients = await db.prepare(`
+        SELECT u.email FROM organization_members om
+        JOIN workspaces w ON w.organization_id = om.organization_id
+        JOIN users u ON u.id = om.user_id
+        WHERE w.id = ? AND om.role IN ('org_owner', 'org_admin') AND u.email IS NOT NULL
+        UNION
+        SELECT u.email FROM playlists p JOIN users u ON u.id = p.user_id
+        WHERE p.id = ? AND u.email IS NOT NULL
+      `).all(g.workspace_id, g.playlist_id);
       if (recipients.length) {
-        const { subject, text } = composeDigest(db, g);
+        const { subject, text } = await composeDigestAsync(db, g);
         for (const r of recipients) {
           await email.sendEmail({ to: r.email, subject, text }); // throw -> caught below -> NOT stamped -> retried
         }
@@ -69,7 +86,7 @@ async function flushAgencyDigests(db = defaultDb, email = defaultEmail) {
       // recipients). A throw above skips this -> the rows stay unsent for the next cycle.
       const now = Math.floor(Date.now() / 1000);
       const stamp = db.prepare('UPDATE agency_notifications SET sent_at = ? WHERE id = ?');
-      db.transaction(() => { for (const id of g.ids.split(',')) stamp.run(now, id); })();
+      await db.transaction(async () => { for (const id of g.ids.split(',')) await stamp.run(now, id); })();
     } catch (e) {
       console.warn('agency digest: send failed, will retry next cycle:', e.message);
     }

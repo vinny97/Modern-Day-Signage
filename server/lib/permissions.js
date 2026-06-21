@@ -134,9 +134,31 @@ function canAccessWorkspace(db, user, workspace) {
   return !!wm;
 }
 
+async function canAdminWorkspaceAsync(db, user, workspace) {
+  if (!user || !workspace) return false;
+  if (isPlatformRole(user.role)) return true;
+  const om = await db.prepare('SELECT role FROM organization_members WHERE organization_id = ? AND user_id = ?')
+    .get(workspace.organization_id, user.id);
+  if (om && (om.role === 'org_owner' || om.role === 'org_admin')) return true;
+  const wm = await db.prepare('SELECT role FROM workspace_members WHERE workspace_id = ? AND user_id = ?')
+    .get(workspace.id, user.id);
+  return !!wm && wm.role === 'workspace_admin';
+}
+
+async function canAccessWorkspaceAsync(db, user, workspace) {
+  if (!user || !workspace) return false;
+  if (isPlatformStaff(user.role)) return true;
+  const om = await db.prepare('SELECT role FROM organization_members WHERE organization_id = ? AND user_id = ?')
+    .get(workspace.organization_id, user.id);
+  if (om && (om.role === 'org_owner' || om.role === 'org_admin')) return true;
+  return !!await db.prepare('SELECT 1 FROM workspace_members WHERE workspace_id = ? AND user_id = ?')
+    .get(workspace.id, user.id);
+}
+
 module.exports = {
   // boolean predicates
-  canRead, canWrite, canAdmin, canAdminWorkspace, canAccessWorkspace, isOrgAdmin, isOrgOwner,
+  canRead, canWrite, canAdmin, canAdminWorkspace, canAccessWorkspace,
+  canAdminWorkspaceAsync, canAccessWorkspaceAsync, isOrgAdmin, isOrgOwner,
   // express middleware
   requireWorkspace,
   requireWorkspaceRead,

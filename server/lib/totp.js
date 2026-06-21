@@ -8,7 +8,7 @@
 const { authenticator } = require('otplib');
 const crypto = require('crypto');
 const secretbox = require('./secretbox');
-const { hashToken } = require('../middleware/apiToken');
+const { hashToken } = require('./token-hash');
 
 const STEP_SEC = 30;
 const ISSUER = 'ScreenTinker';

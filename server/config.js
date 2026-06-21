@@ -20,6 +20,12 @@ module.exports = {
   uploadsDir,
   contentDir: path.join(uploadsDir, 'content'),
   screenshotsDir: path.join(uploadsDir, 'screenshots'),
+  storageDriver: (process.env.STORAGE_DRIVER || 'local').toLowerCase(),
+  r2AccountId: process.env.R2_ACCOUNT_ID || '',
+  r2AccessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+  r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+  r2Bucket: process.env.R2_BUCKET || '',
+  r2Prefix: (process.env.R2_PREFIX || '').replace(/^\/+|\/+$/g, ''),
   certsDir,
   frontendDir: path.join(__dirname, '..', 'frontend'),
   // App-level heartbeat. Checker runs every heartbeatInterval and marks

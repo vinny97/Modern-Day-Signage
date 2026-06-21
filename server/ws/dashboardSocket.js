@@ -1,7 +1,7 @@
 const heartbeat = require('../services/heartbeat');
 const { verifyToken } = require('../middleware/auth');
-const { db } = require('../db/database');
-const { accessContext, accessibleWorkspaceIds } = require('../lib/tenancy');
+const { db } = require('../db/client');
+const { accessContextAsync, accessibleWorkspaceIdsAsync } = require('../lib/tenancy');
 const { workspaceRoom } = require('../lib/socket-rooms');
 
 // Phase 2.3: workspace-scoped socket rooms + per-command permission gates.
@@ -17,12 +17,12 @@ const { workspaceRoom } = require('../lib/socket-rooms');
 // Permission gate for inbound socket commands. Read tier = workspace_viewer+;
 // write tier = workspace_editor+. Platform_admin and org_owner/admin always
 // pass via actingAs.
-function canActOnDevice(socket, deviceId, tier /* 'read' | 'write' */) {
-  const device = db.prepare('SELECT workspace_id FROM devices WHERE id = ?').get(deviceId);
+async function canActOnDevice(socket, deviceId, tier /* 'read' | 'write' */) {
+  const device = await db.prepare('SELECT workspace_id FROM devices WHERE id = ?').get(deviceId);
   if (!device || !device.workspace_id) return false;
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(device.workspace_id);
   if (!ws) return false;
-  const ctx = accessContext(socket.userId, socket.userRole, ws);
+  const ctx = await accessContextAsync(socket.userId, socket.userRole, ws);
   if (!ctx) return false;
   if (ctx.actingAs) return true; // platform_admin or org admin
   if (tier === 'read') return !!ctx.workspaceRole; // viewer/editor/admin all OK
@@ -47,54 +47,54 @@ module.exports = function setupDashboardSocket(io) {
     }
   });
 
-  dashboardNs.on('connection', (socket) => {
+  dashboardNs.on('connection', async (socket) => {
     // Note on workspace-switch lifecycle: the switcher (Phase 3 MVP) calls
     // window.location.reload() after switching, which forces a new socket
     // connection with fresh JWT claims. So workspace memberships are
     // re-evaluated at connect time and we don't need to re-evaluate per-emit.
-    const wsIds = accessibleWorkspaceIds(socket.userId, socket.userRole);
+    const wsIds = await accessibleWorkspaceIdsAsync(socket.userId, socket.userRole);
     for (const wsId of wsIds) socket.join(workspaceRoom(wsId));
     console.log(`Dashboard client connected: ${socket.id} (user: ${socket.userId}, rooms: ${wsIds.length})`);
 
-    socket.on('dashboard:request-screenshot', (data) => {
+    socket.on('dashboard:request-screenshot', async (data) => {
       const { device_id } = data;
-      if (!canActOnDevice(socket, device_id, 'read')) return;
+      if (!await canActOnDevice(socket, device_id, 'read')) return;
       const conn = heartbeat.getConnection(device_id);
       if (conn) deviceNs.to(device_id).emit('device:screenshot-request', {});
     });
 
-    socket.on('dashboard:remote-touch', (data) => {
+    socket.on('dashboard:remote-touch', async (data) => {
       const { device_id, x, y, action } = data;
-      if (!canActOnDevice(socket, device_id, 'write')) return;
+      if (!await canActOnDevice(socket, device_id, 'write')) return;
       deviceNs.to(device_id).emit('device:remote-touch', { x, y, action });
     });
 
-    socket.on('dashboard:remote-key', (data) => {
+    socket.on('dashboard:remote-key', async (data) => {
       const { device_id, keycode } = data;
-      if (!canActOnDevice(socket, device_id, 'write')) return;
+      if (!await canActOnDevice(socket, device_id, 'write')) return;
       console.log(`Remote key: ${keycode} -> ${device_id}`);
       deviceNs.to(device_id).emit('device:remote-key', { keycode });
     });
 
-    socket.on('dashboard:remote-start', (data) => {
+    socket.on('dashboard:remote-start', async (data) => {
       const { device_id } = data;
-      if (!canActOnDevice(socket, device_id, 'write')) return;
+      if (!await canActOnDevice(socket, device_id, 'write')) return;
       const room = deviceNs.adapter.rooms.get(device_id);
       console.log(`Remote start for ${device_id}, room has ${room?.size || 0} socket(s)`);
       deviceNs.to(device_id).emit('device:remote-start', {});
       console.log(`Remote session started for device ${device_id}`);
     });
 
-    socket.on('dashboard:remote-stop', (data) => {
+    socket.on('dashboard:remote-stop', async (data) => {
       const { device_id } = data;
-      if (!canActOnDevice(socket, device_id, 'write')) return;
+      if (!await canActOnDevice(socket, device_id, 'write')) return;
       deviceNs.to(device_id).emit('device:remote-stop', {});
       console.log(`Remote session stopped for device ${device_id}`);
     });
 
-    socket.on('dashboard:device-command', (data, ack) => {
+    socket.on('dashboard:device-command', async (data, ack) => {
       const { device_id, type, payload } = data;
-      if (!canActOnDevice(socket, device_id, 'write')) {
+      if (!await canActOnDevice(socket, device_id, 'write')) {
         if (typeof ack === 'function') ack({ delivered: false, reason: 'forbidden' });
         return;
       }
@@ -125,4 +125,3 @@ module.exports = function setupDashboardSocket(io) {
 
   return dashboardNs;
 };
-

@@ -14,7 +14,7 @@
 // Opt-out: users who explicitly turned email alerts off (email_alerts = 0) are
 // excluded; NULL/unset and on (1) both qualify via COALESCE(...,1)=1.
 
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { sendEmail } = require('./email');
 
 const NUDGE_HOUR_UTC = 15; // 15:00 UTC daily
@@ -105,7 +105,7 @@ function isHosted() {
 // without waiting for 15:00 UTC. Returns the number of nudges sent.
 async function runActivationNudgeSweep() {
   if (!isHosted()) return 0; // defense in depth (scheduler is also gated)
-  const users = db.prepare(ELIGIBLE_SQL).all();
+  const users = await db.prepare(ELIGIBLE_SQL).all();
   console.log(`[NUDGE] sweep: ${users.length} eligible user(s)`);
   let sent = 0;
   for (const u of users) {
@@ -120,7 +120,7 @@ async function runActivationNudgeSweep() {
     });
     console.log(`[NUDGE] nudge -> ${u.email}: ${JSON.stringify(r)}`);
     // Stamp after the send (no retry, same discipline as the welcome email).
-    db.prepare("UPDATE users SET activation_nudge_sent_at = strftime('%s','now') WHERE id = ?").run(u.id);
+    await db.prepare("UPDATE users SET activation_nudge_sent_at = strftime('%s','now') WHERE id = ?").run(u.id);
     sent++;
   }
   return sent;

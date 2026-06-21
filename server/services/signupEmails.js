@@ -18,7 +18,7 @@
 // for an existing user, so a failed Graph send is surfaced in the logs and left
 // alone rather than retried (that code would be dead).
 
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { sendEmail } = require('./email');
 const { getClientIp } = require('./activity');
 const config = require('../config');
@@ -125,12 +125,12 @@ User agent: ${userAgent || 'unknown'}`;
 // Public entry point. `user` only needs `.id`; everything else is re-read from
 // the row so the caller's column selection doesn't matter. `req` supplies the
 // client IP (CF-aware), Cloudflare's free CF-IPCountry header, and user agent.
-function sendSignupEmails(user, req) {
+async function sendSignupEmails(user, req) {
   try {
     // Hosted instance only.
     if (config.selfHosted) return;
 
-    const row = db.prepare(
+    const row = await db.prepare(
       'SELECT email, name, created_at, welcome_email_sent_at FROM users WHERE id = ?'
     ).get(user.id);
     if (!row || row.welcome_email_sent_at) return; // unknown or already handled
@@ -140,7 +140,7 @@ function sendSignupEmails(user, req) {
     const signupUnix = row.created_at || Math.floor(Date.now() / 1000);
 
     // Workspace name is always "Default" at signup, so use the org name instead.
-    const orgRow = db.prepare(
+    const orgRow = await db.prepare(
       'SELECT name FROM organizations WHERE owner_user_id = ? ORDER BY created_at ASC LIMIT 1'
     ).get(user.id);
     const orgName = orgRow ? orgRow.name : `${name}'s organization`;
@@ -149,7 +149,7 @@ function sendSignupEmails(user, req) {
     const country = (req && req.headers && req.headers['cf-ipcountry']) || 'unknown';
     const userAgent = (req && req.headers && req.headers['user-agent']) || 'unknown';
 
-    (async () => {
+    await (async () => {
       const w = await sendEmail({
         to: email,
         fromName: 'Dan at ScreenTinker',
@@ -174,7 +174,7 @@ function sendSignupEmails(user, req) {
 
       // Stamp after the send block regardless of per-email outcome (no retry):
       // marks this user handled so we never double-send.
-      db.prepare("UPDATE users SET welcome_email_sent_at = strftime('%s','now') WHERE id = ?")
+      await db.prepare("UPDATE users SET welcome_email_sent_at = strftime('%s','now') WHERE id = ?")
         .run(user.id);
     })().catch(e => console.error(`[SIGNUP-EMAIL] unexpected failure for ${email}: ${e.message}`));
   } catch (e) {

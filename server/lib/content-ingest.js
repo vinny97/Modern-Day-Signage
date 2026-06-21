@@ -8,8 +8,9 @@
 
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const config = require('../config');
+const storage = require('./storage');
 const { sanitizeString } = require('../middleware/sanitize');
 
 // Multer takes file.originalname from the multipart header, bypassing sanitizeBody, so
@@ -66,12 +67,23 @@ async function ingestUploadedFile({ file, userId, workspaceId }) {
     console.warn('Thumbnail/metadata generation failed:', e.message);
   }
 
-  db.prepare(`
+  await storage.putFile('content', filepath, file.path, file.mimetype);
+  if (thumbnailPath) {
+    await storage.putFile('content', thumbnailPath, path.join(config.contentDir, thumbnailPath), 'image/jpeg');
+  }
+
+  await db.prepare(`
     INSERT INTO content (id, user_id, workspace_id, filename, filepath, mime_type, file_size, duration_sec, thumbnail_path, width, height)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(id, userId, workspaceId, safeFilename(file.originalname), filepath, file.mimetype, file.size, durationSec, thumbnailPath, width, height);
 
-  return db.prepare('SELECT * FROM content WHERE id = ?').get(id);
+  if (storage.isR2) {
+    for (const local of [file.path, thumbnailPath && path.join(config.contentDir, thumbnailPath)].filter(Boolean)) {
+      try { require('fs').unlinkSync(local); } catch {}
+    }
+  }
+
+  return await db.prepare('SELECT * FROM content WHERE id = ?').get(id);
 }
 
 module.exports = { ingestUploadedFile, safeFilename };

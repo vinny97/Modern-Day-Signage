@@ -25,22 +25,22 @@ const { requireAuth, generateMfaPendingToken, generateToken } = require('../midd
 const totp = require('../lib/totp');
 const totpLockout = require('../lib/totp-lockout');
 
-function runRequireAuth(token) {
+async function runRequireAuth(token) {
   const req = { headers: { authorization: 'Bearer ' + token }, originalUrl: '/api/devices' };
   let status = 200, nexted = false;
   const res = { status(s) { status = s; return this; }, json() { return this; } };
-  requireAuth(req, res, () => { nexted = true; });
+  await requireAuth(req, res, () => { nexted = true; });
   return { status, nexted, req };
 }
 
-test('#100 BITE: requireAuth rejects an mfa_pending token (no password-only session)', () => {
-  const pending = runRequireAuth(generateMfaPendingToken({ id: 'u1' }));
+test('#100 BITE: requireAuth rejects an mfa_pending token (no password-only session)', async () => {
+  const pending = await runRequireAuth(generateMfaPendingToken({ id: 'u1' }));
   assert.equal(pending.status, 401, 'mfa_pending token must be 401');
   assert.equal(pending.nexted, false, 'must NOT call next() for an mfa_pending token');
   // Contrast: a FULL token for the SAME user passes - so the user EXISTS in the db,
   // which means removing the mfa_pending check would let the pending token through too
   // (next() called). That's what makes this a real bite-test, not a vacuous 401.
-  const full = runRequireAuth(generateToken({ id: 'u1', email: 'u1@x', role: 'user' }, null));
+  const full = await runRequireAuth(generateToken({ id: 'u1', email: 'u1@x', role: 'user' }, null));
   assert.equal(full.nexted, true, 'a full token for the same user must pass requireAuth');
   assert.equal(full.req.user.id, 'u1');
 });

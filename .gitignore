@@ -7,3 +7,11 @@ server/.env
 server/.env.*
 !.env.example
 !server/.env.example
+
+# Runtime-generated credentials and TLS material
+server/certs/.jwt_secret
+server/certs/*.pem
+server/certs/*.key
+server/db/*.db-shm
+server/db/*.db-wal
+server/db/remote_display.pre-*.db

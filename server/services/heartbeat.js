@@ -1,4 +1,4 @@
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const config = require('../config');
 const { deviceRoom, emitToWorkspace } = require('../lib/socket-rooms');
 
@@ -6,24 +6,24 @@ const { deviceRoom, emitToWorkspace } = require('../lib/socket-rooms');
 const deviceConnections = new Map();
 
 function startHeartbeatChecker(io) {
-  setInterval(() => {
+  setInterval(async () => {
     const now = Date.now();
     const dashboardNs = io.of('/dashboard');
 
     // Check database for devices that should be offline
-    const onlineDevices = db.prepare("SELECT id, last_heartbeat FROM devices WHERE status = 'online'").all();
+    const onlineDevices = await db.prepare("SELECT id, last_heartbeat FROM devices WHERE status = 'online'").all();
 
     for (const device of onlineDevices) {
       const conn = deviceConnections.get(device.id);
       const lastBeat = conn ? conn.lastHeartbeat : (device.last_heartbeat ? device.last_heartbeat * 1000 : 0);
 
       if (now - lastBeat > config.heartbeatTimeout) {
-        db.prepare("UPDATE devices SET status = 'offline', updated_at = strftime('%s','now') WHERE id = ?")
+        await db.prepare("UPDATE devices SET status = 'offline', updated_at = strftime('%s','now') WHERE id = ?")
           .run(device.id);
         deviceConnections.delete(device.id);
 
         // Notify dashboard (workspace-scoped via the device's room).
-        emitToWorkspace(dashboardNs, deviceRoom(device.id), 'dashboard:device-status', {
+        emitToWorkspace(dashboardNs, await deviceRoom(device.id), 'dashboard:device-status', {
           device_id: device.id,
           status: 'offline',
           telemetry: null
@@ -31,31 +31,31 @@ function startHeartbeatChecker(io) {
 
         console.log(`Device ${device.id} marked offline (heartbeat timeout)`);
         try {
-          db.prepare('INSERT INTO device_status_log (device_id, status) VALUES (?, ?)').run(device.id, 'offline_timeout');
+          await db.prepare('INSERT INTO device_status_log (device_id, status) VALUES (?, ?)').run(device.id, 'offline_timeout');
         } catch (_) {}
       }
     }
 
     // Cleanup: delete unclaimed provisioning devices older than 24 hours
     // Keep imported devices (they have user_id set) so users can re-pair them
-    db.prepare(`
+    await db.prepare(`
       DELETE FROM devices WHERE status = 'provisioning'
       AND user_id IS NULL
       AND created_at < strftime('%s','now') - (365 * 86400)
     `).run();
 
     // Cleanup: prune play logs older than 90 days
-    db.prepare(`
+    await db.prepare(`
       DELETE FROM play_logs WHERE started_at < strftime('%s','now') - (90 * 86400)
     `).run();
 
     // Cleanup: expired team invites
-    db.prepare(`
+    await db.prepare(`
       DELETE FROM team_invites WHERE expires_at < strftime('%s','now')
     `).run();
 
     // Cleanup: expired workspace invites
-    db.prepare(`
+    await db.prepare(`
       DELETE FROM workspace_invites WHERE expires_at < strftime('%s','now')
     `).run();
 

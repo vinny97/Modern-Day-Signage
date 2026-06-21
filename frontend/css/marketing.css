@@ -54,8 +54,14 @@ h3 { font-size:24px; margin-bottom:12px; }
 .hero.dark .hero-note { color:#d2d2d2; }
 .check-line { display:flex; align-items:flex-start; gap:10px; font-weight:750; }
 .check-line::before { content:""; width:18px; height:18px; margin-top:4px; border-radius:999px; background:#fce5e2; border:1px solid #f3c4bf; flex:0 0 18px; }
+.landing-hero .section { grid-template-columns:minmax(0,45fr) minmax(380px,55fr); gap:clamp(32px,4vw,56px); min-height:calc(100vh - 94px); min-height:calc(100svh - 94px); padding-top:clamp(32px,5vh,56px); padding-bottom:clamp(32px,5vh,56px); }
+.landing-hero h1 { font-size:clamp(48px,4.4vw,60px); line-height:1.02; margin-bottom:18px; }
+.landing-hero .hero-copy > p { font-size:clamp(17px,1.5vw,20px); max-width:620px; margin-bottom:22px; }
+.landing-hero .hero-note { margin-top:20px; gap:8px; }
 .showcase-card { position:relative; overflow:hidden; border-radius:22px; background:#fff; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.5); }
+.landing-hero .showcase-card { justify-self:end; width:min(100%,72vh); width:min(100%,72svh); }
 .showcase-card img { width:100%; aspect-ratio:1/1; object-fit:cover; }
+.landing-hero .showcase-card img { height:auto; object-fit:contain; }
 .showcase-caption { position:absolute; left:24px; right:24px; bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:14px; background:rgba(255,255,255,0.94); border:1px solid rgba(255,255,255,0.72); border-radius:10px; padding:16px 18px; box-shadow:0 14px 36px rgba(20,24,33,0.16); }
 .showcase-caption strong { display:block; color:var(--ink); font-size:17px; line-height:1.25; }
 .showcase-caption span { color:var(--muted); font-size:13px; }
@@ -145,6 +151,9 @@ footer { background:#fff; border-top:1px solid var(--line); }
   .brand, .brand img { width:144px; }
   .hero .section, .contact-layout { grid-template-columns:1fr; min-height:auto; }
   .hero .section { padding-top:70px; }
+  .landing-hero .section { padding-top:56px; padding-bottom:56px; gap:42px; }
+  .landing-hero h1 { font-size:clamp(42px,7vw,58px); }
+  .landing-hero .showcase-card { justify-self:center; width:min(100%,680px); }
   .how-it-works, .pricing-grid, .reviews, .industries-grid, .four-grid, .use-case-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .image-feature, .image-feature.flip { grid-template-columns:1fr; }
 }
@@ -154,6 +163,10 @@ footer { background:#fff; border-top:1px solid var(--line); }
   .nav-actions .btn-outline { display:none; }
   .section { padding:62px 16px; }
   h1 { font-size:44px; }
+  .landing-hero .section { padding-top:42px; padding-bottom:48px; gap:32px; }
+  .landing-hero h1 { font-size:clamp(40px,11vw,48px); }
+  .landing-hero .hero-actions { align-items:stretch; flex-direction:column; }
+  .landing-hero .hero-actions .btn { width:100%; }
   .panel-grid, .three-grid, .how-it-works, .pricing-grid, .reviews, .industries-grid, .four-grid, .use-case-strip, .form-grid { grid-template-columns:1fr; }
   .showcase-caption { left:12px; right:12px; bottom:12px; padding:12px; align-items:flex-start; flex-direction:column; }
   .image-panel img, .use-case-photo, .use-case-photo img { min-height:260px; }

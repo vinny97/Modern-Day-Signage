@@ -3,16 +3,18 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const upload = require('../middleware/upload');
 const config = require('../config');
-const { checkStorageLimit, checkRemoteUrl } = require('../middleware/subscription');
+const storage = require('../lib/storage');
+const { checkStorageLimitAsync, checkRemoteUrlAsync } = require('../middleware/subscription');
 const { sanitizeString } = require('../middleware/sanitize');
 const { PLATFORM_ROLES, ELEVATED_ROLES } = require('../middleware/auth');
 // Phase 2.2b: workspace-aware access. Mirrors the pattern from devices.js.
-const { accessContext } = require('../lib/tenancy');
+const { accessContextAsync } = require('../lib/tenancy');
 // #73: the upload ingest (processing + insert) is now shared with the agency router.
 const { ingestUploadedFile } = require('../lib/content-ingest');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // Multer captures file.originalname directly from the multipart filename header,
 // bypassing sanitizeBody. Apply the same HTML-escape here so a filename like
@@ -57,7 +59,7 @@ function validateRemoteUrl(url) {
 // Phase 2.2b: workspace-scoped. Cross-workspace visibility comes from
 // switch-workspace, not a special list filter.
 // folder_id filter: omit for everything; "root" or "" for root-level only; <uuid> for that folder.
-router.get('/', (req, res) => {
+router.get('/', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.json([]);
   const folder = req.query.folder;
   const folderId = req.query.folder_id;
@@ -74,21 +76,21 @@ router.get('/', (req, res) => {
   }
   sql += ' ORDER BY folder, created_at DESC LIMIT ? OFFSET ?';
   params.push(Math.min(parseInt(req.query.limit) || 100, 500), parseInt(req.query.offset) || 0);
-  const content = db.prepare(sql).all(...params);
+  const content = await db.prepare(sql).all(...params);
   res.json(content);
-});
+}));
 
 // Get folders list for the caller's current workspace.
-router.get('/folders', (req, res) => {
+router.get('/folders', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.json([]);
-  const folders = db.prepare(
+  const folders = await db.prepare(
     'SELECT folder, COUNT(*) as count FROM content WHERE folder IS NOT NULL AND (workspace_id = ? OR workspace_id IS NULL) GROUP BY folder ORDER BY folder'
   ).all(req.workspaceId);
   res.json(folders);
-});
+}));
 
 // Upload content
-router.post('/', checkStorageLimit, upload.single('file'), async (req, res) => {
+router.post('/', checkStorageLimitAsync, upload.single('file'), async (req, res) => {
   try {
     if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before uploading.' });
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
@@ -103,7 +105,7 @@ router.post('/', checkStorageLimit, upload.single('file'), async (req, res) => {
 });
 
 // Add remote URL content
-router.post('/remote', checkRemoteUrl, (req, res) => {
+router.post('/remote', checkRemoteUrlAsync, async (req, res) => {
   try {
     if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before adding remote content.' });
     const { url, name, mime_type } = req.body;
@@ -115,12 +117,12 @@ router.post('/remote', checkRemoteUrl, (req, res) => {
     const filename = name || url.split('/').pop()?.split('?')[0] || 'remote_content';
     const mimeType = mime_type || (url.match(/\.(mp4|webm|mkv|avi|mov)/i) ? 'video/mp4' : 'image/jpeg');
 
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO content (id, user_id, workspace_id, filename, filepath, mime_type, file_size, remote_url)
       VALUES (?, ?, ?, ?, '', ?, 0, ?)
     `).run(id, req.user.id, req.workspaceId, safeFilename(filename), mimeType, url);
 
-    const content = db.prepare('SELECT * FROM content WHERE id = ?').get(id);
+    const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(id);
     res.status(201).json(content);
   } catch (err) {
     console.error('Remote URL add error:', err);
@@ -156,12 +158,12 @@ router.post('/youtube', async (req, res) => {
     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}&enablejsapi=1`;
     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO content (id, user_id, workspace_id, filename, filepath, mime_type, file_size, remote_url, thumbnail_path)
       VALUES (?, ?, ?, ?, '', 'video/youtube', 0, ?, ?)
     `).run(id, req.user.id, req.workspaceId, safeFilename(filename), embedUrl, thumbnailUrl);
 
-    const content = db.prepare('SELECT * FROM content WHERE id = ?').get(id);
+    const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(id);
     res.status(201).json(content);
   } catch (err) {
     console.error('YouTube add error:', err);
@@ -184,19 +186,19 @@ function extractYoutubeId(url) {
 // Phase 2.2b: workspace-aware access. Mirrors the device check pattern.
 // Platform-template content (workspace_id IS NULL) is readable by anyone
 // and writable only by platform_admin.
-function checkContentRead(req, res) {
-  const content = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+async function checkContentRead(req, res) {
+  const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
   if (!content) { res.status(404).json({ error: 'Content not found' }); return null; }
   // Platform-template row: readable by anyone authenticated.
   if (!content.workspace_id) return content;
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(content.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(content.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   return content;
 }
 
-function checkContentWrite(req, res) {
-  const content = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+async function checkContentWrite(req, res) {
+  const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
   if (!content) { res.status(404).json({ error: 'Content not found' }); return null; }
   // Platform-template row: only platform_admin may write.
   if (!content.workspace_id) {
@@ -205,8 +207,8 @@ function checkContentWrite(req, res) {
     }
     return content;
   }
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(content.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(content.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   // Workspace_viewer is read-only; acting-as (platform_admin or org owner/admin) and editor/admin pass.
   if (!ctx.actingAs && ctx.workspaceRole === 'workspace_viewer') {
@@ -216,15 +218,15 @@ function checkContentWrite(req, res) {
 }
 
 // Get content metadata
-router.get('/:id', (req, res) => {
-  const content = checkContentRead(req, res);
+router.get('/:id', routeAsync(async (req, res) => {
+  const content = await checkContentRead(req, res);
   if (!content) return;
   res.json(content);
-});
+}));
 
 // Update content metadata
-router.put('/:id', (req, res) => {
-  const content = checkContentWrite(req, res);
+router.put('/:id', routeAsync(async (req, res) => {
+  const content = await checkContentWrite(req, res);
   if (!content) return;
 
   const { filename, mime_type, remote_url, folder, folder_id } = req.body;
@@ -248,7 +250,7 @@ router.put('/:id', (req, res) => {
     // break the isolation model. To move content across workspaces, switch
     // workspace first.
     if (folder_id) {
-      const target = db.prepare('SELECT workspace_id FROM content_folders WHERE id = ?').get(folder_id);
+      const target = await db.prepare('SELECT workspace_id FROM content_folders WHERE id = ?').get(folder_id);
       if (!target) return res.status(400).json({ error: 'Invalid folder_id' });
       if (target.workspace_id !== content.workspace_id) {
         return res.status(403).json({ error: 'Cannot move content to a folder in another workspace' });
@@ -260,27 +262,25 @@ router.put('/:id', (req, res) => {
 
   if (updates.length > 0) {
     values.push(req.params.id);
-    db.prepare(`UPDATE content SET ${updates.join(', ')} WHERE id = ?`).run(...values);
+    await db.prepare(`UPDATE content SET ${updates.join(', ')} WHERE id = ?`).run(...values);
   }
 
-  res.json(db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id));
-});
+  res.json(await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id));
+}));
 
 // Replace content file
-router.put('/:id/replace', upload.single('file'), async (req, res) => {
-  const content = checkContentWrite(req, res);
+router.put('/:id/replace', upload.single('file'), routeAsync(async (req, res) => {
+  const content = await checkContentWrite(req, res);
   if (!content) return;
   if (!req.file) return res.status(400).json({ error: 'No file provided' });
 
   // Delete old file
   if (content.filepath) {
-    const oldPath = path.join(config.contentDir, content.filepath);
-    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    await storage.deleteObject('content', content.filepath);
   }
   // Delete old thumbnail
   if (content.thumbnail_path) {
-    const oldThumb = path.join(config.contentDir, content.thumbnail_path);
-    if (fs.existsSync(oldThumb)) fs.unlinkSync(oldThumb);
+    await storage.deleteObject('content', content.thumbnail_path);
   }
 
   const filepath = req.file.filename;
@@ -301,52 +301,54 @@ router.put('/:id/replace', upload.single('file'), async (req, res) => {
     console.warn('Thumbnail generation failed:', e.message);
   }
 
-  db.prepare(`UPDATE content SET filepath = ?, mime_type = ?, file_size = ?, thumbnail_path = ?, width = ?, height = ? WHERE id = ?`)
+  await storage.putFile('content', filepath, req.file.path, req.file.mimetype);
+  if (thumbnailPath) await storage.putFile('content', thumbnailPath, path.join(config.contentDir, thumbnailPath), 'image/jpeg');
+  if (storage.isR2) {
+    for (const local of [req.file.path, thumbnailPath && path.join(config.contentDir, thumbnailPath)].filter(Boolean)) {
+      try { fs.unlinkSync(local); } catch {}
+    }
+  }
+
+  await db.prepare(`UPDATE content SET filepath = ?, mime_type = ?, file_size = ?, thumbnail_path = ?, width = ?, height = ? WHERE id = ?`)
     .run(filepath, req.file.mimetype, req.file.size, thumbnailPath, width, height, req.params.id);
 
-  res.json(db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id));
-});
+  res.json(await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id));
+}));
 
 // Serve content file
-router.get('/:id/file', (req, res) => {
-  const content = checkContentRead(req, res);
+router.get('/:id/file', routeAsync(async (req, res) => {
+  const content = await checkContentRead(req, res);
   if (!content) return;
   if (!content.filepath) return res.status(404).json({ error: 'No file (remote URL content)' });
   // Prevent path traversal
-  const safePath = path.resolve(config.contentDir, path.basename(content.filepath));
-  if (!safePath.startsWith(path.resolve(config.contentDir))) return res.status(403).json({ error: 'Invalid path' });
-  res.sendFile(safePath);
-});
+  await storage.sendObject(res, 'content', content.filepath, content.mime_type);
+}));
 
 // Serve thumbnail
-router.get('/:id/thumbnail', (req, res) => {
-  const content = checkContentRead(req, res);
+router.get('/:id/thumbnail', routeAsync(async (req, res) => {
+  const content = await checkContentRead(req, res);
   if (!content) return;
   if (!content.thumbnail_path) return res.status(404).json({ error: 'Thumbnail not found' });
-  const safePath = path.resolve(config.contentDir, path.basename(content.thumbnail_path));
-  if (!safePath.startsWith(path.resolve(config.contentDir))) return res.status(403).json({ error: 'Invalid path' });
-  res.sendFile(safePath);
-});
+  await storage.sendObject(res, 'content', content.thumbnail_path, 'image/jpeg');
+}));
 
 // Delete content
-router.delete('/:id', (req, res) => {
-  const content = checkContentWrite(req, res);
+router.delete('/:id', routeAsync(async (req, res) => {
+  const content = await checkContentWrite(req, res);
   if (!content) return;
 
   // Delete file from disk (skip for remote URL content)
   if (content.filepath) {
-    const filePath = path.join(config.contentDir, content.filepath);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    await storage.deleteObject('content', content.filepath);
   }
 
   // Delete thumbnail
   if (content.thumbnail_path) {
-    const thumbPath = path.join(config.contentDir, content.thumbnail_path);
-    if (fs.existsSync(thumbPath)) fs.unlinkSync(thumbPath);
+    await storage.deleteObject('content', content.thumbnail_path);
   }
 
   // Get devices that have this content in their playlist (via playlist_items)
-  const affectedDevices = db.prepare(`
+  const affectedDevices = await db.prepare(`
     SELECT DISTINCT d.id as device_id FROM devices d
     JOIN playlists p ON d.playlist_id = p.id
     JOIN playlist_items pi ON pi.playlist_id = p.id
@@ -360,7 +362,7 @@ router.delete('/:id', (req, res) => {
   // Phase 2.2k: scope snapshot scrubbing by content.workspace_id (was content.user_id).
   // Playlists referencing this content live in the same workspace; user_id-keying missed
   // cross-user playlists in the same workspace once playlists became workspace-scoped.
-  const snapshotPlaylists = db.prepare(
+  const snapshotPlaylists = await db.prepare(
     "SELECT id, published_snapshot FROM playlists WHERE workspace_id = ? AND published_snapshot LIKE ?"
   ).all(content.workspace_id, `%${req.params.id}%`);
   for (const pl of snapshotPlaylists) {
@@ -368,14 +370,22 @@ router.delete('/:id', (req, res) => {
       const items = JSON.parse(pl.published_snapshot);
       const filtered = items.filter(item => item.content_id !== req.params.id);
       if (filtered.length !== items.length) {
-        db.prepare('UPDATE playlists SET published_snapshot = ? WHERE id = ?')
+        await db.prepare('UPDATE playlists SET published_snapshot = ? WHERE id = ?')
           .run(JSON.stringify(filtered), pl.id);
       }
     } catch (e) { /* corrupt snapshot, skip */ }
   }
 
   // Delete from DB (cascades to playlist_items via ON DELETE CASCADE)
-  db.prepare('DELETE FROM content WHERE id = ?').run(req.params.id);
+  const remove = db.transaction(async () => {
+    const itemRows = await db.prepare('SELECT id FROM playlist_items WHERE content_id = ?').all(req.params.id);
+    for (const item of itemRows) {
+      await db.prepare('DELETE FROM playlist_item_schedules WHERE playlist_item_id = ?').run(item.id);
+    }
+    await db.prepare('DELETE FROM playlist_items WHERE content_id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM content WHERE id = ?').run(req.params.id);
+  });
+  await remove();
 
   // Push updated snapshots to affected devices
   try {
@@ -385,12 +395,12 @@ router.delete('/:id', (req, res) => {
       const commandQueue = require('../lib/command-queue');
       const deviceNs = io.of('/device');
       for (const d of affectedDevices) {
-        commandQueue.queueOrEmitPlaylistUpdate(deviceNs, d.device_id, buildPlaylistPayload);
+        await commandQueue.queueOrEmitPlaylistUpdate(deviceNs, d.device_id, buildPlaylistPayload);
       }
     }
   } catch (e) { /* silent */ }
 
   res.json({ success: true, affectedDevices: affectedDevices.map(d => d.device_id) });
-});
+}));
 
 module.exports = router;

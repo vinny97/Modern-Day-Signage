@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 
 // Phase 2.1: JWT now optionally carries the user's current workspace_id so
 // the tenancy middleware can resolve scope without an extra DB lookup on
@@ -47,7 +47,7 @@ function recoveryUser(decoded) {
 }
 
 // Express middleware - requires valid JWT
-function requireAuth(req, res, next) {
+async function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -66,7 +66,7 @@ function requireAuth(req, res, next) {
     // accepts it. If this check is removed, password-alone yields a working session and
     // TOTP is bypassed. (Covered by the mfa_pending bite-test.)
     if (decoded.mfa_pending) return res.status(401).json({ error: 'mfa_required' });
-    const user = db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, email_alerts, must_change_password FROM users WHERE id = ?').get(decoded.id);
+    const user = await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, email_alerts, must_change_password FROM users WHERE id = ?').get(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
     req.user = user;
     // Tenancy middleware reads this on the resolver step.
@@ -88,7 +88,7 @@ function requireAuth(req, res, next) {
 }
 
 // Optional auth - sets req.user if token present, continues either way
-function optionalAuth(req, res, next) {
+async function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     try {
@@ -97,7 +97,7 @@ function optionalAuth(req, res, next) {
       if (decoded.mfa_pending) return next(); // #100: pre-TOTP token is not a session
       req.user = decoded.recovery
         ? recoveryUser(decoded)
-        : db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id FROM users WHERE id = ?').get(decoded.id);
+        : await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id FROM users WHERE id = ?').get(decoded.id);
       req.jwtWorkspaceId = decoded.current_workspace_id || null;
     } catch (err) {
       // Token invalid, continue without user
