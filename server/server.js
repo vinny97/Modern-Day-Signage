@@ -7,6 +7,10 @@ const path = require('path');
 const fs = require('fs');
 const config = require('./config');
 const VERSION = require('./version');
+const { db } = require('./db/client');
+const storage = require('./lib/storage');
+const { resolveBrandingAsync, publicBranding } = require('./lib/branding');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // #114: last-resort crash safety net. better-sqlite3 is SYNCHRONOUS, so a constraint
 // violation (e.g. a FK write) inside a socket.io handler with no local try/catch
@@ -22,7 +26,7 @@ function logFatalAndExit(kind, err) {
     const e = err instanceof Error ? err : new Error('Non-error thrown: ' + require('util').inspect(err));
     process.stderr.write(`\n[FATAL ${kind}] ${new Date().toISOString()}\n${e.stack || e.message}\n`);
   } catch (_) { /* the death handler must never throw */ }
-  try { require('./db/database').db.close(); } catch (_) { /* best-effort WAL flush */ }
+  try { void db.close(); } catch (_) { /* best-effort flush */ }
   process.exit(1);
 }
 process.on('uncaughtException', (err) => logFatalAndExit('uncaughtException', err));
@@ -204,17 +208,24 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(config.frontendDir, 'landing.html'));
 });
 
+// Clean marketing entry point for the hosted Self Service trial. The public
+// slug is deliberately validated instead of reflected into the redirect.
+app.get('/signup', (req, res) => {
+  if (req.query.plan && req.query.plan !== 'self-service') {
+    return res.status(400).send('Unknown signup plan');
+  }
+  res.redirect(302, '/app?plan=self-service&mode=register#/login');
+});
+
 // Dashboard app. Inject the resolved instance / custom-domain branding into the
 // shell as a <meta> (#76) so brand-prime can apply it before first paint when the
 // per-workspace brand is not cached yet - no ScreenTinker flash on a never-visited
 // org. CSP blocks inline <script>, so the brand rides in a <meta> that brand-prime
 // reads. Falls back to a plain send of the shell if anything goes wrong.
-app.get('/app', (req, res) => {
+app.get('/app', routeAsync(async (req, res) => {
   const file = path.join(config.frontendDir, 'index.html');
   try {
-    const { db } = require('./db/database');
-    const { resolveBranding, publicBranding } = require('./lib/branding');
-    const brand = publicBranding(resolveBranding(db, { domain: (req.hostname || '').toString() }));
+    const brand = publicBranding(await resolveBrandingAsync(db, { domain: (req.hostname || '').toString() }));
     const attr = JSON.stringify(brand)
       .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const html = fs.readFileSync(file, 'utf8')
@@ -223,7 +234,7 @@ app.get('/app', (req, res) => {
   } catch (e) {
     res.sendFile(file);
   }
-});
+}));
 
 // Sitemap and robots — served explicitly so the Content-Type is guaranteed
 // and these endpoints are immune to any future static-middleware reshuffle.
@@ -389,18 +400,16 @@ app.use('/api/player-debug', require('./routes/player-debug'));
 // page especially) need branding without a token. Resolves custom-domain match
 // -> platform default -> hardcoded ScreenTinker. Domain comes from ?domain= or
 // the request hostname (trust-proxy resolves the forwarded Host behind CF/Nginx).
-app.get('/api/branding', (req, res) => {
-  const { db } = require('./db/database');
-  const { resolveBranding, publicBranding } = require('./lib/branding');
+app.get('/api/branding', routeAsync(async (req, res) => {
   const domain = (req.query.domain || req.hostname || '').toString();
   // publicBranding strips internal columns (id/user_id/workspace_id/custom_domain
   // /timestamps) so this unauthenticated endpoint only exposes presentational fields.
-  res.json(publicBranding(resolveBranding(db, { domain })));
-});
+  res.json(publicBranding(await resolveBrandingAsync(db, { domain })));
+}));
 
 // Screenshot route (before protected routes - needs custom auth for img tags)
 const { verifyToken } = require('./middleware/auth');
-app.get('/api/devices/:id/screenshot', (req, res) => {
+app.get('/api/devices/:id/screenshot', routeAsync(async (req, res) => {
   let user = null;
   const authHeader = req.headers.authorization;
   const tokenParam = req.query.token;
@@ -408,12 +417,10 @@ app.get('/api/devices/:id/screenshot', (req, res) => {
   if (!token) return res.status(401).json({ error: 'Authentication required' });
   try {
     const decoded = verifyToken(token);
-    const { db } = require('./db/database');
-    user = db.prepare('SELECT id, role FROM users WHERE id = ?').get(decoded.id);
+    user = await db.prepare('SELECT id, role FROM users WHERE id = ?').get(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
   } catch { return res.status(401).json({ error: 'Invalid or expired token' }); }
-  const { db: sdb } = require('./db/database');
-  const device = sdb.prepare('SELECT user_id FROM devices WHERE id = ?').get(req.params.id);
+  const device = await db.prepare('SELECT user_id FROM devices WHERE id = ?').get(req.params.id);
   if (!device) return res.status(404).json({ error: 'Device not found' });
   if (!['admin','superadmin'].includes(user.role) && device.user_id && device.user_id !== user.id) return res.status(403).json({ error: 'Access denied' });
   // Serve from memory if available (device online), otherwise from disk (offline snapshot)
@@ -425,12 +432,10 @@ app.get('/api/devices/:id/screenshot', (req, res) => {
     res.set('Cache-Control', 'no-cache');
     return res.send(buffer);
   }
-  const screenshot = sdb.prepare('SELECT * FROM screenshots WHERE device_id = ? ORDER BY captured_at DESC LIMIT 1').get(req.params.id);
+  const screenshot = await db.prepare('SELECT * FROM screenshots WHERE device_id = ? ORDER BY captured_at DESC LIMIT 1').get(req.params.id);
   if (!screenshot) return res.status(404).json({ error: 'No screenshot available' });
-  const safePath = path.resolve(config.screenshotsDir, path.basename(screenshot.filepath));
-  if (!safePath.startsWith(path.resolve(config.screenshotsDir))) return res.status(403).json({ error: 'Invalid path' });
-  res.sendFile(safePath);
-});
+  await storage.sendObject(res, 'screenshots', screenshot.filepath, 'image/jpeg');
+}));
 
 // A logged-in user who can access the content's workspace may view its file /
 // thumbnail even when it isn't referenced by a playlist/widget yet (e.g. the
@@ -438,7 +443,7 @@ app.get('/api/devices/:id/screenshot', (req, res) => {
 // send an Authorization header, so the dashboard fetches these with the Bearer
 // token; this verifies it and checks workspace membership. Anonymous players
 // (no token) still fall back to the playlist/widget reference gate. (#39)
-function requesterCanAccessContent(req, content) {
+async function requesterCanAccessContent(req, content) {
   try {
     const m = (req.headers.authorization || '').match(/^Bearer (.+)$/);
     if (!m) return false;
@@ -446,47 +451,40 @@ function requesterCanAccessContent(req, content) {
     const decoded = jwt.verify(m[1], config.jwtSecret, { algorithms: ['HS256'] });
     if (!decoded || !decoded.id) return false;
     if (decoded.role === 'platform_admin') return true;
-    const { db } = require('./db/database');
-    return !!db.prepare('SELECT 1 FROM workspace_members WHERE workspace_id = ? AND user_id = ?')
+    return !!await db.prepare('SELECT 1 FROM workspace_members WHERE workspace_id = ? AND user_id = ?')
       .get(content.workspace_id, decoded.id);
   } catch { return false; }
 }
 
 // Public content file serving (must be BEFORE protected routes)
-app.get('/api/content/:id/file', (req, res) => {
-  const { db } = require('./db/database');
-  const content = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+app.get('/api/content/:id/file', routeAsync(async (req, res) => {
+  const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
   if (!content) return res.status(404).json({ error: 'Content not found' });
   if (!content.filepath) return res.status(404).json({ error: 'No file (remote URL content)' });
-  const inPlaylist = db.prepare('SELECT id FROM playlist_items WHERE content_id = ? LIMIT 1').get(req.params.id);
+  const inPlaylist = await db.prepare('SELECT id FROM playlist_items WHERE content_id = ? LIMIT 1').get(req.params.id);
   // Scope widget lookup to widgets in the content's workspace — prevents a user
   // in another workspace from unlocking this content by creating a widget that
   // references the UUID. Phase 2.2d: keyed off content.workspace_id (was user_id).
   // Perf note: LIKE scan on widgets.config is O(n) per request. Fine at current scale
   // (<100 widgets); revisit with a content_widget_refs join table if this grows.
-  const inWidget = inPlaylist ? null : db.prepare('SELECT id FROM widgets WHERE workspace_id = ? AND config LIKE ? LIMIT 1').get(content.workspace_id, `%/api/content/${req.params.id}/%`);
-  if (!inPlaylist && !inWidget && !requesterCanAccessContent(req, content)) return res.status(403).json({ error: 'Content not assigned to any playlist or widget' });
-  const safePath = path.resolve(config.contentDir, path.basename(content.filepath));
-  if (!safePath.startsWith(path.resolve(config.contentDir))) return res.status(403).json({ error: 'Invalid path' });
-  res.sendFile(safePath);
-});
+  const inWidget = inPlaylist ? null : await db.prepare('SELECT id FROM widgets WHERE workspace_id = ? AND config LIKE ? LIMIT 1').get(content.workspace_id, `%/api/content/${req.params.id}/%`);
+  if (!inPlaylist && !inWidget && !await requesterCanAccessContent(req, content)) return res.status(403).json({ error: 'Content not assigned to any playlist or widget' });
+  await storage.sendObject(res, 'content', content.filepath, content.mime_type);
+}));
 
 // Public thumbnail serving (must be BEFORE protected routes)
-app.get('/api/content/:id/thumbnail', (req, res) => {
-  const { db } = require('./db/database');
-  const content = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+app.get('/api/content/:id/thumbnail', routeAsync(async (req, res) => {
+  const content = await db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
   if (!content || !content.thumbnail_path) return res.status(404).json({ error: 'Thumbnail not found' });
   // Security: gate the same way as /file - only serve when the content is
   // referenced by a playlist or by a widget IN THE CONTENT'S WORKSPACE. Without
   // this, any anonymous caller holding a content UUID could pull any tenant's
   // thumbnail (the /file route already had this check; the thumbnail route did not).
-  const inPlaylist = db.prepare('SELECT id FROM playlist_items WHERE content_id = ? LIMIT 1').get(req.params.id);
-  const inWidget = inPlaylist ? null : db.prepare('SELECT id FROM widgets WHERE workspace_id = ? AND config LIKE ? LIMIT 1').get(content.workspace_id, `%/api/content/${req.params.id}/%`);
-  if (!inPlaylist && !inWidget && !requesterCanAccessContent(req, content)) return res.status(403).json({ error: 'Content not assigned to any playlist or widget' });
-  const safePath = path.resolve(config.contentDir, path.basename(content.thumbnail_path));
-  if (!safePath.startsWith(path.resolve(config.contentDir))) return res.status(403).json({ error: 'Invalid path' });
-  res.sendFile(safePath);
-});
+  const inPlaylist = await db.prepare('SELECT id FROM playlist_items WHERE content_id = ? LIMIT 1').get(req.params.id);
+  const inWidget = inPlaylist ? null : await db.prepare('SELECT id FROM widgets WHERE workspace_id = ? AND config LIKE ? LIMIT 1').get(content.workspace_id, `%/api/content/${req.params.id}/%`);
+  if (!inPlaylist && !inWidget && !await requesterCanAccessContent(req, content)) return res.status(403).json({ error: 'Content not assigned to any playlist or widget' });
+  await storage.sendObject(res, 'content', content.thumbnail_path, 'image/jpeg');
+}));
 
 // Protected API Routes.
 // Phase 2.1: resolveTenancy runs right after requireAuth on every resource
@@ -576,12 +574,13 @@ app.use('/api/status', require('./routes/status'));
 // route block) - leaving this comment here as a breadcrumb for the move.
 
 // APK version check endpoint (public, used by devices to check for updates)
-app.get('/api/update/check', (req, res) => {
+app.get('/api/update/check', routeAsync(async (req, res) => {
   const currentVersion = req.query.version;
-  const apkPath = resolveApkPath();
-  const apkExists = apkPath !== null;
-  const apkSize = apkExists ? fs.statSync(apkPath).size : 0;
-  const apkModified = apkExists ? fs.statSync(apkPath).mtimeMs : 0;
+  const apkPath = storage.isR2 ? null : resolveApkPath();
+  const apkMeta = storage.isR2 ? await storage.headObject('apk', 'ScreenTinker.apk') : null;
+  const apkExists = storage.isR2 ? !!apkMeta : apkPath !== null;
+  const apkSize = storage.isR2 ? Number(apkMeta?.contentLength || 0) : (apkExists ? fs.statSync(apkPath).size : 0);
+  const apkModified = storage.isR2 ? (apkMeta?.lastModified?.getTime?.() || 0) : (apkExists ? fs.statSync(apkPath).mtimeMs : 0);
 
   const latestVersion = VERSION;
   const updateAvailable = currentVersion && currentVersion !== latestVersion;
@@ -599,7 +598,7 @@ app.get('/api/update/check', (req, res) => {
     apk_size: apkSize,
     apk_modified: apkModified,
   });
-});
+}));
 
 // (Content file endpoint moved above protected routes)
 
@@ -612,7 +611,12 @@ app.use('/uploads/content', (req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Cache-Control', 'public, max-age=2592000, immutable'); // 30 days
   next();
-}, express.static(config.contentDir));
+});
+app.get('/uploads/content/:filename', routeAsync(async (req, res) => {
+  const filename = path.basename(req.params.filename);
+  const content = await db.prepare('SELECT mime_type FROM content WHERE filepath = ? OR thumbnail_path = ? LIMIT 1').get(filename, filename);
+  await storage.sendObject(res, 'content', filename, filename.startsWith('thumb_') ? 'image/jpeg' : content?.mime_type);
+}));
 
 // Setup WebSockets
 const setupWebSockets = require('./ws');
@@ -644,13 +648,12 @@ const { startAgencyDigest } = require('./services/agency-digest');
 startAgencyDigest();
 
 // Handle provisioning via WebSocket notification
-const { db } = require('./db/database');
 const originalProvisionRoute = require('./routes/provisioning');
 
 // Override provision to also notify device via WS
 const { checkDeviceLimit } = require('./middleware/subscription');
 const pairLockout = require('./lib/pair-lockout');
-app.post('/api/provision/pair', requireAuth, resolveTenancy, checkDeviceLimit, (req, res) => {
+app.post('/api/provision/pair', requireAuth, resolveTenancy, checkDeviceLimit, routeAsync(async (req, res) => {
   // #87: lock out an IP after repeated failed pairing-code guesses (brute-force defense
   // beyond the 5/min rate-limit on /api/provision).
   const ip = getClientIp(req);
@@ -664,7 +667,7 @@ app.post('/api/provision/pair', requireAuth, resolveTenancy, checkDeviceLimit, (
   // would have workspace_id NULL and be invisible to workspace-filtered lists.
   if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before pairing.' });
 
-  const device = db.prepare('SELECT * FROM devices WHERE pairing_code = ?').get(pairing_code);
+  const device = await db.prepare('SELECT * FROM devices WHERE pairing_code = ?').get(pairing_code);
   // #87: an UNKNOWN code is a brute-force guess - count it toward the per-IP lockout.
   if (!device) {
     pairLockout.recordFailure(ip);
@@ -678,25 +681,26 @@ app.post('/api/provision/pair', requireAuth, resolveTenancy, checkDeviceLimit, (
   }
   pairLockout.reset(ip); // a valid claim forgives prior failed attempts from this IP
 
-  const deviceName = name || 'Display ' + (db.prepare('SELECT COUNT(*) as count FROM devices WHERE user_id = ?').get(req.user.id).count + 1);
-  db.prepare("UPDATE devices SET pairing_code = NULL, name = ?, user_id = ?, workspace_id = ?, status = 'online', updated_at = strftime('%s','now') WHERE id = ?")
+  const count = Number((await db.prepare('SELECT COUNT(*) as count FROM devices WHERE user_id = ?').get(req.user.id)).count);
+  const deviceName = name || 'Display ' + (count + 1);
+  await db.prepare("UPDATE devices SET pairing_code = NULL, name = ?, user_id = ?, workspace_id = ?, status = 'online', updated_at = strftime('%s','now') WHERE id = ?")
     .run(deviceName, req.user.id, req.workspaceId, device.id);
 
   // Link fingerprint to user
-  db.prepare("UPDATE device_fingerprints SET user_id = ?, device_id = ? WHERE device_id = ?")
+  await db.prepare("UPDATE device_fingerprints SET user_id = ?, device_id = ? WHERE device_id = ?")
     .run(req.user.id, device.id, device.id);
 
   // Notify the device via WebSocket
   deviceNs.to(device.id).emit('device:paired', { device_id: device.id, name: deviceName });
 
-  const updated = db.prepare('SELECT * FROM devices WHERE id = ?').get(device.id);
+  const updated = await db.prepare('SELECT * FROM devices WHERE id = ?').get(device.id);
   require('./lib/device-sanitize').stripDeviceSecrets(updated); // never leak device_token to clients
   // Phase 2.3: scope to the workspace the device was just claimed into.
   const { workspaceRoom, emitToWorkspace } = require('./lib/socket-rooms');
   emitToWorkspace(dashboardNs, workspaceRoom(updated.workspace_id), 'dashboard:device-added', updated);
 
   res.json(updated);
-});
+}));
 
 // Resolve the OTA APK. A copy under the data dir (DATA_DIR) wins, so a container
 // operator can mount one at /data/ScreenTinker.apk; otherwise the legacy in-repo
@@ -709,21 +713,24 @@ function resolveApkPath() {
 }
 
 // Serve APK download
-app.get('/download/apk', (req, res) => {
-  const apkPath = resolveApkPath();
-  if (apkPath) {
+app.get('/download/apk', routeAsync(async (req, res) => {
+  const apkPath = storage.isR2 ? null : resolveApkPath();
+  const apkMeta = storage.isR2 ? await storage.headObject('apk', 'ScreenTinker.apk') : null;
+  if (apkPath || apkMeta) {
     // #96: an APK download means a device is actually applying an OTA - log it so the
     // update is observable end to end (check -> download -> [relaunch]).
-    console.log(`[ota] APK download by ${getClientIp(req)} (${fs.statSync(apkPath).size} bytes) - OTA update in progress`);
+    const size = storage.isR2 ? Number(apkMeta.contentLength || 0) : fs.statSync(apkPath).size;
+    console.log(`[ota] APK download by ${getClientIp(req)} (${size} bytes) - OTA update in progress`);
     res.setHeader('Content-Type', 'application/vnd.android.package-archive');
     res.setHeader('Content-Disposition', 'attachment; filename="ScreenTinker.apk"');
     res.setHeader('Cache-Control', 'no-cache');
-    res.sendFile(apkPath);
+    if (storage.isR2) await storage.sendObject(res, 'apk', 'ScreenTinker.apk', 'application/vnd.android.package-archive');
+    else res.sendFile(apkPath);
   } else {
     console.warn(`[ota] APK download requested by ${getClientIp(req)} but no APK is available (404)`);
     res.status(404).send(`<!DOCTYPE html><html><head><title>APK Not Found</title><style>body{font-family:-apple-system,system-ui,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0f172a;color:#e2e8f0}div{text-align:center;max-width:500px;padding:24px}h1{color:#f87171;font-size:24px}code{background:#1e293b;padding:2px 8px;border-radius:4px;font-size:14px}p{line-height:1.6;color:#94a3b8}</style></head><body><div><h1>APK Not Available</h1><p>The Android APK has not been compiled yet. To build it from source:</p><p><code>cd android</code><br><code>./gradlew assembleDebug</code><br><code>cp app/build/outputs/apk/debug/app-debug.apk ../ScreenTinker.apk</code></p><p>See the <a href="/" style="color:#3b82f6">README</a> for full build instructions.</p><p>In Docker, mount a built APK at <code>/data/ScreenTinker.apk</code> (the data dir).</p><p>Alternatively, use the <a href="/player" style="color:#3b82f6">web player</a> in any browser.</p></div></body></html>`);
   }
-});
+}));
 
 // SPA fallback for app routes. Unmatched /api/ paths return 404 so misrouted
 // clients fail fast instead of hanging until Cloudflare's 15s upstream timeout.

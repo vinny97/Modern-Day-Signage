@@ -69,6 +69,8 @@ module.exports = {
   // Stripe (optional - for paid subscriptions)
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  stripeSelfServicePriceId: process.env.STRIPE_SELF_SERVICE_PRICE_ID || '',
+  appUrl: (process.env.APP_URL || '').replace(/\/$/, ''),
   // Microsoft Graph email sender (services/email.js). Required for actual
   // delivery; absent values short-circuit to a stdout fallback for local dev.
   graphTenantId: process.env.GRAPH_TENANT_ID || '',

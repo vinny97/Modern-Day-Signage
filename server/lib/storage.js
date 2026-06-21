@@ -29,7 +29,9 @@ function key(kind, filename) {
 }
 
 function localPath(kind, filename) {
-  const dir = kind === 'screenshots' ? config.screenshotsDir : config.contentDir;
+  const dir = kind === 'screenshots' ? config.screenshotsDir
+    : kind === 'apk' ? config.dataDir
+      : config.contentDir;
   return path.join(dir, path.basename(filename));
 }
 
@@ -52,6 +54,24 @@ async function getObject(kind, filename) {
   return { body: result.Body, contentType: result.ContentType, contentLength: result.ContentLength };
 }
 
+async function headObject(kind, filename) {
+  if (!isR2) {
+    const target = localPath(kind, filename);
+    try {
+      const stat = fs.statSync(target);
+      return { contentLength: stat.size, lastModified: stat.mtime };
+    } catch { return null; }
+  }
+  const { HeadObjectCommand } = require('@aws-sdk/client-s3');
+  try {
+    const result = await r2Client().send(new HeadObjectCommand({ Bucket: config.r2Bucket, Key: key(kind, filename) }));
+    return { contentLength: result.ContentLength, contentType: result.ContentType, lastModified: result.LastModified };
+  } catch (error) {
+    if (error?.name === 'NotFound' || error?.name === 'NoSuchKey' || error?.$metadata?.httpStatusCode === 404) return null;
+    throw error;
+  }
+}
+
 async function deleteObject(kind, filename) {
   if (!filename) return;
   if (!isR2) {
@@ -72,4 +92,4 @@ async function sendObject(res, kind, filename, fallbackType) {
   object.body.pipe(res);
 }
 
-module.exports = { isR2, putFile, getObject, deleteObject, sendObject, key };
+module.exports = { isR2, putFile, getObject, headObject, deleteObject, sendObject, key };

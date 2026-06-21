@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS plans (
 INSERT OR IGNORE INTO plans (id, name, display_name, max_devices, max_storage_mb, remote_control, remote_url, priority_support, price_monthly, price_yearly, stripe_price_monthly, stripe_price_yearly, sort_order)
 VALUES
   ('free',       'free',       'Free',        2,    500,   0, 0, 0, 0,     0,   NULL,                                NULL, 0),
-  ('starter',    'starter',    'Self Service',8,    2048,  1, 0, 0, 9.99,  0,   'price_1TjLALAVaFQgDIvTTNuBRMXM', NULL, 1),
+  ('starter',    'starter',    'Self Service',1,    2048,  1, 0, 0, 5,     0,   NULL,                                NULL, 1),
   ('pro',        'pro',        'Managed',     25,   10240, 1, 1, 0, 24.99, 0,   'price_1TjLAxAVaFQgDIvTiV2PKI2V', NULL, 2),
   ('enterprise', 'enterprise', 'Managed Pro', -1,   -1,    1, 1, 1, 49.99, 0,   'price_1TjLE5AVaFQgDIvTCt7hl2w6', NULL, 3);
 
@@ -37,6 +37,10 @@ CREATE TABLE IF NOT EXISTS users (
     stripe_subscription_id TEXT,
     subscription_status TEXT DEFAULT 'active',
     subscription_ends  INTEGER,
+    trial_started      INTEGER,
+    trial_ends_at      INTEGER,
+    trial_plan         TEXT,
+    past_due_grace_ends_at INTEGER,
     -- #100: TOTP MFA (opt-in, local accounts only). totp_secret_enc is secretbox-
     -- encrypted (REVERSIBLE - the server recomputes codes). totp_last_step blocks
     -- intra-window replay (a code from an already-consumed 30s step is rejected).
@@ -46,6 +50,25 @@ CREATE TABLE IF NOT EXISTS users (
     created_at      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
     updated_at      INTEGER NOT NULL DEFAULT (strftime('%s','now'))
 );
+
+CREATE TABLE IF NOT EXISTS stripe_events (
+    event_id       TEXT PRIMARY KEY,
+    event_type     TEXT NOT NULL,
+    processed_at   INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS subscription_notifications (
+    user_id        TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    event_key      TEXT NOT NULL,
+    status         TEXT NOT NULL DEFAULT 'pending',
+    attempts       INTEGER NOT NULL DEFAULT 0,
+    last_error     TEXT,
+    sent_at        INTEGER,
+    updated_at     INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+    PRIMARY KEY (user_id, event_key)
+);
+CREATE INDEX IF NOT EXISTS idx_subscription_notifications_status
+    ON subscription_notifications(status, updated_at);
 
 -- #100: single-use TOTP recovery codes. SHA-256 hashed (same discipline as
 -- api_tokens.token_hash); plaintext shown once at enrollment. used_at NULL = available.

@@ -103,6 +103,11 @@ const migrations = [
   // Trial tracking
   "ALTER TABLE users ADD COLUMN trial_started INTEGER",
   "ALTER TABLE users ADD COLUMN trial_plan TEXT DEFAULT 'pro'",
+  "ALTER TABLE users ADD COLUMN trial_ends_at INTEGER",
+  "ALTER TABLE users ADD COLUMN past_due_grace_ends_at INTEGER",
+  "CREATE TABLE IF NOT EXISTS stripe_events (event_id TEXT PRIMARY KEY, event_type TEXT NOT NULL, processed_at INTEGER NOT NULL DEFAULT (strftime('%s','now')))",
+  "CREATE TABLE IF NOT EXISTS subscription_notifications (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, event_key TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', attempts INTEGER NOT NULL DEFAULT 0, last_error TEXT, sent_at INTEGER, updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')), PRIMARY KEY (user_id, event_key))",
+  "CREATE INDEX IF NOT EXISTS idx_subscription_notifications_status ON subscription_notifications(status, updated_at)",
   // Stripe price IDs on plans
   "ALTER TABLE plans ADD COLUMN stripe_price_monthly TEXT",
   "ALTER TABLE plans ADD COLUMN stripe_price_yearly TEXT",
@@ -233,6 +238,62 @@ for (const sql of migrations) {
   }
 }
 if (_migApplied > 0) console.log(`[migrate] applied ${_migApplied} new column migration(s)`);
+
+// ScreenFizz hosted billing v1. Existing paid/manual Starter accounts using
+// more than one screen are moved to a hidden legacy plan before Starter is
+// reduced to the new £5 single-screen product. Existing unpaid Pro trials keep
+// their original 14-day deadline; only new signups receive the 7-day trial.
+try {
+  const BILLING_V1 = 'screenfizz_self_service_trial_v1';
+  const applied = db.prepare('SELECT 1 FROM schema_migrations WHERE id = ?').get(BILLING_V1);
+  if (!applied) {
+    db.transaction(() => {
+      db.prepare(`INSERT OR IGNORE INTO plans (
+        id, name, display_name, max_devices, max_storage_mb, remote_control,
+        remote_url, priority_support, price_monthly, price_yearly,
+        stripe_price_monthly, stripe_price_yearly, sort_order, active
+      ) SELECT 'starter_legacy', 'starter_legacy', 'Self Service Legacy',
+        max_devices, max_storage_mb, remote_control, remote_url,
+        priority_support, price_monthly, price_yearly,
+        stripe_price_monthly, stripe_price_yearly, sort_order, 0
+        FROM plans WHERE id = 'starter'`).run();
+
+      db.prepare(`UPDATE users SET plan_id = 'starter_legacy'
+        WHERE plan_id = 'starter'
+          AND trial_started IS NULL
+          AND subscription_status = 'active'
+          AND id IN (
+            SELECT user_id FROM devices WHERE user_id IS NOT NULL
+            GROUP BY user_id HAVING COUNT(*) > 1
+          )`).run();
+
+      db.prepare(`UPDATE plans SET display_name = 'Self Service', max_devices = 1,
+        max_storage_mb = 2048, remote_control = 1, price_monthly = 5,
+        price_yearly = 0, stripe_price_yearly = NULL WHERE id = 'starter'`).run();
+
+      db.prepare(`UPDATE users SET
+        trial_ends_at = trial_started + (14 * 86400),
+        subscription_status = CASE
+          WHEN trial_started + (14 * 86400) > strftime('%s','now') THEN 'trial'
+          ELSE 'expired' END
+        WHERE trial_started IS NOT NULL
+          AND trial_ends_at IS NULL
+          AND stripe_subscription_id IS NULL`).run();
+
+      db.prepare('INSERT INTO schema_migrations (id) VALUES (?)').run(BILLING_V1);
+    })();
+  }
+} catch (e) {
+  console.error('[migrate] ScreenFizz billing v1 migration failed:', e.message);
+}
+if (config.stripeSelfServicePriceId) {
+  try {
+    db.prepare('UPDATE plans SET stripe_price_monthly = ? WHERE id = ?')
+      .run(config.stripeSelfServicePriceId, 'starter');
+  } catch (e) {
+    console.error('[migrate] Could not configure Self Service Stripe price:', e.message);
+  }
+}
 
 // #74/#75 per-item schedules: the playlist_item_schedules table is created
 // idempotently by schema.sql (CREATE TABLE IF NOT EXISTS, run every boot, so it

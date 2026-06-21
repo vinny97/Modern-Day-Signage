@@ -43,6 +43,9 @@ function applyLoginBrandingDoc(b) {
 export async function render(container) {
   const [config, branding] = await Promise.all([loadAuthConfig(), loadLoginBranding()]);
   const isSetup = config.needsSetup;
+  const signupParams = new URLSearchParams(window.location.search);
+  const selfServiceSignup = signupParams.get('plan') === 'self-service';
+  const showRegistration = !isSetup && selfServiceSignup && signupParams.get('mode') === 'register';
   // registration_enabled may be absent on older servers — treat as enabled for back-compat
   const canRegister = config.registration_enabled !== false;
 
@@ -66,7 +69,7 @@ export async function render(container) {
 
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:var(--radius-lg);padding:24px;box-shadow:0 18px 50px rgba(15,23,42,0.08)">
           <!-- Local Auth Form -->
-          <div id="localAuthForm">
+          <div id="localAuthForm" style="display:${showRegistration ? 'none' : 'block'}">
             <div class="form-group">
               <label>${t('auth.email')}</label>
               <input type="email" id="loginEmail" class="input" placeholder="${t('auth.placeholder_email')}" autocomplete="email">
@@ -92,7 +95,7 @@ export async function render(container) {
           </div>
 
           <!-- Register form (hidden by default) -->
-          <div id="registerForm" style="display:none">
+          <div id="registerForm" style="display:${showRegistration ? 'block' : 'none'}">
             <div class="form-group">
               <label>${t('auth.name')}</label>
               <input type="text" id="regName" class="input" placeholder="${t('auth.placeholder_name')}">
@@ -238,13 +241,13 @@ function setupHandlers(config, isSetup) {
     const password = document.getElementById(isFirstUser ? 'loginPassword' : 'regPassword').value;
     const name = document.getElementById(isFirstUser ? 'loginName' : 'regName')?.value.trim() || '';
     if (!email || !password) { showError(t('auth.error_email_password_required')); return; }
-    if (password.length < 6) { showError(t('auth.error_password_min_6')); return; }
+    if (password.length < 8) { showError(t('auth.error_password_min_8')); return; }
 
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name })
+        body: JSON.stringify({ email, password, name, plan_intent: selfServiceSignup ? 'self-service' : undefined })
       });
       const data = await res.json();
       if (!res.ok) { showError(data.error); return; }
@@ -271,7 +274,7 @@ function setupHandlers(config, isSetup) {
               const res = await fetch('/api/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ credential: response.access_token, email: tokenData.email })
+                body: JSON.stringify({ credential: response.access_token, email: tokenData.email, plan_intent: selfServiceSignup ? 'self-service' : undefined })
               });
               const data = await res.json();
               if (res.ok) onAuthSuccess(data);
@@ -304,7 +307,7 @@ function setupHandlers(config, isSetup) {
           const res = await fetch('/api/auth/microsoft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ access_token: loginResponse.accessToken })
+            body: JSON.stringify({ access_token: loginResponse.accessToken, plan_intent: selfServiceSignup ? 'self-service' : undefined })
           });
           const data = await res.json();
           if (res.ok) onAuthSuccess(data);
@@ -320,7 +323,7 @@ function setupHandlers(config, isSetup) {
 function onAuthSuccess(data) {
   localStorage.setItem('token', data.token);
   localStorage.setItem('user', JSON.stringify(data.user));
-  window.location.hash = '#/';
+  history.replaceState(null, '', window.location.pathname + '#/');
   window.location.reload();
 }
 

@@ -1,19 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
 const config = require('../config');
 const VERSION = require('../version');
 const { PLATFORM_ROLES } = require('../middleware/auth');
+const storage = require('../lib/storage');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // Public status page
-router.get('/', (req, res) => {
-  const totalDevices = db.prepare('SELECT COUNT(*) as count FROM devices').get().count;
-  const onlineDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'online'").get().count;
-  const totalContent = db.prepare('SELECT COUNT(*) as count FROM content').get().count;
-  const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+router.get('/', routeAsync(async (req, res) => {
   const uptime = process.uptime();
 
   // Public status - minimal info only (no user counts, no server internals)
@@ -25,7 +23,7 @@ router.get('/', (req, res) => {
     uptime_human: formatUptime(uptime),
     timestamp: new Date().toISOString(),
   });
-});
+}));
 
 function formatUptime(seconds) {
   const d = Math.floor(seconds / 86400);
@@ -37,7 +35,7 @@ function formatUptime(seconds) {
 }
 
 // Full database backup (superadmin only)
-router.get('/backup', (req, res) => {
+router.get('/backup', routeAsync(async (req, res) => {
   const token = req.query.token;
   if (!token) return res.status(401).json({ error: 'Token required' });
 
@@ -45,18 +43,21 @@ router.get('/backup', (req, res) => {
     const jwt = require('jsonwebtoken');
     const config = require('../config');
     const decoded = jwt.verify(token, config.jwtSecret);
-    const user = db.prepare('SELECT role FROM users WHERE id = ?').get(decoded.id);
+    const user = await db.prepare('SELECT role FROM users WHERE id = ?').get(decoded.id);
     if (!user || !PLATFORM_ROLES.includes(user.role)) return res.status(403).json({ error: 'Platform admin only' });
   } catch {
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const dbPath = require('../config').dbPath;
+  if (db.client === 'postgres') {
+    return res.status(409).json({ error: 'Postgres backups must use the Supabase database backup/export tools; object files are backed up separately from R2.' });
+  }
+  const dbPath = config.dbPath;
   res.download(dbPath, `remotedisplay-backup-${new Date().toISOString().split('T')[0]}.db`);
-});
+}));
 
 // User data export (own data only)
-router.get('/export', (req, res) => {
+router.get('/export', routeAsync(async (req, res) => {
   const token = req.query.token;
   if (!token) return res.status(401).json({ error: 'Token required' });
 
@@ -73,13 +74,13 @@ router.get('/export', (req, res) => {
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const user = db.prepare('SELECT id, email, name, role, auth_provider, plan_id, created_at FROM users WHERE id = ?').get(userId);
+  const user = await db.prepare('SELECT id, email, name, role, auth_provider, plan_id, created_at FROM users WHERE id = ?').get(userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   // Phase 2.2f: export workspace-scoped branding. Fall back to first-accessible
   // workspace if the JWT didn't carry one.
   if (!workspaceId) {
-    const w = db.prepare(`
+    const w = await db.prepare(`
       SELECT w.id FROM workspaces w
       JOIN workspace_members wm ON wm.workspace_id = w.id
       WHERE wm.user_id = ? ORDER BY wm.joined_at ASC LIMIT 1
@@ -87,44 +88,41 @@ router.get('/export', (req, res) => {
     workspaceId = w?.id || null;
   }
 
-  const devices = db.prepare('SELECT id, name, status, ip_address, android_version, app_version, screen_width, screen_height, created_at FROM devices WHERE user_id = ?').all(userId);
+  const devices = await db.prepare('SELECT id, name, status, ip_address, android_version, app_version, screen_width, screen_height, created_at, playlist_id FROM devices WHERE user_id = ?').all(userId);
   const deviceIds = devices.map(d => d.id);
   const devicePlaceholders = deviceIds.map(() => '?').join(',') || "'__none__'";
 
-  const content = db.prepare('SELECT id, filename, mime_type, file_size, duration_sec, remote_url, width, height, created_at FROM content WHERE user_id = ?').all(userId);
-  const widgets = db.prepare('SELECT id, widget_type, name, config, created_at FROM widgets WHERE user_id = ?').all(userId);
-  const layouts = db.prepare('SELECT id, name, width, height, is_template, template_category, created_at FROM layouts WHERE user_id = ? AND is_template = 0').all(userId);
+  const content = await db.prepare('SELECT id, filename, mime_type, file_size, duration_sec, remote_url, width, height, created_at FROM content WHERE user_id = ?').all(userId);
+  const widgets = await db.prepare('SELECT id, widget_type, name, config, created_at FROM widgets WHERE user_id = ?').all(userId);
+  const layouts = await db.prepare('SELECT id, name, width, height, is_template, template_category, created_at FROM layouts WHERE user_id = ? AND is_template = 0').all(userId);
   const layoutIds = layouts.map(l => l.id);
   const layoutPlaceholders = layoutIds.map(() => '?').join(',') || "'__none__'";
-  const layoutZones = layoutIds.length ? db.prepare(`SELECT * FROM layout_zones WHERE layout_id IN (${layoutPlaceholders})`).all(...layoutIds) : [];
+  const layoutZones = layoutIds.length ? await db.prepare(`SELECT * FROM layout_zones WHERE layout_id IN (${layoutPlaceholders})`).all(...layoutIds) : [];
 
-  const playlists = db.prepare('SELECT id, name, description, is_auto_generated, created_at, updated_at FROM playlists WHERE user_id = ?').all(userId);
+  const playlists = await db.prepare('SELECT id, name, description, is_auto_generated, created_at, updated_at FROM playlists WHERE user_id = ?').all(userId);
   const playlistIds = playlists.map(p => p.id);
   const playlistPlaceholders = playlistIds.map(() => '?').join(',') || "'__none__'";
-  const playlistItems = playlistIds.length ? db.prepare(`SELECT id, playlist_id, content_id, widget_id, sort_order, duration_sec FROM playlist_items WHERE playlist_id IN (${playlistPlaceholders})`).all(...playlistIds) : [];
+  const playlistItems = playlistIds.length ? await db.prepare(`SELECT id, playlist_id, content_id, widget_id, sort_order, duration_sec FROM playlist_items WHERE playlist_id IN (${playlistPlaceholders})`).all(...playlistIds) : [];
 
-  const schedules = db.prepare('SELECT id, device_id, group_id, zone_id, content_id, widget_id, layout_id, playlist_id, title, start_time, end_time, timezone, recurrence, recurrence_end, priority, enabled, color, created_at FROM schedules WHERE user_id = ?').all(userId);
-  const videoWalls = db.prepare('SELECT * FROM video_walls WHERE user_id = ?').all(userId);
+  const schedules = await db.prepare('SELECT id, device_id, group_id, zone_id, content_id, widget_id, layout_id, playlist_id, title, start_time, end_time, timezone, recurrence, recurrence_end, priority, enabled, color, created_at FROM schedules WHERE user_id = ?').all(userId);
+  const videoWalls = await db.prepare('SELECT * FROM video_walls WHERE user_id = ?').all(userId);
   const wallIds = videoWalls.map(w => w.id);
   const wallPlaceholders = wallIds.map(() => '?').join(',') || "'__none__'";
-  const wallDevices = wallIds.length ? db.prepare(`SELECT * FROM video_wall_devices WHERE wall_id IN (${wallPlaceholders})`).all(...wallIds) : [];
+  const wallDevices = wallIds.length ? await db.prepare(`SELECT * FROM video_wall_devices WHERE wall_id IN (${wallPlaceholders})`).all(...wallIds) : [];
 
-  const kioskPages = db.prepare('SELECT id, name, config, created_at FROM kiosk_pages WHERE user_id = ?').all(userId);
-  const deviceGroups = db.prepare('SELECT id, name, color, created_at FROM device_groups WHERE user_id = ?').all(userId);
+  const kioskPages = await db.prepare('SELECT id, name, config, created_at FROM kiosk_pages WHERE user_id = ?').all(userId);
+  const deviceGroups = await db.prepare('SELECT id, name, color, created_at FROM device_groups WHERE user_id = ?').all(userId);
   const groupIds = deviceGroups.map(g => g.id);
   const groupPlaceholders = groupIds.map(() => '?').join(',') || "'__none__'";
-  const groupMembers = groupIds.length ? db.prepare(`SELECT * FROM device_group_members WHERE group_id IN (${groupPlaceholders})`).all(...groupIds) : [];
-  const alertConfigs = db.prepare('SELECT id, alert_type, enabled, config, created_at FROM alert_configs WHERE user_id = ?').all(userId);
-  const whiteLabel = workspaceId ? db.prepare('SELECT * FROM white_labels WHERE workspace_id = ?').get(workspaceId) : null;
+  const groupMembers = groupIds.length ? await db.prepare(`SELECT * FROM device_group_members WHERE group_id IN (${groupPlaceholders})`).all(...groupIds) : [];
+  const alertConfigs = await db.prepare('SELECT id, alert_type, enabled, config, created_at FROM alert_configs WHERE user_id = ?').all(userId);
+  const whiteLabel = workspaceId ? await db.prepare('SELECT * FROM white_labels WHERE workspace_id = ?').get(workspaceId) : null;
 
   const exportData = {
     format: 'screentinker-export-v2',
     exported_at: new Date().toISOString(),
     user,
-    devices: devices.map(d => {
-      const dev = db.prepare('SELECT playlist_id FROM devices WHERE id = ?').get(d.id);
-      return { ...d, playlist_id: dev?.playlist_id || null };
-    }),
+    devices,
     content,
     widgets: widgets.map(w => ({ ...w, config: JSON.parse(w.config || '{}') })),
     layouts,
@@ -155,20 +153,18 @@ router.get('/export', (req, res) => {
     const filesToInclude = [];
     for (const c of exportData.content) {
       if (c.remote_url || !c.filename) continue;
-      const row = db.prepare('SELECT filepath, thumbnail_path FROM content WHERE id = ?').get(c.id);
+      const row = await db.prepare('SELECT filepath, thumbnail_path FROM content WHERE id = ?').get(c.id);
       if (row?.filepath) {
-        const filePath = path.join(config.contentDir, path.basename(row.filepath));
-        if (fs.existsSync(filePath)) {
-          c.original_filepath = path.basename(row.filepath);
-          archive.file(filePath, { name: `files/${c.id}/${c.original_filepath}` });
-        }
+        const object = await storage.getObject('content', row.filepath);
+        c.original_filepath = path.basename(row.filepath);
+        if (object.localPath) archive.file(object.localPath, { name: `files/${c.id}/${c.original_filepath}` });
+        else archive.append(object.body, { name: `files/${c.id}/${c.original_filepath}` });
       }
       if (row?.thumbnail_path) {
-        const thumbPath = path.join(config.contentDir, path.basename(row.thumbnail_path));
-        if (fs.existsSync(thumbPath)) {
-          c.original_thumbnail = path.basename(row.thumbnail_path);
-          archive.file(thumbPath, { name: `files/${c.id}/${c.original_thumbnail}` });
-        }
+        const object = await storage.getObject('content', row.thumbnail_path);
+        c.original_thumbnail = path.basename(row.thumbnail_path);
+        if (object.localPath) archive.file(object.localPath, { name: `files/${c.id}/${c.original_thumbnail}` });
+        else archive.append(object.body, { name: `files/${c.id}/${c.original_thumbnail}` });
       }
     }
 
@@ -181,7 +177,7 @@ router.get('/export', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', `attachment; filename=screentinker-export-${new Date().toISOString().split('T')[0]}.json`);
   res.json(exportData);
-});
+}));
 
 // User data import (JSON or ZIP with files)
 const multer = require('multer');
@@ -204,14 +200,14 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const user = db.prepare('SELECT id, role FROM users WHERE id = ?').get(userId);
+  const user = await db.prepare('SELECT id, role FROM users WHERE id = ?').get(userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   // Phase 2.2b: imports stamp workspace_id on devices and content so the
   // rows are visible to the workspace-filtered list endpoints. Fall back to
   // the importer's first accessible workspace if the JWT didn't carry one.
   if (!workspaceId) {
-    const w = db.prepare(`
+    const w = await db.prepare(`
       SELECT w.id FROM workspaces w
       JOIN workspace_members wm ON wm.workspace_id = w.id
       WHERE wm.user_id = ? ORDER BY wm.joined_at ASC LIMIT 1
@@ -284,13 +280,13 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
   // Map old IDs to new IDs
   const idMap = { devices: {}, content: {}, widgets: {}, layouts: {}, zones: {}, playlists: {}, groups: {}, walls: {}, kiosk: {} };
 
-  const importDb = db.transaction(() => {
+  const importDb = db.transaction(async () => {
     // Import devices (as offline, unlinked - they'll need re-pairing)
     for (const d of (data.devices || [])) {
       const newId = uuid.v4();
       idMap.devices[d.id] = newId;
       const pairingCode = String(Math.floor(100000 + Math.random() * 900000));
-      db.prepare(`INSERT INTO devices (id, user_id, workspace_id, name, pairing_code, status, screen_width, screen_height, created_at) VALUES (?, ?, ?, ?, ?, 'provisioning', ?, ?, ?)`).run(newId, userId, workspaceId, d.name, pairingCode, d.screen_width || null, d.screen_height || null, d.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO devices (id, user_id, workspace_id, name, pairing_code, status, screen_width, screen_height, created_at) VALUES (?, ?, ?, ?, ?, 'provisioning', ?, ?, ?)`).run(newId, userId, workspaceId, d.name, pairingCode, d.screen_width || null, d.screen_height || null, d.created_at || Math.floor(Date.now() / 1000));
       stats.devices++;
     }
 
@@ -307,14 +303,15 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       if (files && files.length > 0) {
         for (const f of files) {
           const ext = path.extname(f.name);
-          const destName = `${newId}${ext}`;
+          const isThumbnail = c.original_thumbnail && f.name === c.original_thumbnail;
+          const destName = `${isThumbnail ? 'thumb_' : ''}${newId}${ext}`;
           const destPath = path.join(config.contentDir, destName);
           try {
             fs.copyFileSync(f.path, destPath);
             // Match original filepath vs thumbnail
             if (c.original_filepath && f.name === c.original_filepath) {
               newFilepath = destName;
-            } else if (c.original_thumbnail && f.name === c.original_thumbnail) {
+            } else if (isThumbnail) {
               newThumbnail = destName;
             } else if (!newFilepath) {
               // Fallback: first non-thumbnail file is the content
@@ -327,7 +324,10 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
         }
       }
 
-      db.prepare(`INSERT INTO content (id, user_id, workspace_id, filename, filepath, mime_type, file_size, duration_sec, remote_url, thumbnail_path, width, height, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, c.filename, newFilepath, c.mime_type, c.file_size || 0, c.duration_sec || null, c.remote_url || null, newThumbnail, c.width || null, c.height || null, c.created_at || Math.floor(Date.now() / 1000));
+      if (newFilepath) await storage.putFile('content', newFilepath, path.join(config.contentDir, newFilepath), c.mime_type);
+      if (newThumbnail) await storage.putFile('content', newThumbnail, path.join(config.contentDir, newThumbnail), 'image/jpeg');
+
+      await db.prepare(`INSERT INTO content (id, user_id, workspace_id, filename, filepath, mime_type, file_size, duration_sec, remote_url, thumbnail_path, width, height, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, c.filename, newFilepath, c.mime_type, c.file_size || 0, c.duration_sec || null, c.remote_url || null, newThumbnail, c.width || null, c.height || null, c.created_at || Math.floor(Date.now() / 1000));
       stats.content++;
     }
 
@@ -336,7 +336,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       const newId = uuid.v4();
       idMap.widgets[w.id] = newId;
       const config = typeof w.config === 'string' ? w.config : JSON.stringify(w.config || {});
-      db.prepare(`INSERT INTO widgets (id, user_id, workspace_id, widget_type, name, config, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, w.widget_type, w.name, config, w.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO widgets (id, user_id, workspace_id, widget_type, name, config, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, w.widget_type, w.name, config, w.created_at || Math.floor(Date.now() / 1000));
       stats.widgets++;
     }
 
@@ -344,7 +344,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
     for (const l of (data.layouts || [])) {
       const newId = uuid.v4();
       idMap.layouts[l.id] = newId;
-      db.prepare(`INSERT INTO layouts (id, user_id, workspace_id, name, width, height, is_template, created_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?)`).run(newId, userId, workspaceId, l.name, l.width || 1920, l.height || 1080, l.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO layouts (id, user_id, workspace_id, name, width, height, is_template, created_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?)`).run(newId, userId, workspaceId, l.name, l.width || 1920, l.height || 1080, l.created_at || Math.floor(Date.now() / 1000));
       stats.layouts++;
     }
     for (const z of (data.layout_zones || [])) {
@@ -352,7 +352,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       if (!newLayoutId) continue;
       const newId = uuid.v4();
       idMap.zones[z.id] = newId;
-      db.prepare(`INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, newLayoutId, z.name, z.x_percent, z.y_percent, z.width_percent, z.height_percent, z.z_index || 0, z.zone_type || 'content', z.fit_mode || 'cover', z.background_color || '#000000', z.sort_order || 0);
+      await db.prepare(`INSERT INTO layout_zones (id, layout_id, name, x_percent, y_percent, width_percent, height_percent, z_index, zone_type, fit_mode, background_color, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, newLayoutId, z.name, z.x_percent, z.y_percent, z.width_percent, z.height_percent, z.z_index || 0, z.zone_type || 'content', z.fit_mode || 'cover', z.background_color || '#000000', z.sort_order || 0);
     }
 
     // Import playlists (v2) or convert assignments to playlists (v1)
@@ -360,7 +360,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       for (const p of (data.playlists || [])) {
         const newId = uuid.v4();
         idMap.playlists[p.id] = newId;
-        db.prepare('INSERT INTO playlists (id, user_id, workspace_id, name, description, is_auto_generated, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(newId, userId, workspaceId, p.name, p.description || '', p.is_auto_generated || 0, p.created_at || Math.floor(Date.now() / 1000), p.updated_at || Math.floor(Date.now() / 1000));
+        await db.prepare('INSERT INTO playlists (id, user_id, workspace_id, name, description, is_auto_generated, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(newId, userId, workspaceId, p.name, p.description || '', p.is_auto_generated || 0, p.created_at || Math.floor(Date.now() / 1000), p.updated_at || Math.floor(Date.now() / 1000));
         stats.playlists++;
       }
       for (const pi of (data.playlist_items || [])) {
@@ -369,12 +369,12 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
         const contentId = pi.content_id ? idMap.content[pi.content_id] : null;
         const widgetId = pi.widget_id ? idMap.widgets[pi.widget_id] : null;
         if (!contentId && !widgetId) continue;
-        db.prepare('INSERT INTO playlist_items (playlist_id, content_id, widget_id, sort_order, duration_sec) VALUES (?, ?, ?, ?, ?)').run(playlistId, contentId, widgetId, pi.sort_order || 0, pi.duration_sec || 10);
+        await db.prepare('INSERT INTO playlist_items (playlist_id, content_id, widget_id, sort_order, duration_sec) VALUES (?, ?, ?, ?, ?)').run(playlistId, contentId, widgetId, pi.sort_order || 0, pi.duration_sec || 10);
       }
       // Set device playlist_id references
       for (const d of (data.devices || [])) {
         if (d.playlist_id && idMap.playlists[d.playlist_id]) {
-          db.prepare('UPDATE devices SET playlist_id = ? WHERE id = ?').run(idMap.playlists[d.playlist_id], idMap.devices[d.id]);
+          await db.prepare('UPDATE devices SET playlist_id = ? WHERE id = ?').run(idMap.playlists[d.playlist_id], idMap.devices[d.id]);
         }
       }
     } else {
@@ -390,7 +390,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       if (!devId && !grpId) continue;
       const newId = uuid.v4();
       const playlistId = s.playlist_id ? (idMap.playlists[s.playlist_id] || null) : null;
-      db.prepare(`INSERT INTO schedules (id, user_id, device_id, group_id, zone_id, content_id, widget_id, layout_id, playlist_id, title, start_time, end_time, timezone, recurrence, recurrence_end, priority, enabled, color, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, devId, grpId, s.zone_id ? (idMap.zones[s.zone_id] || null) : null, s.content_id ? (idMap.content[s.content_id] || null) : null, s.widget_id ? (idMap.widgets[s.widget_id] || null) : null, s.layout_id ? (idMap.layouts[s.layout_id] || null) : null, playlistId, s.title || '', s.start_time, s.end_time, s.timezone || 'UTC', s.recurrence || null, s.recurrence_end || null, s.priority || 0, s.enabled !== undefined ? s.enabled : 1, s.color || '#3B82F6', s.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO schedules (id, user_id, device_id, group_id, zone_id, content_id, widget_id, layout_id, playlist_id, title, start_time, end_time, timezone, recurrence, recurrence_end, priority, enabled, color, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, devId, grpId, s.zone_id ? (idMap.zones[s.zone_id] || null) : null, s.content_id ? (idMap.content[s.content_id] || null) : null, s.widget_id ? (idMap.widgets[s.widget_id] || null) : null, s.layout_id ? (idMap.layouts[s.layout_id] || null) : null, playlistId, s.title || '', s.start_time, s.end_time, s.timezone || 'UTC', s.recurrence || null, s.recurrence_end || null, s.priority || 0, s.enabled !== undefined ? s.enabled : 1, s.color || '#3B82F6', s.created_at || Math.floor(Date.now() / 1000));
       stats.schedules++;
     }
 
@@ -398,14 +398,14 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
     for (const w of (data.video_walls || [])) {
       const newId = uuid.v4();
       idMap.walls[w.id] = newId;
-      db.prepare(`INSERT INTO video_walls (id, user_id, name, grid_cols, grid_rows, bezel_h_mm, bezel_v_mm, screen_w_mm, screen_h_mm, sync_mode, content_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, w.name, w.grid_cols, w.grid_rows, w.bezel_h_mm || 0, w.bezel_v_mm || 0, w.screen_w_mm || 400, w.screen_h_mm || 225, w.sync_mode || 'leader', w.content_id ? (idMap.content[w.content_id] || null) : null, w.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO video_walls (id, user_id, workspace_id, name, grid_cols, grid_rows, bezel_h_mm, bezel_v_mm, screen_w_mm, screen_h_mm, sync_mode, content_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, w.name, w.grid_cols, w.grid_rows, w.bezel_h_mm || 0, w.bezel_v_mm || 0, w.screen_w_mm || 400, w.screen_h_mm || 225, w.sync_mode || 'leader', w.content_id ? (idMap.content[w.content_id] || null) : null, w.created_at || Math.floor(Date.now() / 1000));
       stats.video_walls++;
     }
     for (const wd of (data.video_wall_devices || [])) {
       const wallId = idMap.walls[wd.wall_id];
       const devId = idMap.devices[wd.device_id];
       if (!wallId || !devId) continue;
-      db.prepare(`INSERT INTO video_wall_devices (wall_id, device_id, grid_col, grid_row, rotation) VALUES (?, ?, ?, ?, ?)`).run(wallId, devId, wd.grid_col, wd.grid_row, wd.rotation || 0);
+      await db.prepare(`INSERT INTO video_wall_devices (wall_id, device_id, grid_col, grid_row, rotation) VALUES (?, ?, ?, ?, ?)`).run(wallId, devId, wd.grid_col, wd.grid_row, wd.rotation || 0);
     }
 
     // Import kiosk pages
@@ -413,7 +413,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
       const newId = uuid.v4();
       idMap.kiosk[k.id] = newId;
       const config = typeof k.config === 'string' ? k.config : JSON.stringify(k.config || {});
-      db.prepare(`INSERT INTO kiosk_pages (id, user_id, workspace_id, name, config, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, k.name, config, k.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO kiosk_pages (id, user_id, workspace_id, name, config, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, k.name, config, k.created_at || Math.floor(Date.now() / 1000));
       stats.kiosk_pages++;
     }
 
@@ -421,44 +421,44 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
     for (const g of (data.device_groups || [])) {
       const newId = uuid.v4();
       idMap.groups[g.id] = newId;
-      db.prepare(`INSERT INTO device_groups (id, user_id, workspace_id, name, color, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, g.name, g.color || '#3B82F6', g.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO device_groups (id, user_id, workspace_id, name, color, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, workspaceId, g.name, g.color || '#3B82F6', g.created_at || Math.floor(Date.now() / 1000));
       stats.device_groups++;
     }
     for (const gm of (data.device_group_members || [])) {
       const groupId = idMap.groups[gm.group_id];
       const devId = idMap.devices[gm.device_id];
       if (!groupId || !devId) continue;
-      db.prepare(`INSERT OR IGNORE INTO device_group_members (group_id, device_id) VALUES (?, ?)`).run(groupId, devId);
+      await db.prepare(`INSERT OR IGNORE INTO device_group_members (group_id, device_id) VALUES (?, ?)`).run(groupId, devId);
     }
 
     // Import alert configs
     for (const a of (data.alert_configs || [])) {
       const newId = uuid.v4();
       const config = typeof a.config === 'string' ? a.config : JSON.stringify(a.config || {});
-      db.prepare(`INSERT INTO alert_configs (id, user_id, alert_type, enabled, config, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, a.alert_type, a.enabled !== undefined ? a.enabled : 1, config, a.created_at || Math.floor(Date.now() / 1000));
+      await db.prepare(`INSERT INTO alert_configs (id, user_id, alert_type, enabled, config, created_at) VALUES (?, ?, ?, ?, ?, ?)`).run(newId, userId, a.alert_type, a.enabled !== undefined ? a.enabled : 1, config, a.created_at || Math.floor(Date.now() / 1000));
     }
 
     // Import white label - UPSERT into the importer's current workspace.
     if (data.white_label && workspaceId) {
       const wl = data.white_label;
-      const existing = db.prepare('SELECT id FROM white_labels WHERE workspace_id = ?').get(workspaceId);
+      const existing = await db.prepare('SELECT id FROM white_labels WHERE workspace_id = ?').get(workspaceId);
       if (existing) {
-        db.prepare(`UPDATE white_labels SET brand_name=?, logo_url=?, favicon_url=?, primary_color=?, bg_color=?, custom_domain=?, custom_css=?, hide_branding=?, updated_at=strftime('%s','now') WHERE workspace_id=?`).run(wl.brand_name || 'ScreenTinker', wl.logo_url || null, wl.favicon_url || null, wl.primary_color || '#3B82F6', wl.bg_color || '#111827', wl.custom_domain || null, wl.custom_css || null, wl.hide_branding || 0, workspaceId);
+        await db.prepare(`UPDATE white_labels SET brand_name=?, logo_url=?, favicon_url=?, primary_color=?, bg_color=?, custom_domain=?, custom_css=?, hide_branding=?, updated_at=strftime('%s','now') WHERE workspace_id=?`).run(wl.brand_name || 'ScreenTinker', wl.logo_url || null, wl.favicon_url || null, wl.primary_color || '#3B82F6', wl.bg_color || '#111827', wl.custom_domain || null, wl.custom_css || null, wl.hide_branding || 0, workspaceId);
       } else {
-        db.prepare(`INSERT INTO white_labels (id, user_id, workspace_id, brand_name, logo_url, favicon_url, primary_color, bg_color, custom_domain, custom_css, hide_branding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(uuid.v4(), userId, workspaceId, wl.brand_name || 'ScreenTinker', wl.logo_url || null, wl.favicon_url || null, wl.primary_color || '#3B82F6', wl.bg_color || '#111827', wl.custom_domain || null, wl.custom_css || null, wl.hide_branding || 0);
+        await db.prepare(`INSERT INTO white_labels (id, user_id, workspace_id, brand_name, logo_url, favicon_url, primary_color, bg_color, custom_domain, custom_css, hide_branding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(uuid.v4(), userId, workspaceId, wl.brand_name || 'ScreenTinker', wl.logo_url || null, wl.favicon_url || null, wl.primary_color || '#3B82F6', wl.bg_color || '#111827', wl.custom_domain || null, wl.custom_css || null, wl.hide_branding || 0);
       }
     }
   });
 
   try {
-    importDb();
+    await importDb();
 
     // v1: convert assignments to per-device playlists AFTER transaction (content files now on disk)
     if (!isV2 && data.assignments?.length) {
       const { execFile } = require('child_process');
 
       async function probeImportedContent(newContentId) {
-        const c = db.prepare('SELECT id, mime_type, filepath, duration_sec FROM content WHERE id = ?').get(newContentId);
+        const c = await db.prepare('SELECT id, mime_type, filepath, duration_sec FROM content WHERE id = ?').get(newContentId);
         if (!c || !c.mime_type?.startsWith('video/') || !c.filepath) return c?.duration_sec ? Math.ceil(c.duration_sec) : null;
         if (c.duration_sec) return Math.ceil(c.duration_sec);
         try {
@@ -470,7 +470,7 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
           const info = JSON.parse(stdout);
           if (info.format?.duration) {
             const dur = parseFloat(info.format.duration);
-            db.prepare('UPDATE content SET duration_sec = ? WHERE id = ?').run(dur, c.id);
+            await db.prepare('UPDATE content SET duration_sec = ? WHERE id = ?').run(dur, c.id);
             return Math.ceil(dur);
           }
         } catch (e) { /* probe failed, fall back to default */ }
@@ -502,23 +502,24 @@ router.post('/import', importUpload.single('file'), async (req, res) => {
           items.push({ contentId, widgetId, sort_order: a.sort_order || 0, duration });
         }
 
-        db.prepare('INSERT INTO playlists (id, user_id, workspace_id, name, description, is_auto_generated) VALUES (?, ?, ?, ?, ?, 1)')
+        await db.prepare('INSERT INTO playlists (id, user_id, workspace_id, name, description, is_auto_generated) VALUES (?, ?, ?, ?, ?, 1)')
           .run(playlistId, userId, workspaceId, `${devName} (imported)`, 'Converted from v1 assignments');
         for (const item of items) {
-          db.prepare('INSERT INTO playlist_items (playlist_id, content_id, widget_id, sort_order, duration_sec) VALUES (?, ?, ?, ?, ?)')
+          await db.prepare('INSERT INTO playlist_items (playlist_id, content_id, widget_id, sort_order, duration_sec) VALUES (?, ?, ?, ?, ?)')
             .run(playlistId, item.contentId, item.widgetId, item.sort_order, item.duration);
         }
-        db.prepare('UPDATE devices SET playlist_id = ? WHERE id = ?').run(playlistId, devId);
+        await db.prepare('UPDATE devices SET playlist_id = ? WHERE id = ?').run(playlistId, devId);
         stats.playlists++;
       }
     }
 
     // Collect pairing codes for imported devices
-    const devicePairings = (data.devices || []).map(d => {
+    const devicePairings = [];
+    for (const d of (data.devices || [])) {
       const newId = idMap.devices[d.id];
-      const dev = db.prepare('SELECT name, pairing_code FROM devices WHERE id = ?').get(newId);
-      return dev ? { name: dev.name, pairing_code: dev.pairing_code } : null;
-    }).filter(Boolean);
+      const dev = await db.prepare('SELECT name, pairing_code FROM devices WHERE id = ?').get(newId);
+      if (dev) devicePairings.push({ name: dev.name, pairing_code: dev.pairing_code });
+    }
 
     res.json({
       success: true,

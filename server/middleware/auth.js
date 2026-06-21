@@ -1,6 +1,16 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const { db } = require('../db/client');
+const { getAccessState, subscriptionRequiredBody } = require('../services/subscriptionAccess');
+
+const SUBSCRIPTION_EXEMPT_PATHS = new Set([
+  '/api/auth/me',
+  '/api/auth/logout',
+  '/api/subscription/me',
+  '/api/subscription/plans',
+  '/api/stripe/checkout',
+  '/api/stripe/portal',
+]);
 
 // Phase 2.1: JWT now optionally carries the user's current workspace_id so
 // the tenancy middleware can resolve scope without an extra DB lookup on
@@ -66,7 +76,11 @@ async function requireAuth(req, res, next) {
     // accepts it. If this check is removed, password-alone yields a working session and
     // TOTP is bypassed. (Covered by the mfa_pending bite-test.)
     if (decoded.mfa_pending) return res.status(401).json({ error: 'mfa_required' });
-    const user = await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, email_alerts, must_change_password FROM users WHERE id = ?').get(decoded.id);
+    const user = await db.prepare(`SELECT id, email, name, role, auth_provider,
+      avatar_url, plan_id, email_alerts, must_change_password,
+      stripe_customer_id, stripe_subscription_id, subscription_status,
+      subscription_ends, trial_started, trial_ends_at, trial_plan,
+      past_due_grace_ends_at FROM users WHERE id = ?`).get(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
     req.user = user;
     // Tenancy middleware reads this on the resolver step.
@@ -80,6 +94,12 @@ async function requireAuth(req, res, next) {
       const url = (req.originalUrl || '').split('?')[0].replace(/\/$/, '');
       const allowed = url === '/api/auth/me' || url === '/api/auth/logout';
       if (!allowed) return res.status(403).json({ error: 'password_change_required' });
+    }
+    const access = await getAccessState(user);
+    req.access = access;
+    const cleanUrl = (req.originalUrl || '').split('?')[0].replace(/\/$/, '');
+    if (access && !access.allowed && !SUBSCRIPTION_EXEMPT_PATHS.has(cleanUrl)) {
+      return res.status(402).json(subscriptionRequiredBody(access));
     }
     next();
   } catch (err) {

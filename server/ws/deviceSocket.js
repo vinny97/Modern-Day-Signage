@@ -6,6 +6,7 @@ const { db } = require('../db/client');
 const config = require('../config');
 const heartbeat = require('../services/heartbeat');
 const commandQueue = require('../lib/command-queue');
+const storage = require('../lib/storage');
 
 // Debounce window for marking a device offline on socket disconnect. Brief
 // flap (Wi-Fi blip, Engine.IO ping miss, server-side eviction-then-reconnect)
@@ -723,7 +724,10 @@ module.exports = function setupDeviceSocket(io) {
           try {
             const filename = `${deviceId}_latest.jpg`;
             const buffer = Buffer.from(lastB64, 'base64');
-            fs.writeFileSync(path.join(config.screenshotsDir, filename), buffer);
+            const localScreenshot = path.join(config.screenshotsDir, filename);
+            fs.writeFileSync(localScreenshot, buffer);
+            await storage.putFile('screenshots', filename, localScreenshot, 'image/jpeg');
+            if (storage.isR2) try { fs.unlinkSync(localScreenshot); } catch {}
             const existing = await db.prepare('SELECT id FROM screenshots WHERE device_id = ?').get(deviceId);
             if (existing) {
               await db.prepare('UPDATE screenshots SET filepath = ?, captured_at = strftime(\'%s\',\'now\') WHERE device_id = ?').run(filename, deviceId);

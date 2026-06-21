@@ -35,6 +35,13 @@ slices:
   until the R2 adapter is configured.
 - Layouts, layout zones, device assignments, and schedules use Postgres and are
   covered by the temporary live Supabase verification workflow.
+- Device groups, video walls, WebSockets, preview payloads, reporting,
+  background services, administration, deletion, and import/export use the
+  async database facade. The complete server boots against Supabase.
+- `server/lib/storage.js` provides local and Cloudflare R2 storage for content,
+  thumbnails, screenshots, widget previews, and ZIP export/import.
+- `server/db/migrations/002_foreign_keys.sql` enforces core foreign keys for new
+  writes as `NOT VALID`, allowing historical rows to be audited before validation.
 - `server/db/migrations/001_runtime_parity.sql` adds the tables and columns that
   legacy SQLite installs create through startup migrations.
 
@@ -72,11 +79,14 @@ npm run db:pg:migrate
 npm run db:pg:verify
 npm run db:pg:verify-auth
 npm run db:pg:verify-core
+npm run storage:r2:verify
+npm run storage:r2:backfill -- --dry-run
+npm run storage:r2:backfill
 ```
 
-The full app still boots on SQLite until the remaining route/service call sites
-are converted from sync `db.prepare(...).get/all/run` to async Postgres calls.
-Do not set the deployed app's `DB_CLIENT=postgres` yet.
+After `db:pg:verify-core` passes, the app can run with `DB_CLIENT=postgres`.
+Keep `STORAGE_DRIVER=local` until the R2 round-trip check passes, then switch it
+independently to `r2`.
 
 For a clean re-import into an existing Supabase database:
 
@@ -87,12 +97,21 @@ PG_TRUNCATE_BEFORE_IMPORT=true npm run db:pg:migrate
 Use that only when the target Supabase database contains disposable imported
 data. It truncates the imported application tables before loading SQLite rows.
 
-## Remaining Work
+The R2 backfill is resumable and non-destructive by default. It skips objects
+whose R2 size already matches, uploads missing or mismatched content,
+thumbnails, screenshots, and `ScreenTinker.apk`, and reports database rows whose
+local source file is missing. Add `--delete-local` only after a successful live
+verification and backup. Add `--skip-apk` when OTA APK distribution is unused.
 
-- Convert device groups and video walls.
-- Convert device/dashboard WebSockets and the shared preview payload builder.
-- Convert admin/reporting/background services and user/org/workspace deletion helpers.
-- Add a constraint-hardening migration for Postgres foreign keys.
-- Move content file writes/reads/deletes to an R2-backed storage adapter.
-- Update backup/restore flows so database exports and object storage are handled
-  separately.
+On Render, existing files must be backfilled from the old VPS volume or a local
+backup before switching storage. Point `UPLOADS_DIR` and `DATA_DIR` at that
+source copy while running the command, with `DB_CLIENT=postgres` so file names
+come from Supabase.
+
+## Remaining Deployment Work
+
+- Configure the R2 environment values and run `npm run storage:r2:verify`.
+- The live Supabase foreign-key audit found zero orphans and all 24 constraints
+  were validated on 2026-06-21.
+- Rotate the Supabase database password and production `JWT_SECRET` before the
+  final deployment.

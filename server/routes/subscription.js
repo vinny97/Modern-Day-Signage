@@ -49,6 +49,7 @@ router.get('/me', requireAuth, routeAsync(async (req, res) => {
       end: plan.trial_end ? new Date(plan.trial_end * 1000).toISOString() : null,
       plan: plan.trial_plan || null,
     },
+    access: plan.access,
     self_hosted: config.selfHosted,
   });
 }));

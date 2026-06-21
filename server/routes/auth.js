@@ -11,6 +11,7 @@ const { logActivity, getClientIp } = require('../services/activity');
 const totp = require('../lib/totp');
 const totpLockout = require('../lib/totp-lockout');
 const { sendSignupEmails } = require('../services/signupEmails');
+const { getAccessState, trialFields } = require('../services/subscriptionAccess');
 const { deleteUserCascadeAsync, OrgHasOtherMembersError } = require('../lib/user-deletion');
 const config = require('../config');
 const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
@@ -89,6 +90,25 @@ async function canRegister() {
   return userCount === 0;
 }
 
+function signupBilling(isFirstUser) {
+  if (config.selfHosted) {
+    return {
+      planId: isFirstUser ? 'enterprise' : 'free',
+      status: 'active',
+      trialStarted: null,
+      trialEndsAt: null,
+      trialPlan: null,
+    };
+  }
+  const { trialStarted, trialEndsAt } = trialFields();
+  return { planId: 'starter', status: 'trial', trialStarted, trialEndsAt, trialPlan: 'starter' };
+}
+
+async function userWithAccess(user) {
+  if (!user) return user;
+  return { ...user, access: await getAccessState(user) };
+}
+
 // Register
 router.post('/register', async (req, res, next) => {
   try {
@@ -110,15 +130,17 @@ router.post('/register', async (req, res, next) => {
   const userCount = (await db.prepare('SELECT COUNT(*) as count FROM users').get()).count;
   const role = userCount === 0 ? 'platform_admin' : 'user';
   const isFirstUser = userCount === 0;
-  const plan = (isFirstUser && config.selfHosted) ? 'enterprise' : 'pro'; // Start on Pro trial
-  const trialStarted = isFirstUser && config.selfHosted ? null : Math.floor(Date.now() / 1000);
+  const billing = signupBilling(isFirstUser);
 
   await db.prepare(`
-    INSERT INTO users (id, email, name, password_hash, auth_provider, role, plan_id, trial_started, trial_plan)
-    VALUES (?, ?, ?, ?, 'local', ?, ?, ?, ?)
-  `).run(id, email.toLowerCase(), name || email.split('@')[0], passwordHash, role, plan, trialStarted, trialStarted ? 'pro' : null);
+    INSERT INTO users (id, email, name, password_hash, auth_provider, role,
+      plan_id, subscription_status, trial_started, trial_ends_at, trial_plan)
+    VALUES (?, ?, ?, ?, 'local', ?, ?, ?, ?, ?, ?)
+  `).run(id, email.toLowerCase(), name || email.split('@')[0], passwordHash, role,
+    billing.planId, billing.status, billing.trialStarted, billing.trialEndsAt, billing.trialPlan);
 
-  const user = await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, stripe_customer_id, stripe_subscription_id, subscription_status, subscription_ends FROM users WHERE id = ?').get(id);
+  let user = await db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+  user = await userWithAccess(user);
   // #12: org-on-create. Per-request createOrg overrides the deployment default
   // (config.autoCreateOrgOnSignup). The first user is always given an org so a
   // fresh install is never left headless. When neither applies, the user is
@@ -128,8 +150,9 @@ router.post('/register', async (req, res, next) => {
     || (createOrg !== undefined ? !!createOrg : config.autoCreateOrgOnSignup);
   const workspaceId = await ensureDefaultOrgForUser(user, { allowCreate: createOrgForUser });
   const token = generateToken(user, workspaceId);
+  const { password_hash: _passwordHash, totp_secret_enc: _totpSecret, totp_last_step: _totpStep, ...safeUser } = user;
 
-  res.status(201).json({ token, user, current_workspace_id: workspaceId });
+  res.status(201).json({ token, user: safeUser, current_workspace_id: workspaceId });
 
   // Welcome + admin-notify emails (hosted instance only, idempotent, async).
   await sendSignupEmails(user, req);
@@ -173,7 +196,8 @@ async function issueSession(req, res, user, extra = {}) {
   // #100: callers pass a SELECT * row. Strip password_hash AND the TOTP internals
   // (the encrypted secret + the replay counter) so no secret/internal rides in the
   // response body - "secrets never in responses", same as the API token work.
-  const { password_hash, totp_secret_enc, totp_last_step, ...safeUser } = user;
+  const hydratedUser = await userWithAccess(user);
+  const { password_hash, totp_secret_enc, totp_last_step, ...safeUser } = hydratedUser;
   res.json({ token, user: safeUser, current_workspace_id: workspaceId, ...extra });
 }
 
@@ -339,13 +363,14 @@ router.post('/google', async (req, res) => {
       const userCount = (await db.prepare('SELECT COUNT(*) as count FROM users').get()).count;
       const role = userCount === 0 ? 'platform_admin' : 'user';
       const isFirst = userCount === 0;
-      const plan = (isFirst && config.selfHosted) ? 'enterprise' : 'pro';
-      const trialStarted = isFirst && config.selfHosted ? null : Math.floor(Date.now() / 1000);
+      const billing = signupBilling(isFirst);
 
       await db.prepare(`
-        INSERT INTO users (id, email, name, auth_provider, provider_id, avatar_url, role, plan_id, trial_started, trial_plan)
-        VALUES (?, ?, ?, 'google', ?, ?, ?, ?, ?, ?)
-      `).run(id, email.toLowerCase(), name || '', googleId, picture || '', role, plan, trialStarted, trialStarted ? 'pro' : null);
+        INSERT INTO users (id, email, name, auth_provider, provider_id, avatar_url,
+          role, plan_id, subscription_status, trial_started, trial_ends_at, trial_plan)
+        VALUES (?, ?, ?, 'google', ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(id, email.toLowerCase(), name || '', googleId, picture || '', role,
+        billing.planId, billing.status, billing.trialStarted, billing.trialEndsAt, billing.trialPlan);
 
       user = await db.prepare('SELECT * FROM users WHERE id = ?').get(id);
     } else if (user.auth_provider !== 'google') {
@@ -362,6 +387,7 @@ router.post('/google', async (req, res) => {
 
     const workspaceId = await ensureDefaultOrgForUser(user, { allowCreate: config.autoCreateOrgOnSignup });
     const token = generateToken(user, workspaceId);
+    user = await userWithAccess(user);
     const { password_hash, ...safeUser } = user;
     res.json({ token, user: safeUser, current_workspace_id: workspaceId });
 
@@ -422,13 +448,14 @@ router.post('/microsoft', async (req, res) => {
       const userCount = (await db.prepare('SELECT COUNT(*) as count FROM users').get()).count;
       const role = userCount === 0 ? 'platform_admin' : 'user';
       const isFirst = userCount === 0;
-      const plan = (isFirst && config.selfHosted) ? 'enterprise' : 'pro';
-      const trialStarted = isFirst && config.selfHosted ? null : Math.floor(Date.now() / 1000);
+      const billing = signupBilling(isFirst);
 
       await db.prepare(`
-        INSERT INTO users (id, email, name, auth_provider, provider_id, role, plan_id, trial_started, trial_plan)
-        VALUES (?, ?, ?, 'microsoft', ?, ?, ?, ?, ?)
-      `).run(id, email, name, microsoftId, role, plan, trialStarted, trialStarted ? 'pro' : null);
+        INSERT INTO users (id, email, name, auth_provider, provider_id, role,
+          plan_id, subscription_status, trial_started, trial_ends_at, trial_plan)
+        VALUES (?, ?, ?, 'microsoft', ?, ?, ?, ?, ?, ?, ?)
+      `).run(id, email, name, microsoftId, role, billing.planId, billing.status,
+        billing.trialStarted, billing.trialEndsAt, billing.trialPlan);
 
       user = await db.prepare('SELECT * FROM users WHERE id = ?').get(id);
     } else if (user.auth_provider !== 'microsoft') {
@@ -443,6 +470,7 @@ router.post('/microsoft', async (req, res) => {
 
     const workspaceId = await ensureDefaultOrgForUser(user, { allowCreate: config.autoCreateOrgOnSignup });
     const token = generateToken(user, workspaceId);
+    user = await userWithAccess(user);
     const { password_hash, ...safeUser } = user;
     res.json({ token, user: safeUser, current_workspace_id: workspaceId });
 
@@ -541,6 +569,7 @@ router.get('/me', requireAuth, resolveTenancy, routeAsync(async (req, res) => {
 
   res.json({
     ...req.user,
+    access: req.access || await getAccessState(req.user),
     hide_billing: config.hideBilling, // #116: client hides the Subscription nav + guards #/billing
     current_workspace_id: req.workspaceId,
     current_workspace: req.workspace ? { id: req.workspace.id, name: req.workspace.name, organization_id: req.workspace.organization_id } : null,
@@ -608,8 +637,8 @@ router.put('/me', requireAuth, routeAsync(async (req, res) => {
     await db.prepare('UPDATE users SET password_hash = ?, must_change_password = 0, updated_at = strftime(\'%s\',\'now\') WHERE id = ?')
       .run(hash, req.user.id);
   }
-  const user = await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, email_alerts, must_change_password FROM users WHERE id = ?').get(req.user.id);
-  res.json(user);
+  const user = await db.prepare('SELECT id, email, name, role, auth_provider, avatar_url, plan_id, email_alerts, must_change_password, subscription_status, subscription_ends, trial_started, trial_ends_at, trial_plan, past_due_grace_ends_at FROM users WHERE id = ?').get(req.user.id);
+  res.json(await userWithAccess(user));
 }));
 
 // List users - platform admins see all, admins see team members only
