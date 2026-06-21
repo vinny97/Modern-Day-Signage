@@ -7,7 +7,7 @@
 // workspace configures its own endpoint/key (encrypted at rest, never returned).
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const config = require('../config');
 const { encrypt, decrypt } = require('../lib/secretbox');
 const { generateImage } = require('../lib/image-gen');
@@ -155,8 +155,8 @@ function deoverlapTexts(texts) {
 }
 
 // GET /api/ai/settings — workspace members (never returns the key)
-router.get('/settings', (req, res) => {
-  const row = db.prepare('SELECT base_url, model, image_base_url, image_model, image_provider, api_key_enc, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
+router.get('/settings', async (req, res, next) => { try {
+  const row = await db.prepare('SELECT base_url, model, image_base_url, image_model, image_provider, api_key_enc, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
   res.json({
     base_url: row ? row.base_url || '' : '',
     model: row ? row.model || '' : '',
@@ -168,10 +168,10 @@ router.get('/settings', (req, res) => {
     configured: !!(row && row.base_url && row.model),
     image_configured: !!(row && row.image_base_url && row.image_provider),
   });
-});
+} catch (error) { next(error); } });
 
 // PUT /api/ai/settings — workspace admin
-router.put('/settings', (req, res) => {
+router.put('/settings', async (req, res, next) => { try {
   if (!isWorkspaceAdmin(req)) return res.status(403).json({ error: 'Workspace admin required' });
   const base_url = String(req.body && req.body.base_url || '').trim().replace(/\/+$/, '');
   const model = String(req.body && req.body.model || '').trim();
@@ -181,7 +181,7 @@ router.put('/settings', (req, res) => {
   if (base_url && !endpointAllowed(base_url)) return res.status(400).json({ error: 'Endpoint URL not allowed (private/internal addresses are blocked on this instance).' });
   if (image_base_url && !endpointAllowed(image_base_url)) return res.status(400).json({ error: 'Image endpoint URL not allowed.' });
 
-  const existing = db.prepare('SELECT api_key_enc, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
+  const existing = await db.prepare('SELECT api_key_enc, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
   let api_key_enc = existing ? existing.api_key_enc : null;
   if (typeof (req.body && req.body.api_key) === 'string' && req.body.api_key.length) api_key_enc = encrypt(req.body.api_key);
   if (req.body && req.body.clear_key) api_key_enc = null;
@@ -190,16 +190,16 @@ router.put('/settings', (req, res) => {
   if (typeof (req.body && req.body.image_api_key) === 'string' && req.body.image_api_key.length) image_api_key_enc = encrypt(req.body.image_api_key);
   if (req.body && req.body.clear_image_key) image_api_key_enc = null;
 
-  db.prepare(`
+  await db.prepare(`
     INSERT INTO ai_settings (workspace_id, base_url, api_key_enc, model, image_base_url, image_model, image_provider, image_api_key_enc, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%s','now'))
     ON CONFLICT(workspace_id) DO UPDATE SET base_url=excluded.base_url, api_key_enc=excluded.api_key_enc,
       model=excluded.model, image_base_url=excluded.image_base_url, image_model=excluded.image_model,
       image_provider=excluded.image_provider, image_api_key_enc=excluded.image_api_key_enc, updated_at=excluded.updated_at
   `).run(req.workspaceId, base_url || null, api_key_enc, model || null, image_base_url || null, image_model || null, image_provider, image_api_key_enc);
-  logActivity(req.user.id, 'ai_settings_update', `endpoint: ${base_url || '(none)'} model: ${model || '(none)'}`, null, getClientIp(req), req.workspaceId);
+  await logActivity(req.user.id, 'ai_settings_update', `endpoint: ${base_url || '(none)'} model: ${model || '(none)'}`, null, getClientIp(req), req.workspaceId);
   res.json({ ok: true });
-});
+} catch (error) { next(error); } });
 
 // POST /api/ai/models — list the models the configured/entered endpoint offers,
 // for the settings dropdown. Admin only. Uses the posted key, or the saved one.
@@ -209,7 +209,7 @@ router.post('/models', async (req, res) => {
   if (!base_url) return res.status(400).json({ error: 'Endpoint base URL required' });
   if (!endpointAllowed(base_url)) return res.status(400).json({ error: 'Endpoint URL not allowed (private/internal addresses are blocked on this instance).' });
   let key = (req.body && typeof req.body.api_key === 'string' && req.body.api_key.length) ? req.body.api_key : null;
-  if (!key) { const row = db.prepare('SELECT api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId); key = (row && decrypt(row.api_key_enc)) || 'none'; }
+  if (!key) { const row = await db.prepare('SELECT api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId); key = (row && decrypt(row.api_key_enc)) || 'none'; }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
   let r;
@@ -232,7 +232,7 @@ router.post('/generate-design', async (req, res) => {
   const prompt = String(req.body && req.body.prompt || '').trim().slice(0, 500);
   if (!prompt) return res.status(400).json({ error: 'Prompt required' });
 
-  const row = db.prepare('SELECT base_url, api_key_enc, model, image_base_url, image_model, image_provider, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
+  const row = await db.prepare('SELECT base_url, api_key_enc, model, image_base_url, image_model, image_provider, image_api_key_enc FROM ai_settings WHERE workspace_id = ?').get(req.workspaceId);
   if (!row || !row.base_url || !row.model) return res.status(400).json({ error: 'AI is not configured. Set an endpoint and model in AI settings first.' });
   if (!endpointAllowed(row.base_url)) return res.status(400).json({ error: 'Configured endpoint is not allowed.' });
 

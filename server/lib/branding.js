@@ -50,6 +50,19 @@ function resolveBranding(db, { workspaceId = null, domain = null } = {}) {
   return platformDefaultRow(db) || { ...HARDCODED_BRANDING };
 }
 
+async function resolveBrandingAsync(db, { workspaceId = null, domain = null } = {}) {
+  if (workspaceId) {
+    const row = await db.prepare('SELECT * FROM white_labels WHERE workspace_id = ?').get(workspaceId);
+    if (row) return row;
+  }
+  if (domain) {
+    const row = await db.prepare('SELECT * FROM white_labels WHERE custom_domain = ?').get(domain);
+    if (row) return row;
+  }
+  return await db.prepare('SELECT * FROM white_labels WHERE id = ?').get(PLATFORM_DEFAULT_ID)
+    || { ...HARDCODED_BRANDING };
+}
+
 // Presentational fields only. The PUBLIC resolver (GET /api/branding) and the
 // by-domain lookup must not leak internal columns (id, user_id, workspace_id,
 // custom_domain, timestamps) to unauthenticated / cross-tenant callers.
@@ -60,4 +73,4 @@ function publicBranding(row) {
   return out;
 }
 
-module.exports = { resolveBranding, platformDefaultRow, publicBranding, HARDCODED_BRANDING, PLATFORM_DEFAULT_ID };
+module.exports = { resolveBranding, resolveBrandingAsync, platformDefaultRow, publicBranding, HARDCODED_BRANDING, PLATFORM_DEFAULT_ID };

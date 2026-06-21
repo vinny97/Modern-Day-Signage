@@ -11,7 +11,7 @@ const { logActivity, getClientIp } = require('../services/activity');
 const totp = require('../lib/totp');
 const totpLockout = require('../lib/totp-lockout');
 const { sendSignupEmails } = require('../services/signupEmails');
-const { deleteUserCascade, OrgHasOtherMembersError } = require('../lib/user-deletion');
+const { deleteUserCascadeAsync, OrgHasOtherMembersError } = require('../lib/user-deletion');
 const config = require('../config');
 const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
@@ -657,10 +657,7 @@ router.delete('/users/:id', requireAuth, requireSuperAdmin, routeAsync(async (re
   // orgs the user solely owns, preserves (unlinks/reassigns) resources in orgs
   // they don't own, and refuses if they own a shared org.
   try {
-    if (db.client !== 'sqlite') {
-      return res.status(501).json({ error: 'User deletion is not available during the Postgres migration window' });
-    }
-    deleteUserCascade(require('../db/database').db, { targetId: target.id, actingAdminId: req.user.id });
+    await deleteUserCascadeAsync(db, { targetId: target.id, actingAdminId: req.user.id });
   } catch (e) {
     if (e instanceof OrgHasOtherMembersError) return res.status(409).json({ error: e.message });
     throw e;

@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db/database');
+const { db } = require('../db/client');
 const { requireAuth, requireSuperAdmin } = require('../middleware/auth');
 
 // Hard caps on string lengths so an unauth caller can't fill the DB with a
@@ -43,19 +43,18 @@ function clampJson(obj, max) {
   }
 }
 
-const insertStmt = db.prepare(`
+const insertSql = `
   INSERT INTO player_debug_logs
     (device_id, ip, user_agent, url, error_fingerprint, error_data, context)
   VALUES (?, ?, ?, ?, ?, ?, ?)
-`);
+`;
 
-const countStmt = db.prepare('SELECT COUNT(*) AS n FROM player_debug_logs');
-const pruneStmt = db.prepare(`
+const pruneSql = `
   DELETE FROM player_debug_logs
   WHERE id IN (SELECT id FROM player_debug_logs ORDER BY id ASC LIMIT ?)
-`);
+`;
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
     const deviceId = clamp(body.deviceId, MAX_DEVICE_ID);
@@ -65,15 +64,15 @@ router.post('/', (req, res) => {
     const errors = clampJson(body.errors, MAX_ERROR_DATA);
     const context = clampJson(body.context, MAX_CONTEXT);
 
-    insertStmt.run(deviceId, req.ip, userAgent, url, fingerprint, errors, context);
+    await db.prepare(insertSql).run(deviceId, req.ip, userAgent, url, fingerprint, errors, context);
 
     // FIFO cap. Prune the oldest PRUNE_BATCH rows when we cross ROW_CAP.
     // Done synchronously on insert so the cap is never far exceeded; cost is
     // bounded (the DELETE is indexed via the autoinc id) and fires only
     // every PRUNE_BATCH inserts past the cap.
-    const { n } = countStmt.get();
+    const { n } = await db.prepare('SELECT COUNT(*) AS n FROM player_debug_logs').get();
     if (n > ROW_CAP) {
-      pruneStmt.run(PRUNE_BATCH);
+      await db.prepare(pruneSql).run(PRUNE_BATCH);
     }
 
     res.status(204).end();
@@ -93,7 +92,7 @@ router.post('/', (req, res) => {
 // GET /list - paginated listing, newest first, with filters.
 //   query: page (1-indexed), limit (default 50, max 200),
 //          ua_contains, since (unix-sec), until (unix-sec), has_error (1/0)
-router.get('/list', requireAuth, requireSuperAdmin, (req, res) => {
+router.get('/list', requireAuth, requireSuperAdmin, async (req, res, next) => { try {
   const page = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
   const offset = (page - 1) * limit;
@@ -113,22 +112,22 @@ router.get('/list', requireAuth, requireSuperAdmin, (req, res) => {
   }
   const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
-  const total = db.prepare(`SELECT COUNT(*) AS n FROM player_debug_logs ${whereSql}`).get(...params).n;
-  const rows = db.prepare(`
+  const total = (await db.prepare(`SELECT COUNT(*) AS n FROM player_debug_logs ${whereSql}`).get(...params)).n;
+  const rows = await db.prepare(`
     SELECT id, device_id, ip, user_agent, url, error_fingerprint, error_data, context, created_at
     FROM player_debug_logs ${whereSql}
     ORDER BY id DESC LIMIT ? OFFSET ?
   `).all(...params, limit, offset);
 
   res.json({ total, page, limit, rows });
-});
+} catch (error) { next(error); } });
 
 // GET /summary - UA family counts for the top-of-page header summary.
 // Classification order matters: smart-TV markers checked before Chrome
 // (Tizen 5+ / WebOS / etc. contain Chrome/N in their UA), Edge before
 // Chrome (Edg/N appears alongside Chrome/N in Chromium-Edge).
-router.get('/summary', requireAuth, requireSuperAdmin, (req, res) => {
-  const rows = db.prepare('SELECT user_agent FROM player_debug_logs').all();
+router.get('/summary', requireAuth, requireSuperAdmin, async (req, res, next) => { try {
+  const rows = await db.prepare('SELECT user_agent FROM player_debug_logs').all();
   const counts = {
     tizen: 0, webos: 0, fire_tv: 0, bravia: 0,
     edge: 0, chrome: 0, firefox: 0, safari: 0,
@@ -147,16 +146,16 @@ router.get('/summary', requireAuth, requireSuperAdmin, (req, res) => {
     else counts.other++;
   }
   res.json({ total: rows.length, byFamily: counts });
-});
+} catch (error) { next(error); } });
 
 // DELETE /older-than?days=30 - manual purge. Confirmation happens client-side;
 // this is a single-shot DELETE that returns the row count actually deleted.
 // Bounded at 1..3650 days so a typo can't no-op or run forever.
-router.delete('/older-than', requireAuth, requireSuperAdmin, (req, res) => {
+router.delete('/older-than', requireAuth, requireSuperAdmin, async (req, res, next) => { try {
   const days = Math.max(1, Math.min(3650, parseInt(req.query.days) || 30));
   const cutoff = Math.floor(Date.now() / 1000) - days * 86400;
-  const result = db.prepare('DELETE FROM player_debug_logs WHERE created_at < ?').run(cutoff);
+  const result = await db.prepare('DELETE FROM player_debug_logs WHERE created_at < ?').run(cutoff);
   res.json({ deleted: result.changes, days, cutoff });
-});
+} catch (error) { next(error); } });
 
 module.exports = router;

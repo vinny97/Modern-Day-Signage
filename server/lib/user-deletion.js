@@ -181,7 +181,77 @@ function deleteUserCascade(db, { targetId, actingAdminId }) {
   run();
 }
 
+async function tablesPresentAsync(db) {
+  if (db.client === 'postgres') {
+    return new Set((await db.prepare("SELECT table_name AS name FROM information_schema.tables WHERE table_schema = 'public'").all()).map(r => r.name));
+  }
+  return new Set((await db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all()).map(r => r.name));
+}
+
+async function purgeWorkspacesAsync(db, wsIds, have) {
+  if (!wsIds.length) return;
+  const wph = inClause(wsIds.length);
+  if (have.has('devices')) {
+    const devIds = (await db.prepare(`SELECT id FROM devices WHERE workspace_id IN (${wph})`).all(...wsIds)).map(r => r.id);
+    if (devIds.length) {
+      const dph = inClause(devIds.length);
+      for (const table of DEVICE_LOG_TABLES) if (have.has(table)) await db.prepare(`DELETE FROM ${table} WHERE device_id IN (${dph})`).run(...devIds);
+    }
+  }
+  for (const table of WORKSPACE_SCOPED) if (have.has(table)) await db.prepare(`DELETE FROM ${table} WHERE workspace_id IN (${wph})`).run(...wsIds);
+  if (have.has('activity_log')) await db.prepare(`UPDATE activity_log SET workspace_id = NULL WHERE workspace_id IN (${wph})`).run(...wsIds);
+  await db.prepare(`DELETE FROM workspaces WHERE id IN (${wph})`).run(...wsIds);
+}
+
+async function deleteWorkspaceCascadeAsync(db, { workspaceId }) {
+  await db.withTransaction(async () => purgeWorkspacesAsync(db, [workspaceId], await tablesPresentAsync(db)));
+}
+
+async function deleteOrgCascadeAsync(db, { orgId }) {
+  await db.withTransaction(async () => {
+    const have = await tablesPresentAsync(db);
+    const wsIds = (await db.prepare('SELECT id FROM workspaces WHERE organization_id = ?').all(orgId)).map(r => r.id);
+    await purgeWorkspacesAsync(db, wsIds, have);
+    if (have.has('activity_log')) await db.prepare('UPDATE activity_log SET organization_id = NULL WHERE organization_id = ?').run(orgId);
+    await db.prepare('DELETE FROM organizations WHERE id = ?').run(orgId);
+  });
+}
+
+async function listOwnedOrgsWithSharingAsync(db, userId) {
+  const orgs = await db.prepare('SELECT id FROM organizations WHERE owner_user_id = ?').all(userId);
+  for (const org of orgs) {
+    const otherOrgMembers = Number((await db.prepare('SELECT COUNT(*) AS c FROM organization_members WHERE organization_id = ? AND user_id != ?').get(org.id, userId)).c);
+    const otherWsMembers = Number((await db.prepare(`SELECT COUNT(*) AS c FROM workspace_members wm JOIN workspaces w ON w.id = wm.workspace_id WHERE w.organization_id = ? AND wm.user_id != ?`).get(org.id, userId)).c);
+    org.shared = otherOrgMembers + otherWsMembers > 0;
+  }
+  return orgs;
+}
+
+async function deleteUserCascadeAsync(db, { targetId, actingAdminId }) {
+  const owned = await listOwnedOrgsWithSharingAsync(db, targetId);
+  const shared = owned.filter(org => org.shared);
+  if (shared.length) throw new OrgHasOtherMembersError('User owns an organization with other members - reassign ownership before deleting', shared.length);
+  await db.withTransaction(async () => {
+    const have = await tablesPresentAsync(db);
+    const soloOrgIds = owned.map(org => org.id);
+    if (soloOrgIds.length) {
+      const oph = inClause(soloOrgIds.length);
+      const wsIds = (await db.prepare(`SELECT id FROM workspaces WHERE organization_id IN (${oph})`).all(...soloOrgIds)).map(r => r.id);
+      await purgeWorkspacesAsync(db, wsIds, have);
+      if (have.has('activity_log')) await db.prepare(`UPDATE activity_log SET organization_id = NULL WHERE organization_id IN (${oph})`).run(...soloOrgIds);
+      await db.prepare(`DELETE FROM organizations WHERE id IN (${oph})`).run(...soloOrgIds);
+    }
+    for (const [table, column] of NULLABLE_USER_REFS) if (have.has(table)) await db.prepare(`UPDATE ${table} SET ${column} = NULL WHERE ${column} = ?`).run(targetId);
+    for (const table of REASSIGN_USER_TABLES) if (have.has(table)) await db.prepare(`UPDATE ${table} SET user_id = COALESCE((SELECT o.owner_user_id FROM workspaces w JOIN organizations o ON o.id = w.organization_id WHERE w.id = ${table}.workspace_id), ?) WHERE user_id = ?`).run(actingAdminId, targetId);
+    if (have.has('teams')) await db.prepare('DELETE FROM teams WHERE owner_id = ?').run(targetId);
+    if (have.has('team_invites')) await db.prepare('DELETE FROM team_invites WHERE invited_by = ?').run(targetId);
+    if (have.has('workspace_invites')) await db.prepare('DELETE FROM workspace_invites WHERE invited_by = ?').run(targetId);
+    await db.prepare('DELETE FROM users WHERE id = ?').run(targetId);
+  });
+}
+
 module.exports = {
   deleteUserCascade, OrgHasOtherMembersError, listOwnedOrgsWithSharing,
   deleteWorkspaceCascade, deleteOrgCascade,
+  deleteUserCascadeAsync, deleteWorkspaceCascadeAsync, deleteOrgCascadeAsync,
 };

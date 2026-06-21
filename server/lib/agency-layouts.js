@@ -46,4 +46,27 @@ function listLayoutGeometry(db, tokenId, workspaceId, playlistId = null) {
   }));
 }
 
-module.exports = { listLayoutGeometry };
+async function listLayoutGeometryAsync(db, tokenId, workspaceId, playlistId = null) {
+  const params = playlistId ? [workspaceId, tokenId, playlistId] : [workspaceId, tokenId];
+  const layouts = await db.prepare(`
+    SELECT DISTINCT l.id, l.name, l.width, l.height
+    FROM api_token_targets t
+    JOIN playlists p ON p.id = t.playlist_id AND p.workspace_id = ?
+    JOIN playlist_items pi ON pi.playlist_id = p.id AND pi.zone_id IS NOT NULL
+    JOIN layout_zones lz ON lz.id = pi.zone_id
+    JOIN layouts l ON l.id = lz.layout_id
+    WHERE t.token_id = ?${playlistId ? ' AND p.id = ?' : ''} ORDER BY l.name
+  `).all(...params);
+  for (const layout of layouts) {
+    layout.zones = await db.prepare(`SELECT id, name, x_percent, y_percent, width_percent, height_percent,
+      z_index, zone_type, fit_mode, background_color, sort_order
+      FROM layout_zones WHERE layout_id = ? ORDER BY sort_order, z_index`).all(layout.id);
+    layout.feeds_zone_ids = (await db.prepare(`SELECT DISTINCT pi.zone_id FROM api_token_targets t
+      JOIN playlist_items pi ON pi.playlist_id = t.playlist_id AND pi.zone_id IS NOT NULL
+      JOIN layout_zones lz ON lz.id = pi.zone_id
+      WHERE t.token_id = ? AND lz.layout_id = ?`).all(tokenId, layout.id)).map(row => row.zone_id);
+  }
+  return layouts;
+}
+
+module.exports = { listLayoutGeometry, listLayoutGeometryAsync };

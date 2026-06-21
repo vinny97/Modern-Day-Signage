@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { db } = require('../db/database');
-const appConfig = require('../config');
+const { db } = require('../db/client');
 const { PLATFORM_ROLES, ELEVATED_ROLES } = require('../middleware/auth');
 // Phase 2.2d: workspace-aware access. Same pattern as devices.js / content.js.
-const { accessContext } = require('../lib/tenancy');
+const { accessContextAsync } = require('../lib/tenancy');
+const storage = require('../lib/storage');
+const routeAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 // For preview only: inline /api/content/:id/file and /thumbnail URLs as data URIs,
 // scoped to the caller's current workspace. Lets the srcdoc preview iframe show
@@ -15,27 +15,34 @@ const { accessContext } = require('../lib/tenancy');
 // the widget-reference gate).
 const MAX_INLINE_BYTES = 10 * 1024 * 1024; // 10MB cap — base64 expands ~1.33x
 const MIME_RE = /^image\/[a-zA-Z0-9.+-]+$/;
-function inlineUserContent(html, workspaceId) {
+async function inlineUserContent(html, workspaceId) {
   if (!workspaceId) return html;
-  return html.replace(/\/api\/content\/([a-f0-9-]+)\/(file|thumbnail)/gi, (match, id, kind) => {
-    const c = db.prepare('SELECT filepath, thumbnail_path, mime_type, workspace_id FROM content WHERE id = ?').get(id);
+  const matches = [...html.matchAll(/\/api\/content\/([a-f0-9-]+)\/(file|thumbnail)/gi)];
+  for (const found of matches) {
+    const [match, id, kind] = found;
+    const c = await db.prepare('SELECT filepath, thumbnail_path, mime_type, workspace_id FROM content WHERE id = ?').get(id);
     // Inline content only when it lives in the caller's workspace, or is a
     // platform-template row (workspace_id IS NULL) shared with everyone.
-    if (!c) return match;
-    if (c.workspace_id && c.workspace_id !== workspaceId) return match;
+    if (!c || (c.workspace_id && c.workspace_id !== workspaceId)) continue;
     const filename = kind === 'thumbnail' ? c.thumbnail_path : c.filepath;
-    if (!filename) return match;
+    if (!filename) continue;
     const mime = kind === 'thumbnail' ? 'image/jpeg' : c.mime_type;
-    if (!mime || !MIME_RE.test(mime)) return match;
-    const safe = path.resolve(appConfig.contentDir, path.basename(filename));
-    if (!safe.startsWith(path.resolve(appConfig.contentDir))) return match;
+    if (!mime || !MIME_RE.test(mime)) continue;
     try {
-      const st = fs.statSync(safe);
-      if (!st.isFile() || st.size > MAX_INLINE_BYTES) return match;
-      const buf = fs.readFileSync(safe);
-      return `data:${mime};base64,${buf.toString('base64')}`;
-    } catch { return match; }
-  });
+      const object = await storage.getObject('content', filename);
+      let buf;
+      if (object.localPath) {
+        const st = fs.statSync(object.localPath);
+        if (!st.isFile() || st.size > MAX_INLINE_BYTES) continue;
+        buf = fs.readFileSync(object.localPath);
+      } else {
+        if (Number(object.contentLength || 0) > MAX_INLINE_BYTES) continue;
+        buf = Buffer.from(await object.body.transformToByteArray());
+      }
+      html = html.split(match).join(`data:${mime};base64,${buf.toString('base64')}`);
+    } catch {}
+  }
+  return html;
 }
 
 // Escape HTML to prevent XSS
@@ -84,42 +91,42 @@ function safeNumber(v, fallback) {
 // platform-template rows (workspace_id IS NULL) shared with all workspaces.
 // Phase 2.2d: workspace-scoped. Cross-workspace visibility comes from
 // switch-workspace, not a special list branch.
-router.get('/', (req, res) => {
+router.get('/', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.json([]);
-  const widgets = db.prepare(
+  const widgets = await db.prepare(
     'SELECT * FROM widgets WHERE (workspace_id = ? OR workspace_id IS NULL) ORDER BY created_at DESC'
   ).all(req.workspaceId);
   res.json(widgets);
-});
+}));
 
 // Create widget in the caller's current workspace.
-router.post('/', (req, res) => {
+router.post('/', routeAsync(async (req, res) => {
   if (!req.workspaceId) return res.status(403).json({ error: 'No workspace context. Switch to a workspace before creating widgets.' });
   const { widget_type, name, config } = req.body;
   if (!widget_type || !name) return res.status(400).json({ error: 'widget_type and name required' });
 
   const id = uuidv4();
-  db.prepare('INSERT INTO widgets (id, user_id, workspace_id, widget_type, name, config) VALUES (?, ?, ?, ?, ?, ?)')
+  await db.prepare('INSERT INTO widgets (id, user_id, workspace_id, widget_type, name, config) VALUES (?, ?, ?, ?, ?, ?)')
     .run(id, req.user.id, req.workspaceId, widget_type, name, JSON.stringify(config || {}));
 
-  res.status(201).json(db.prepare('SELECT * FROM widgets WHERE id = ?').get(id));
-});
+  res.status(201).json(await db.prepare('SELECT * FROM widgets WHERE id = ?').get(id));
+}));
 
 // Phase 2.2d: workspace-aware access. Mirrors the device/content pattern.
 // Platform-template widgets (workspace_id IS NULL) are readable by anyone
 // authenticated and writable only by platform_admin.
-function checkWidgetRead(req, res) {
-  const widget = db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
+async function checkWidgetRead(req, res) {
+  const widget = await db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
   if (!widget) { res.status(404).json({ error: 'Widget not found' }); return null; }
   if (!widget.workspace_id) return widget;
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(widget.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(widget.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   return widget;
 }
 
-function checkWidgetWrite(req, res) {
-  const widget = db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
+async function checkWidgetWrite(req, res) {
+  const widget = await db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
   if (!widget) { res.status(404).json({ error: 'Widget not found' }); return null; }
   if (!widget.workspace_id) {
     if (!PLATFORM_ROLES.includes(req.user.role)) {
@@ -127,8 +134,8 @@ function checkWidgetWrite(req, res) {
     }
     return widget;
   }
-  const ws = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(widget.workspace_id);
-  const ctx = ws && accessContext(req.user.id, req.user.role, ws);
+  const ws = await db.prepare('SELECT * FROM workspaces WHERE id = ?').get(widget.workspace_id);
+  const ctx = ws && await accessContextAsync(req.user.id, req.user.role, ws);
   if (!ctx) { res.status(403).json({ error: 'Access denied' }); return null; }
   if (!ctx.actingAs && ctx.workspaceRole === 'workspace_viewer') {
     res.status(403).json({ error: 'Read-only access' }); return null;
@@ -137,31 +144,31 @@ function checkWidgetWrite(req, res) {
 }
 
 // Get widget
-router.get('/:id', (req, res) => {
-  const widget = checkWidgetRead(req, res);
+router.get('/:id', routeAsync(async (req, res) => {
+  const widget = await checkWidgetRead(req, res);
   if (!widget) return;
   res.json(widget);
-});
+}));
 
 // Update widget
-router.put('/:id', (req, res) => {
-  const widget = checkWidgetWrite(req, res);
+router.put('/:id', routeAsync(async (req, res) => {
+  const widget = await checkWidgetWrite(req, res);
   if (!widget) return;
 
   const { name, config } = req.body;
-  if (name) db.prepare('UPDATE widgets SET name = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(name, req.params.id);
-  if (config) db.prepare('UPDATE widgets SET config = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(JSON.stringify(config), req.params.id);
+  if (name) await db.prepare('UPDATE widgets SET name = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(name, req.params.id);
+  if (config) await db.prepare('UPDATE widgets SET config = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?').run(JSON.stringify(config), req.params.id);
 
-  res.json(db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id));
-});
+  res.json(await db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id));
+}));
 
 // Delete widget
-router.delete('/:id', (req, res) => {
-  const widget = checkWidgetWrite(req, res);
+router.delete('/:id', routeAsync(async (req, res) => {
+  const widget = await checkWidgetWrite(req, res);
   if (!widget) return;
-  db.prepare('DELETE FROM widgets WHERE id = ?').run(req.params.id);
+  await db.prepare('DELETE FROM widgets WHERE id = ?').run(req.params.id);
   res.json({ success: true });
-});
+}));
 
 const KNOWN_WIDGET_TYPES = new Set(['clock','weather','rss','text','webpage','social','directory-board']);
 function renderWidgetHtml(type, config) {
@@ -179,8 +186,8 @@ function renderWidgetHtml(type, config) {
 }
 
 // Render widget as HTML page
-router.get('/:id/render', (req, res) => {
-  const widget = db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
+router.get('/:id/render', routeAsync(async (req, res) => {
+  const widget = await db.prepare('SELECT * FROM widgets WHERE id = ?').get(req.params.id);
   if (!widget) return res.status(404).send('Widget not found');
   const config = JSON.parse(widget.config || '{}');
   // This page is DESIGNED to be embedded by the player, which frames it in a
@@ -194,18 +201,18 @@ router.get('/:id/render', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'text/html');
   res.send(renderWidgetHtml(widget.widget_type, config));
-});
+}));
 
 // Preview unsaved widget from config (used by editor Preview button)
-router.post('/preview', (req, res) => {
+router.post('/preview', routeAsync(async (req, res) => {
   const { widget_type, config } = req.body || {};
   if (!widget_type || typeof widget_type !== 'string') return res.status(400).json({ error: 'widget_type required' });
   if (!KNOWN_WIDGET_TYPES.has(widget_type)) return res.status(400).json({ error: 'Unknown widget_type' });
   let html = renderWidgetHtml(widget_type, config || {});
-  if (req.workspaceId) html = inlineUserContent(html, req.workspaceId);
+  if (req.workspaceId) html = await inlineUserContent(html, req.workspaceId);
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
-});
+}));
 
 function renderClock(c) {
   return `<!DOCTYPE html><html><head><style>
