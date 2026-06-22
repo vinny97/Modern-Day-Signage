@@ -217,9 +217,9 @@ function accessibleWorkspaceIds(userId, role) {
 async function accessibleWorkspaceIdsAsync(userId, role) {
   if (!userId) return [];
   if (isPlatformStaff(role)) {
-    return (await asyncDb.prepare('SELECT id FROM workspaces').all()).map(row => row.id);
+    return (await db.prepare('SELECT id FROM workspaces').all()).map(row => row.id);
   }
-  return (await asyncDb.prepare(`
+  return (await db.prepare(`
     SELECT workspace_id AS id FROM workspace_members WHERE user_id = ?
     UNION
     SELECT w.id FROM workspaces w

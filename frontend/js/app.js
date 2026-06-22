@@ -374,7 +374,12 @@ function route() {
     return;
   }
 
-  // Show sidebar for authenticated views
+  // Show sidebar for authenticated views. Reaching this point means the user is
+  // authenticated and NOT on login/onboarding/no-workspace/change-password (those
+  // branches return earlier), so it's safe to reveal the app chrome now — this is
+  // what clears the boot-time hide that prevents the dashboard flashing before the
+  // login page on an unauthenticated visit from the marketing site.
+  document.documentElement.classList.remove('app-booting');
   sidebar.style.display = '';
   app.style.marginLeft = '';
   const mb = document.getElementById('mobileMenuBtn');

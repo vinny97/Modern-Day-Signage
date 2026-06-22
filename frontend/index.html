@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/manifest.json">
@@ -13,6 +13,15 @@
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/reset.css">
   <link rel="stylesheet" href="/css/main.css">
+  <!-- Prevent a flash of the app shell (sidebar/nav) before the router decides
+       whether to show the dashboard or the login page. The chrome stays hidden
+       until app.js reveals it for an authenticated view (see route() in app.js). -->
+  <style>
+    .app-booting .sidebar,
+    .app-booting .mobile-menu-btn,
+    .app-booting .sidebar-backdrop { display: none !important; }
+  </style>
+  <script>document.documentElement.classList.add('app-booting');</script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- OAuth providers loaded on-demand by login.js when needed -->
 </head>

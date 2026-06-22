@@ -361,7 +361,7 @@ body.auth-route .content {
 
 .btn-danger {
   background: var(--danger-dim);
-  color: #fca5a5;
+  color: var(--danger);
 }
 
 .btn-danger:hover {
