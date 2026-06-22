@@ -29,8 +29,21 @@ function logFatalAndExit(kind, err) {
   try { void db.close(); } catch (_) { /* best-effort flush */ }
   process.exit(1);
 }
+// A synchronous uncaught throw can leave global state corrupt, so we still exit
+// and let the platform restart a fresh process.
 process.on('uncaughtException', (err) => logFatalAndExit('uncaughtException', err));
-process.on('unhandledRejection', (reason) => logFatalAndExit('unhandledRejection', reason));
+// An UNHANDLED PROMISE REJECTION is different: it's almost always a single async
+// request/socket handler that forgot a try/catch (e.g. a bad DB query for one
+// user). Killing the whole instance for that takes every other user down too —
+// which is exactly what a single bug just did. Log it loudly with a full stack so
+// it's still diagnosable, but KEEP SERVING. The offending request fails on its
+// own; everyone else is unaffected.
+process.on('unhandledRejection', (reason) => {
+  try {
+    const e = reason instanceof Error ? reason : new Error('Non-error rejection: ' + require('util').inspect(reason));
+    process.stderr.write(`\n[unhandledRejection — logged, not fatal] ${new Date().toISOString()}\n${e.stack || e.message}\n`);
+  } catch (_) { /* the handler must never throw */ }
+});
 
 // Ensure upload directories exist
 [config.contentDir, config.screenshotsDir].forEach(dir => {

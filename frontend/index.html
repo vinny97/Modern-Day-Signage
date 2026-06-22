@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="app-booting">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,14 +14,15 @@
   <link rel="stylesheet" href="/css/reset.css">
   <link rel="stylesheet" href="/css/main.css">
   <!-- Prevent a flash of the app shell (sidebar/nav) before the router decides
-       whether to show the dashboard or the login page. The chrome stays hidden
-       until app.js reveals it for an authenticated view (see route() in app.js). -->
+       whether to show the dashboard or the login page. The boot class is set on
+       <html> directly (CSP blocks inline scripts on the dashboard), and app.js
+       removes it once it reveals an authenticated view (see route() in app.js).
+       Inline <style> is allowed by the dashboard CSP (style-src 'unsafe-inline'). -->
   <style>
     .app-booting .sidebar,
     .app-booting .mobile-menu-btn,
     .app-booting .sidebar-backdrop { display: none !important; }
   </style>
-  <script>document.documentElement.classList.add('app-booting');</script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- OAuth providers loaded on-demand by login.js when needed -->
 </head>
