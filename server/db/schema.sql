@@ -71,7 +71,10 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 INSERT OR IGNORE INTO products (id, name, slug, price, currency, active)
-VALUES ('screenfizz-player', 'ScreenFizz Player', 'screenfizz-player', 9900, 'gbp', 1);
+VALUES ('screenfizz-player', 'ScreenFizz Player', 'screenfizz-player', 6000, 'gbp', 1);
+-- Correct any DB seeded with the earlier £99 placeholder to the real £60 price.
+-- Scoped to the stale default so it never stomps a deliberately-set price.
+UPDATE products SET price = 6000 WHERE id = 'screenfizz-player' AND price = 9900;
 
 CREATE TABLE IF NOT EXISTS hardware_orders (
     id                      INTEGER PRIMARY KEY AUTOINCREMENT,

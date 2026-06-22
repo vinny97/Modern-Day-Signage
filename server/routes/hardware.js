@@ -29,33 +29,41 @@ router.post('/checkout', optionalAuth, routeAsync(async (req, res) => {
 
   const price = Number(config.hardwarePlayerPricePence || product.price || 9900);
   const baseUrl = config.appUrl || `${req.protocol}://${req.get('host')}`;
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    customer_creation: 'always',
-    customer_email: req.user?.email || undefined,
-    line_items: [{
-      quantity: 1,
-      price_data: {
-        currency: 'gbp',
-        unit_amount: price,
-        product_data: { name: 'ScreenFizz Player', description: 'Pre-configured plug-and-play digital signage player' },
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      customer_creation: 'always',
+      customer_email: req.user?.email || undefined,
+      line_items: [{
+        quantity: 1,
+        price_data: {
+          currency: 'gbp',
+          unit_amount: price,
+          product_data: { name: 'ScreenFizz Player', description: 'Pre-configured plug-and-play digital signage player' },
+        },
+      }],
+      shipping_address_collection: { allowed_countries: ['GB'] },
+      phone_number_collection: { enabled: true },
+      tax_id_collection: { enabled: true },
+      // Only enable Stripe Tax when the account is configured for it — otherwise
+      // Stripe rejects every session ("must specify a tax code in all line items").
+      automatic_tax: { enabled: config.hardwareAutomaticTax },
+      success_url: `${baseUrl}/hardware-order-success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/hardware.html?checkout=cancelled`,
+      metadata: {
+        order_type: 'hardware_player',
+        product_id: product.id,
+        quantity: '1',
+        user_id: req.user?.id || '',
       },
-    }],
-    shipping_address_collection: { allowed_countries: ['GB'] },
-    phone_number_collection: { enabled: true },
-    tax_id_collection: { enabled: true },
-    automatic_tax: { enabled: true },
-    success_url: `${baseUrl}/hardware-order-success.html?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl}/hardware.html?checkout=cancelled`,
-    metadata: {
-      order_type: 'hardware_player',
-      product_id: product.id,
-      quantity: '1',
-      user_id: req.user?.id || '',
-    },
-  });
-  res.json({ url: session.url });
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    // Don't leak Stripe's stack trace / internal paths to the client.
+    console.error('Hardware checkout error:', err.message);
+    res.status(502).json({ error: 'Could not start checkout. Please try again later.' });
+  }
 }));
 
 router.get('/orders/session/:sessionId', routeAsync(async (req, res) => {
@@ -113,10 +121,15 @@ router.post('/orders/:id/refund', requireAuth, requirePlatformAdmin, routeAsync(
   if (!order) return res.status(404).json({ error: 'Order not found' });
   if (!order.stripe_payment_intent) return res.status(400).json({ error: 'Order has no refundable payment' });
   if (order.status === 'refunded') return res.status(409).json({ error: 'Order is already refunded' });
-  const refund = await stripe.refunds.create({ payment_intent: order.stripe_payment_intent });
-  await db.prepare("UPDATE hardware_orders SET status = 'refunded', stripe_refund_id = ?, updated_at = strftime('%s','now') WHERE id = ?")
-    .run(refund.id, order.id);
-  res.json(await db.prepare('SELECT * FROM hardware_orders WHERE id = ?').get(order.id));
+  try {
+    const refund = await stripe.refunds.create({ payment_intent: order.stripe_payment_intent });
+    await db.prepare("UPDATE hardware_orders SET status = 'refunded', stripe_refund_id = ?, updated_at = strftime('%s','now') WHERE id = ?")
+      .run(refund.id, order.id);
+    res.json(await db.prepare('SELECT * FROM hardware_orders WHERE id = ?').get(order.id));
+  } catch (err) {
+    console.error('Hardware refund error:', err.message);
+    res.status(502).json({ error: 'Refund could not be processed. Please try again or refund from the Stripe dashboard.' });
+  }
 }));
 
 module.exports = router;

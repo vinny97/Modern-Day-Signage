@@ -101,7 +101,14 @@ export async function render(container) {
         </div>
         ${subData.self_hosted ? `<p style="color:var(--text-muted);font-size:12px;margin-top:12px">${t('billing.self_hosted_note')}</p>` : ''}
       </div>
+
+      <div class="settings-section" id="hardwareOrdersSection">
+        <h3>Your Orders</h3>
+        <div id="hardwareOrdersList"><p style="color:var(--text-muted)">Loading…</p></div>
+      </div>
     `;
+
+    loadHardwareOrders();
 
     window._checkout = async (planId, interval) => {
       try {
@@ -140,6 +147,53 @@ export async function render(container) {
   } catch (err) {
     document.getElementById('billingContent').innerHTML = `<div class="empty-state"><h3>${t('billing.failed_to_load')}</h3><p>${esc(err.message)}</p></div>`;
   }
+}
+
+const ORDER_STATUS_LABELS = {
+  paid: 'Paid', preparing: 'Preparing', ready_to_ship: 'Ready to Ship', shipped: 'Shipped',
+  delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded',
+};
+
+function orderMoney(pence, currency) {
+  const symbol = (currency || 'gbp').toLowerCase() === 'gbp' ? '£' : '';
+  return symbol + (Number(pence || 0) / 100).toFixed(2);
+}
+
+async function loadHardwareOrders() {
+  const el = document.getElementById('hardwareOrdersList');
+  if (!el) return;
+  let orders;
+  try {
+    orders = await fetch('/api/hardware/orders/mine', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }).then(r => r.ok ? r.json() : []);
+  } catch (_) {
+    orders = [];
+  }
+  if (!orders || !orders.length) {
+    el.innerHTML = `<p style="color:var(--text-muted);font-size:13px">You haven't ordered any hardware yet. <a href="/hardware.html">Buy a ScreenFizz Player</a>.</p>`;
+    return;
+  }
+  el.innerHTML = orders.map(o => `
+    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:600">ScreenFizz Player</div>
+          <div style="font-size:12px;color:var(--text-muted)">Order ${esc(o.order_number || '—')} · Ordered ${o.created_at ? new Date(Number(o.created_at) * 1000).toLocaleDateString() : '—'}</div>
+        </div>
+        <div style="text-align:right">
+          <span style="background:var(--bg-secondary);padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500">${ORDER_STATUS_LABELS[o.status] || esc(o.status)}</span>
+          <div style="font-weight:600;margin-top:4px">${orderMoney(o.total, o.currency)}</div>
+        </div>
+      </div>
+      ${o.tracking_number ? `
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:13px">
+        <span style="color:var(--text-muted)">Courier:</span> ${esc(o.courier || '—')}
+        &nbsp;·&nbsp;
+        <span style="color:var(--text-muted)">Tracking:</span> ${esc(o.tracking_number)}
+      </div>` : ''}
+    </div>
+  `).join('');
 }
 
 export function cleanup() {}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed | ScreenFizz</title>
+  <meta name="description" content="Your ScreenFizz Player order has been confirmed.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/screenfizz-logo.png">
+  <link rel="stylesheet" href="/css/marketing.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a></div></div>
+  </nav>
+
+  <main>
+    <section class="section" style="text-align:center;max-width:620px;margin:0 auto">
+      <div style="font-size:56px;line-height:1;margin-bottom:8px" aria-hidden="true">✅</div>
+      <div class="eyebrow">Order Confirmed</div>
+      <h1>Thanks for your order!</h1>
+      <p>Your ScreenFizz Player will be prepared and shipped within 1–2 business days.</p>
+
+      <div id="orderBox" style="border:1px solid var(--border, #e5e7eb);border-radius:16px;padding:28px 24px;margin:28px auto;max-width:420px">
+        <div style="color:var(--text-muted, #6b7280);font-size:13px;letter-spacing:.04em;text-transform:uppercase">Order Number</div>
+        <div id="orderNumber" style="font-size:32px;font-weight:700;margin-top:6px">Confirming…</div>
+        <div id="orderMeta" style="color:var(--text-muted, #6b7280);font-size:13px;margin-top:8px"></div>
+      </div>
+
+      <p>You'll receive an email once your player has been dispatched.</p>
+      <div class="hero-actions" style="margin-top:24px;justify-content:center"><a class="btn btn-primary" href="/app#/billing">View My Orders</a><a class="btn btn-outline" href="/">Back to Home</a></div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div></div></footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    const orderNumberEl = document.getElementById('orderNumber');
+    const orderMetaEl = document.getElementById('orderMeta');
+
+    function formatMoney(pence, currency) {
+      const symbol = (currency || 'gbp').toLowerCase() === 'gbp' ? '£' : '';
+      return symbol + (Number(pence || 0) / 100).toFixed(2);
+    }
+
+    function showOrder(order) {
+      orderNumberEl.textContent = order.order_number || 'Confirmed';
+      const parts = [];
+      if (order.total != null) parts.push('Total: ' + formatMoney(order.total, order.currency));
+      orderMetaEl.textContent = parts.join(' · ');
+    }
+
+    // The order row is created by the Stripe webhook, which can land a moment
+    // after the customer is redirected here. Poll the session endpoint (202 =
+    // not ready yet) for up to ~30s before falling back to a generic message.
+    async function pollOrder(attempt = 0) {
+      if (!sessionId) {
+        orderNumberEl.textContent = 'Confirmed';
+        orderMetaEl.textContent = 'Your order is being processed.';
+        return;
+      }
+      try {
+        const res = await fetch('/api/hardware/orders/session/' + encodeURIComponent(sessionId));
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.pending === false && data.order) {
+          showOrder(data.order);
+          return;
+        }
+      } catch (_) { /* retry below */ }
+      if (attempt < 15) {
+        setTimeout(() => pollOrder(attempt + 1), 2000);
+      } else {
+        orderNumberEl.textContent = 'Confirmed';
+        orderMetaEl.textContent = "Your payment was successful. We'll email your order details shortly.";
+      }
+    }
+
+    pollOrder();
+  </script>
+</body>
+</html>

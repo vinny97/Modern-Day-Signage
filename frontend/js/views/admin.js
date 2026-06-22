@@ -61,6 +61,7 @@ export async function render(container) {
     <div class="page-header">
       <div><h1>${t('admin.title')}</h1><div class="subtitle">${t('admin.subtitle')}</div></div>
       <div style="display:flex;gap:8px">
+        <a href="#/admin/hardware" class="btn btn-secondary">Hardware Orders</a>
         <button class="btn btn-secondary" id="adminCreateOrgBtn">${t('admin.create_org.button')}</button>
         <button class="btn btn-primary" id="adminAddUserBtn">${t('admin.add_user')}</button>
       </div>

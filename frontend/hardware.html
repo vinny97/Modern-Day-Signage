@@ -15,7 +15,7 @@
 </head>
 <body>
   <nav class="site-nav" aria-label="Primary navigation">
-    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/managed-digital-signage.html">Services</a><div class="dropdown-menu"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/managed-digital-signage.html#pro-content">Pro Managed Content Service</a></div></div><div class="dropdown"><a class="nav-link" href="/self-service-software.html">Products</a><div class="dropdown-menu"><a href="/self-service-software.html">ScreenFizz Software</a><a href="/hardware.html">ScreenFizz Player</a></div></div><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact.html">Order Player</a></div></div>
+    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/managed-digital-signage.html">Services</a><div class="dropdown-menu"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/managed-digital-signage.html#pro-content">Pro Managed Content Service</a></div></div><div class="dropdown"><a class="nav-link" href="/self-service-software.html">Products</a><div class="dropdown-menu"><a href="/self-service-software.html">ScreenFizz Software</a><a href="/hardware.html">ScreenFizz Player</a></div></div><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="#buy">Buy Player</a></div></div>
   </nav>
 
   <main>
@@ -24,7 +24,7 @@
         <div class="eyebrow">Hardware</div>
         <h1>ScreenFizz Player</h1>
         <p>A small plug-and-play device that connects your TV to ScreenFizz. We prepare it before it arrives, so setup stays simple.</p>
-        <div class="hero-actions" style="margin-top:30px"><a class="btn btn-primary" href="/contact.html">Order Player</a><a class="btn btn-outline" href="/pricing.html">View Plans</a></div>
+        <div class="hero-actions" style="margin-top:30px"><button class="btn btn-primary" id="buyPlayerHero" type="button">Buy Player · £60</button><a class="btn btn-outline" href="/pricing.html">View Plans</a></div>
       </div>
     </section>
 
@@ -49,8 +49,63 @@
         <article class="card"><h3>£60 one-time</h3><p>Buy the player once and use it with your selected ScreenFizz plan.</p></article>
       </div>
     </section>
+
+    <section class="section section-tight" id="buy">
+      <div class="pricing-cta" style="max-width:520px;margin:0 auto;text-align:center;border:1px solid var(--border, #e5e7eb);border-radius:16px;padding:40px 32px">
+        <div class="eyebrow">ScreenFizz Player</div>
+        <h2 style="margin:8px 0 4px">Plug &amp; Play Digital Signage Player</h2>
+        <ul style="list-style:none;padding:0;margin:20px 0;text-align:left;display:inline-block">
+          <li>✓ Ready in minutes</li>
+          <li>✓ Pre-configured for your account</li>
+          <li>✓ WiFi setup included</li>
+          <li>✓ Automatic updates</li>
+        </ul>
+        <div style="font-size:40px;font-weight:700;margin:8px 0 24px">£60</div>
+        <button class="btn btn-primary" id="buyPlayer" type="button" style="width:100%;max-width:280px">Buy Player</button>
+        <p class="form-status" id="buyStatus" aria-live="polite" style="margin-top:14px;min-height:20px"></p>
+        <p style="font-size:13px;color:var(--text-muted, #6b7280);margin-top:4px">Secure checkout powered by Stripe. Shipped within 1–2 business days.</p>
+      </div>
+    </section>
   </main>
 
   <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div></div></footer>
+
+  <script>
+    const buyStatus = document.getElementById('buyStatus');
+
+    async function startCheckout(button) {
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Redirecting to checkout…';
+      if (buyStatus) { buyStatus.className = 'form-status'; buyStatus.textContent = ''; }
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/hardware/checkout', {
+          method: 'POST',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.url) {
+          window.location.href = data.url;
+          return;
+        }
+        if (buyStatus) {
+          buyStatus.className = 'form-status error';
+          buyStatus.textContent = data.error || 'Sorry, checkout is unavailable right now. Please try again later.';
+        }
+      } catch (err) {
+        if (buyStatus) {
+          buyStatus.className = 'form-status error';
+          buyStatus.textContent = 'Network error. Please try again.';
+        }
+      } finally {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    }
+
+    document.getElementById('buyPlayer')?.addEventListener('click', e => startCheckout(e.currentTarget));
+    document.getElementById('buyPlayerHero')?.addEventListener('click', e => startCheckout(e.currentTarget));
+  </script>
 </body>
 </html>

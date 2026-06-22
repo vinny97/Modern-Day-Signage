@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 INSERT INTO products (id, name, slug, price, currency, active)
-VALUES ('screenfizz-player', 'ScreenFizz Player', 'screenfizz-player', 9900, 'gbp', 1)
+VALUES ('screenfizz-player', 'ScreenFizz Player', 'screenfizz-player', 6000, 'gbp', 1)
 ON CONFLICT (id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS hardware_orders (

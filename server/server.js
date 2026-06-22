@@ -147,6 +147,7 @@ app.use((req, res, next) => {
     '/self-service-software.html',
     '/pricing.html',
     '/hardware.html',
+    '/hardware-order-success.html',
     '/contact.html',
     '/compare/pricing-tiers.html',
   ].includes(req.path)) return marketingCsp(req, res, next);

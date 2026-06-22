@@ -70,7 +70,11 @@ module.exports = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
   stripeSelfServicePriceId: process.env.STRIPE_SELF_SERVICE_PRICE_ID || '',
-  hardwarePlayerPricePence: parseInt(process.env.HARDWARE_PLAYER_PRICE_PENCE || '9900', 10),
+  hardwarePlayerPricePence: parseInt(process.env.HARDWARE_PLAYER_PRICE_PENCE || '6000', 10),
+  // Stripe Tax (automatic_tax) requires Stripe Tax to be enabled on the account
+  // with an origin address + line-item tax codes. Off by default so checkout works
+  // out of the box; set HARDWARE_AUTOMATIC_TAX=true once Stripe Tax is configured.
+  hardwareAutomaticTax: String(process.env.HARDWARE_AUTOMATIC_TAX || '').toLowerCase() === 'true',
   appUrl: (process.env.APP_URL || '').replace(/\/$/, ''),
   // Resend email sender (services/email.js). Required for actual delivery;
   // absent values short-circuit to a stdout fallback for local development.
