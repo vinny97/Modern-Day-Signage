@@ -3,19 +3,19 @@
 //   (b) an admin notification to Dan so no signup goes unnoticed.
 //
 // Fired fire-and-forget from all three signup paths (local /register, /google,
-// /microsoft) at the point a NEW user is created. Reuses the single Microsoft
-// Graph transport in ./email (no second mail path).
+// /microsoft) at the point a NEW user is created. Reuses the single Resend
+// transport in ./email (no second mail path).
 //
 // Gating & safety:
 //   - Hosted-instance only: skipped when SELF_HOSTED=true so self-host operators
 //     never emit mail from our domain (and never CC Dan on their signups).
 //   - Idempotent: users.welcome_email_sent_at is stamped after the send block;
 //     a non-null value short-circuits, so a user is only ever emailed once.
-//   - sendEmail() never throws, so a Graph hiccup is logged (per-email
+//   - sendEmail() never throws, so a Resend hiccup is logged (per-email
 //     {sent, reason}) but never blocks or fails the signup request.
 //
 // No retry logic by design: there is no path that re-enters the new-user branch
-// for an existing user, so a failed Graph send is surfaced in the logs and left
+// for an existing user, so a failed Resend send is surfaced in the logs and left
 // alone rather than retried (that code would be dead).
 
 const { db } = require('../db/client');
@@ -25,7 +25,7 @@ const config = require('../config');
 
 // Admin signup-notify recipient. Sourced from env (not hardcoded) so the
 // hosted .com address never ships in open-source code: a self-hoster who
-// configures Graph but forgets SELF_HOSTED=true would otherwise fire their
+// configures Resend but forgets SELF_HOSTED=true would otherwise fire their
 // users' signup PII into our inbox. Unset -> admin notify is skipped entirely
 // (the user's welcome email is unaffected). Hosted prod sets this env var.
 const ADMIN_NOTIFY_TO = process.env.ADMIN_NOTIFY_EMAIL || null;

@@ -21,7 +21,7 @@ ScreenTinker is self-hosted digital signage software. Manage screens across mult
 - **Mobile-responsive** — full management dashboard and landing page work on phones and tablets
 - **Workspaces** — multi-tenant data model: organizations contain workspaces, workspaces contain devices/content/playlists/schedules; users can be members of multiple workspaces and switch via a dropdown in the sidebar
 - **Member roles** — six-level hierarchy (platform_admin / org_owner / org_admin / workspace_admin / workspace_editor / workspace_viewer) gated at every API route
-- **Alerts** — email notifications via Microsoft Graph when devices go offline; built-in spam protection (2h dedup, 24h long-offline cutoff, sequential send pattern); per-user opt-out via Settings → Account
+- **Alerts** — email notifications via Resend when devices go offline; built-in spam protection (2h dedup, 24h long-offline cutoff, sequential send pattern); per-user opt-out via Settings → Account
 - **White-label** — custom branding, colors, logo, favicon, CSS, and domain
 - **Content management** — folder organization, remote URL content (no upload needed), YouTube embeds, video duration detection via ffprobe, automatic thumbnail generation, Unicode-safe filenames (NFC normalization + UTF-8 multipart decoding)
 - **Export/Import** — v2 format with playlists, device groups, schedules, and optional media bundling (ZIP); backward-compatible v1 import with automatic playlist migration
@@ -72,7 +72,7 @@ Schema migrations run automatically the first time the server starts after a git
 - **Android / web players** → device-namespace WebSocket → server. Authenticated per-device with a long-lived device token. Each device joins a room keyed on its `device_id`.
 - **Admin dashboard** → dashboard-namespace WebSocket → server. Authenticated with the user's JWT. Each socket joins one room per accessible workspace so outbound events (device status, screenshots, playback progress) only reach dashboards that should see them.
 - **Admin REST** → `/api/*` HTTPS → Express → SQLite. Everything scoped by `workspace_id` from JWT `current_workspace_id` claim.
-- **Email** → Microsoft Graph `sendMail` via client-credentials OAuth flow. In-memory token cache. Sequential send pattern through alert backlogs to respect Graph's per-app concurrency limits.
+- **Email** → Resend HTTPS API. Sequential send pattern through alert backlogs to avoid provider bursts.
 
 ## Supported Platforms
 
@@ -185,42 +185,37 @@ Let users sign in with Microsoft/Azure AD.
 | `MICROSOFT_CLIENT_ID` | Your Azure AD application client ID |
 | `MICROSOFT_TENANT_ID` | Tenant ID (`common` for multi-tenant) |
 
-#### Email Alerts (Microsoft Graph)
+#### Transactional Email (Resend)
 
-Send email notifications when devices go offline. Backed by Microsoft Graph Mail.Send via the client-credentials flow.
+Send welcome messages, workspace invitations, trial lifecycle emails, contact notifications, and device-offline alerts through Resend.
 
 | Variable | Description |
 |----------|-------------|
-| `GRAPH_TENANT_ID` | Microsoft Azure AD tenant ID |
-| `GRAPH_CLIENT_ID` | Azure AD app registration client ID |
-| `GRAPH_CLIENT_SECRET` | Azure AD app registration client secret |
-| `GRAPH_SENDER_EMAIL` | Mailbox to send from (must be a valid mailbox or alias in the tenant) |
-| `GRAPH_SENDER_NAME` | Display name shown in the email `From` field (defaults to `ScreenTinker`) |
+| `RESEND_API_KEY` | Resend API key |
+| `RESEND_FROM_EMAIL` | Sender address on a domain verified in Resend |
+| `RESEND_FROM_NAME` | Display name shown in the email `From` field (defaults to `ScreenTinker`) |
 
-**Azure AD app setup:**
+**Resend setup:**
 
-1. Register a new app in Azure AD (single-tenant)
-2. Under **API permissions**, add an **Application** permission: Microsoft Graph → `Mail.Send`
-3. Click **Grant admin consent** for the tenant
-4. Under **Certificates & secrets**, generate a new **Client secret** and capture the value (it is only shown once)
-5. Capture the **Directory (tenant) ID** and **Application (client) ID** from the Overview page
-6. Set the five env vars above in your deployment (systemd unit, `.env` file, etc.)
+1. Add and verify your sending domain in Resend, including the supplied DNS records.
+2. Create an API key with sending access.
+3. Set the three environment variables above in your deployment.
 
-**Local dev fallback:** if any of `GRAPH_TENANT_ID`, `GRAPH_CLIENT_ID`, `GRAPH_CLIENT_SECRET`, or `GRAPH_SENDER_EMAIL` is unset, `sendEmail()` short-circuits and logs `[EMAIL] not configured - would send to ...` to stdout instead of calling Graph. The app keeps running normally; only delivery is suppressed. This means a minimal local-dev install with no M365 access works fine — email-triggering features (device-offline alerts, future invite emails) just won't deliver anything externally.
+**Local dev fallback:** if either `RESEND_API_KEY` or `RESEND_FROM_EMAIL` is unset, `sendEmail()` logs `[EMAIL] not configured - would send to ...` instead of calling Resend. The app keeps running normally; only delivery is suppressed.
 
 **Dev safety allow-list:**
 
 | Variable | Description |
 |----------|-------------|
-| `GRAPH_DEV_RESTRICT_TO` | Comma-separated allow-list of recipient emails. When set, sends to addresses **not** in the list are suppressed (logged but never posted to Graph). |
+| `RESEND_DEV_RESTRICT_TO` | Comma-separated allow-list of recipient emails. When set, sends to addresses **not** in the list are suppressed (logged but never posted to Resend). |
 
 Use this in local dev when running against a fresh production database clone to prevent accidental emails to real users. Leave it **unset in production** so emails flow to everyone normally.
 
 **Alert spam protections** (also live, no configuration needed):
 - **2-hour dedup window** per (alert-type, target-id) pair — the same device won't trigger repeated alerts within two hours
 - **24-hour long-offline cutoff** — devices that have been offline for more than 24 hours stop generating alerts (the user already knows or the device is abandoned; further alerts are noise)
-- **Sequential send pattern** through the offline-alert backlog — avoids Graph's per-app concurrent-send throttling (HTTP 429 `ApplicationThrottled`)
-- **Per-user opt-out** via the `email_alerts` toggle in Settings → Account; respects user preference before any Graph call
+- **Sequential send pattern** through the offline-alert backlog — avoids bursts against the email provider
+- **Per-user opt-out** via the `email_alerts` toggle in Settings → Account; respects user preference before any Resend call
 
 ### Production Deployment
 
@@ -262,12 +257,10 @@ Environment=SELF_HOSTED=true
 # Environment=APP_URL=https://signage.yourcompany.com
 # Environment=STRIPE_SECRET_KEY=sk_live_...
 # Environment=STRIPE_WEBHOOK_SECRET=whsec_...
-# Email alerts via Microsoft Graph - see Email Alerts section above for setup
-# Environment=GRAPH_TENANT_ID=...
-# Environment=GRAPH_CLIENT_ID=...
-# Environment=GRAPH_CLIENT_SECRET=...
-# Environment=GRAPH_SENDER_EMAIL=support@yourcompany.com
-# Environment=GRAPH_SENDER_NAME=Your Brand
+# Transactional email via Resend - see the section above for setup
+# Environment=RESEND_API_KEY=re_...
+# Environment=RESEND_FROM_EMAIL=support@yourcompany.com
+# Environment=RESEND_FROM_NAME=Your Brand
 
 [Install]
 WantedBy=multi-user.target
@@ -453,18 +446,17 @@ npm run dev        # same as start, plus --watch for auto-restart
 ```
 SELF_HOSTED=true
 APP_URL=https://localhost:3443
-# Optional: Microsoft Graph email config for testing real delivery
-# GRAPH_TENANT_ID=...
-# GRAPH_CLIENT_ID=...
-# GRAPH_CLIENT_SECRET=...
-# GRAPH_SENDER_EMAIL=you@yourcompany.com
-# Optional: dev safety - only let these recipient emails through to Graph
-# GRAPH_DEV_RESTRICT_TO=you@yourcompany.com,colleague@yourcompany.com
+# Optional: Resend email config for testing real delivery
+# RESEND_API_KEY=re_...
+# RESEND_FROM_EMAIL=you@yourcompany.com
+# RESEND_FROM_NAME=Your Brand
+# Optional: dev safety - only let these recipient emails through to Resend
+# RESEND_DEV_RESTRICT_TO=you@yourcompany.com,colleague@yourcompany.com
 ```
 
-**No M365 access?** That's fine. With `GRAPH_*` env vars unset, `sendEmail()` short-circuits and logs `[EMAIL] not configured - would send to ...` to stdout. Everything else runs normally; only outbound email is suppressed. Useful for backend work that touches the email path without setting up an Azure app.
+**No Resend account?** That's fine. With `RESEND_*` env vars unset, `sendEmail()` short-circuits and logs `[EMAIL] not configured - would send to ...` to stdout. Everything else runs normally; only outbound email is suppressed.
 
-**Running against a fresh prod DB clone?** Set `GRAPH_DEV_RESTRICT_TO=your-email@example.com` to keep accidental sends from reaching real users in the cloned database. Sends to anyone outside the list are logged but never posted to Graph.
+**Running against a fresh prod DB clone?** Set `RESEND_DEV_RESTRICT_TO=your-email@example.com` to keep accidental sends from reaching real users in the cloned database. Sends to anyone outside the list are logged but never posted to Resend.
 
 **Reporting issues:** [GitHub Issues](https://github.com/screentinker/screentinker/issues) for bugs and feature requests, or drop into [Discord](https://discord.gg/utTdsrqq4Z) for quick questions and feedback.
 
@@ -497,7 +489,7 @@ scripts/          Device setup scripts + admin recovery
 - **Frontend:** Vanilla JS SPA (no framework, no build step), ES modules, Service Worker for offline support
 - **Android:** Kotlin, ExoPlayer, Socket.IO client
 - **Auth:** JWT with bcrypt, Google/Microsoft OAuth (optional)
-- **Email:** Microsoft Graph via `@azure/msal-node` client-credentials (optional)
+- **Email:** Resend HTTPS API (optional)
 - **Payments:** Stripe (optional)
 - **Data model:** multi-tenant — organizations contain workspaces contain resources; six-level role hierarchy gated server-side at every API route
 

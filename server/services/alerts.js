@@ -53,7 +53,7 @@ async function checkOfflineDevices(io) {
       const subject = `Display Offline: ${device.name}`;
       const body = `Your display "${device.name}" has been offline for ${offlineMinutes} minutes.\n\nLast heartbeat: ${new Date(device.last_heartbeat * 1000).toLocaleString()}\n\nCheck your device and network connection.\n\n- ScreenTinker`;
 
-      // Sequential await: Microsoft Graph imposes a MailboxConcurrency limit
+      // Sequential await avoids bursts against the transactional email provider
       // (429 ApplicationThrottled when fanning out ~20+ parallel sends from
       // one app). At ~250ms per send, a backlog of 20 devices takes ~5s -
       // well within the 60s alert tick interval. sendEmail() never throws

@@ -10,6 +10,7 @@ const SUBSCRIPTION_EXEMPT_PATHS = new Set([
   '/api/subscription/plans',
   '/api/stripe/checkout',
   '/api/stripe/portal',
+  '/api/hardware/orders/mine',
 ]);
 
 // Phase 2.1: JWT now optionally carries the user's current workspace_id so

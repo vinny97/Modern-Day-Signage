@@ -390,6 +390,11 @@ app.use('/api/subscription', require('./routes/subscription'));
 app.use('/api/contact', rateLimit(60000, 5));
 app.use('/api/contact', require('./routes/contact'));
 
+// Focused ScreenFizz Player ordering: public Checkout/session confirmation,
+// authenticated customer history, and platform-admin fulfilment endpoints.
+app.use('/api/hardware', rateLimit(60000, 30));
+app.use('/api/hardware', require('./routes/hardware'));
+
 // Public player debug-log sink. Smart TVs and other embedded browsers
 // without devtools POST captured errors here. Rate limited to 10 req/min
 // per IP+path. Body is JSON (express.json() is global at line 140).

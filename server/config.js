@@ -70,19 +70,18 @@ module.exports = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
   stripeSelfServicePriceId: process.env.STRIPE_SELF_SERVICE_PRICE_ID || '',
+  hardwarePlayerPricePence: parseInt(process.env.HARDWARE_PLAYER_PRICE_PENCE || '9900', 10),
   appUrl: (process.env.APP_URL || '').replace(/\/$/, ''),
-  // Microsoft Graph email sender (services/email.js). Required for actual
-  // delivery; absent values short-circuit to a stdout fallback for local dev.
-  graphTenantId: process.env.GRAPH_TENANT_ID || '',
-  graphClientId: process.env.GRAPH_CLIENT_ID || '',
-  graphClientSecret: process.env.GRAPH_CLIENT_SECRET || '',
-  graphSenderEmail: process.env.GRAPH_SENDER_EMAIL || '',
-  graphSenderName: process.env.GRAPH_SENDER_NAME || 'ScreenTinker',
+  // Resend email sender (services/email.js). Required for actual delivery;
+  // absent values short-circuit to a stdout fallback for local development.
+  resendApiKey: process.env.RESEND_API_KEY || '',
+  resendFromEmail: process.env.RESEND_FROM_EMAIL || '',
+  resendFromName: process.env.RESEND_FROM_NAME || 'ScreenTinker',
   // Dev safety net: comma-separated allow-list of recipient emails. When set,
   // sends to any address NOT in the list are suppressed (logged but not posted
-  // to Graph). Intended for local dev that pulls fresh prod DB copies - keeps
+  // to Resend). Intended for local dev that pulls fresh prod DB copies - keeps
   // us from accidentally emailing real prod users. UNSET on prod systemd unit.
-  graphDevRestrictTo: process.env.GRAPH_DEV_RESTRICT_TO || '',
+  resendDevRestrictTo: process.env.RESEND_DEV_RESTRICT_TO || '',
   // Self-hosted mode: if true, first user gets enterprise plan and no billing
   selfHosted: process.env.SELF_HOSTED === 'true',
   // #116: opt-in UI gate. When true, hides the Subscription nav item + billing view

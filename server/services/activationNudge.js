@@ -1,6 +1,6 @@
 // Activation nudge (Slice 3): a once-per-user "checking in" email sent T+3 days
 // after signup when the user still has zero paired screens. Daily sweep at a
-// fixed UTC hour. Reuses the single Microsoft Graph transport (./email).
+// fixed UTC hour. Reuses the single Resend transport (./email).
 //
 // GATING — positive hosted signal, NOT !selfHosted:
 //   This is a daily BULK sweep. A self-hoster who configured Graph but forgot

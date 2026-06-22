@@ -35,7 +35,7 @@ export function render(container) {
       <h3>${t('help.faq')}</h3>
       ${[
         { q: 'What devices are supported?', a: 'Android TV/tablets (APK), Raspberry Pi, Windows, ChromeOS, LG webOS, Samsung Tizen, Fire TV, and any device with a web browser.' },
-        { q: 'How does the free trial work?', a: 'New accounts get a 14-day free trial of the Pro plan (15 devices, all features). After 14 days, you\'re moved to the Free plan (1 device) unless you upgrade.' },
+        { q: 'How does the free trial work?', a: 'New hosted accounts get a 7-day free trial of ScreenFizz Self-Service with no credit card required. Subscribe for £5/month to keep using the service after the trial.' },
         { q: 'Can I use portrait mode displays?', a: 'Yes! Set the orientation to "Portrait" in the device\'s Info tab. The content will be rotated accordingly.' },
         { q: 'What happens when a device goes offline?', a: 'Devices cache content locally, so they continue playing their playlist even without internet. You\'ll receive an email alert after 5 minutes of being offline.' },
         { q: 'Can I self-host ScreenTinker?', a: 'Yes! Deploy the server on your own infrastructure. All data stays on your network. Set SELF_HOSTED=true in the environment.' },

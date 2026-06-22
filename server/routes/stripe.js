@@ -14,16 +14,16 @@ if (config.stripeSecretKey) {
 }
 
 // Idempotency: mark a Stripe event as processed so duplicate deliveries are no-ops.
-function markEventProcessed(eventId, eventType) {
+async function markEventProcessed(eventId, eventType) {
   try {
-    db.prepare('INSERT OR IGNORE INTO stripe_events (event_id, event_type) VALUES (?, ?)')
+    await db.prepare('INSERT OR IGNORE INTO stripe_events (event_id, event_type) VALUES (?, ?)')
       .run(eventId, eventType);
   } catch { /* non-fatal */ }
 }
 
-function isEventAlreadyProcessed(eventId) {
+async function isEventAlreadyProcessed(eventId) {
   try {
-    return !!db.prepare('SELECT 1 FROM stripe_events WHERE event_id = ?').get(eventId);
+    return !!await db.prepare('SELECT 1 FROM stripe_events WHERE event_id = ?').get(eventId);
   } catch { return false; }
 }
 
@@ -141,7 +141,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
   // Idempotency: skip events we've already processed (handles Stripe retries and
   // duplicate deliveries without double-updating the DB or double-sending emails).
-  if (isEventAlreadyProcessed(event.id)) {
+  if (await isEventAlreadyProcessed(event.id)) {
     console.log(`Stripe webhook: ${event.id} already processed, skipping`);
     return res.json({ received: true });
   }
@@ -149,7 +149,16 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
+        let session = event.data.object;
+        if (session.metadata?.order_type === 'hardware_player') {
+          // Retrieve the completed object so shipping/customer/tax details are
+          // present even when Stripe sends a compact webhook representation.
+          session = await stripe.checkout.sessions.retrieve(session.id);
+          const { createHardwareOrderFromSession } = require('../services/hardwareOrders');
+          const order = await createHardwareOrderFromSession(session);
+          console.log(`Hardware order ${order.order_number} created from ${session.id}`);
+          break;
+        }
         const userId = session.metadata?.user_id;
         const planId = session.metadata?.plan_id;
         if (userId && session.subscription) {
@@ -231,6 +240,15 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         }
         break;
       }
+
+      case 'charge.refunded': {
+        const charge = event.data.object;
+        if (charge.payment_intent) {
+          await db.prepare("UPDATE hardware_orders SET status = 'refunded', updated_at = strftime('%s','now') WHERE stripe_payment_intent = ?")
+            .run(charge.payment_intent);
+        }
+        break;
+      }
     }
   } catch (err) {
     console.error('Webhook processing error:', err.message);
@@ -238,7 +256,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     return res.status(500).json({ error: 'Webhook processing failed' });
   }
 
-  markEventProcessed(event.id, event.type);
+  await markEventProcessed(event.id, event.type);
   res.json({ received: true });
 });
 

@@ -296,6 +296,19 @@ body {
   padding: 24px 32px;
 }
 
+/* Authentication is a full-page light surface. The login view already paints
+   its own white panel, but the normal dashboard shell otherwise leaves dark
+   body background visible through the content padding around it. */
+body.auth-route {
+  background: #ffffff;
+}
+
+body.auth-route .content {
+  margin-left: 0;
+  padding: 0;
+  background: #ffffff;
+}
+
 /* Page Header */
 .page-header {
   display: flex;

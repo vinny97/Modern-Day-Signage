@@ -260,6 +260,7 @@ function route() {
   if (currentView && currentView.cleanup) currentView.cleanup();
 
   const hash = window.location.hash || '#/';
+  document.body.classList.toggle('auth-route', hash === '#/login');
 
   // Slice 2C - direct hits on #/accept-invite/{id}. Handle BEFORE the
   // auth-redirect-to-login because an unauthed visit needs to stash the

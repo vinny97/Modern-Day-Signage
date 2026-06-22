@@ -1,6 +1,6 @@
 // Public (unauthenticated) contact form endpoint. Used by the Enterprise /
 // Custom card on the marketing landing page to send a lead to Dan's inbox via
-// the existing Microsoft Graph email service.
+// the existing Resend email service.
 //
 // Honeypot strategy: the form has a hidden 'fax_number' field that real users
 // never see (off-screen + aria-hidden + tabindex=-1). If a submission arrives
