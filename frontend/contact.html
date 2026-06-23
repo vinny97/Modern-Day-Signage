@@ -56,10 +56,10 @@
             <input type="radio" name="package" value="lite"> Lite
           </label>
           <label class="radio-option">
-            <input type="radio" name="package" value="complete"> Complete &#11088;
+            <input type="radio" name="package" value="managed"> Managed &#11088;
           </label>
           <label class="radio-option">
-            <input type="radio" name="package" value="premium"> Premium
+            <input type="radio" name="package" value="solution"> Complete Solution
           </label>
         </div>
 
@@ -134,35 +134,35 @@
     /* Pricing matrix — edit these values to update estimates */
     var PRICING = {
       lite: {
-        '1':   { setup: '&#163;99 &#8211; &#163;149',  monthly: 'From &#163;19/month' },
-        '2-3': { setup: '&#163;179 &#8211; &#163;279', monthly: 'From &#163;35/month' },
+        '1':   { setup: '&#163;60', monthly: '&#163;5/month' },
+        '2-3': { setup: '&#163;120 &#8211; &#163;180', monthly: '&#163;10 &#8211; &#163;15/month' },
         '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
       },
-      complete: {
+      managed: {
+        '1':   { setup: '&#163;60', monthly: '&#163;15/month' },
+        '2-3': { setup: '&#163;120 &#8211; &#163;180', monthly: '&#163;30 &#8211; &#163;45/month' },
+        '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
+      },
+      solution: {
         '1': {
-          self:     { setup: '&#163;200 &#8211; &#163;350', monthly: 'From &#163;25/month' },
-          arranged: { setup: '&#163;250 &#8211; &#163;450', monthly: 'From &#163;29/month' }
+          self:     { setup: 'From &#163;399', monthly: 'Custom quote' },
+          arranged: { setup: 'Custom quote', monthly: 'Custom quote' }
         },
         '2-3': {
-          self:     { setup: '&#163;400 &#8211; &#163;650', monthly: 'From &#163;45/month' },
-          arranged: { setup: '&#163;500 &#8211; &#163;800', monthly: 'From &#163;49/month' }
+          self:     { setup: 'Custom quote', monthly: 'Custom quote' },
+          arranged: { setup: 'Custom quote', monthly: 'Custom quote' }
         },
-        '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
-      },
-      premium: {
-        '1':   { setup: '&#163;300 &#8211; &#163;550',    monthly: 'From &#163;39/month' },
-        '2-3': { setup: '&#163;600 &#8211; &#163;1,000',  monthly: 'From &#163;69/month' },
         '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
       }
     };
 
     var INCLUDES = {
-      lite:     ['ScreenFizz Player', 'Managed service', 'Content updates', 'WhatsApp support'],
-      complete: ['ScreenFizz Player', 'Display included', 'Wall mount', 'Managed service', 'Content updates'],
-      premium:  ['Everything in Complete', 'Professional installation', 'Seasonal campaigns', 'Priority support']
+      lite:     ['Pre-configured ScreenFizz Player', 'Dashboard access', 'Remote troubleshooting', 'Email and WhatsApp support'],
+      managed:  ['ScreenFizz Player', 'Initial content creation', 'Managed updates', 'Remote monitoring'],
+      solution: ['Commercial display', 'ScreenFizz Player', 'Wall mount', 'Content creation and managed updates']
     };
 
-    var PACKAGE_LABELS = { lite: 'ScreenFizz Lite', complete: 'ScreenFizz Complete', premium: 'ScreenFizz Premium' };
+    var PACKAGE_LABELS = { lite: 'ScreenFizz Lite', managed: 'ScreenFizz Managed', solution: 'Complete Solution' };
     var SCREEN_LABELS  = { '1': '1 Screen', '2-3': '2&#8211;3 Screens', '4+': '4+ Screens' };
 
     var leadForm      = document.getElementById('leadForm');
@@ -208,23 +208,21 @@
       var setup, monthly;
 
       if (!row) { setup = 'Custom quote'; monthly = 'Custom quote'; }
-      else if (pkg === 'complete' && install && row[install]) {
+      else if (pkg === 'solution' && install && row[install]) {
         setup   = row[install].setup;
         monthly = row[install].monthly;
       } else if (row.setup) {
         setup   = row.setup;
         monthly = row.monthly;
       } else {
-        /* complete without install selection yet */
+        /* complete solution without install selection yet */
         setup   = row['self'].setup;
         monthly = row['self'].monthly;
       }
 
       /* Summary checks */
       var summaryItems = [PACKAGE_LABELS[pkg], SCREEN_LABELS[screens]];
-      if (pkg === 'premium') {
-        summaryItems.push('Installation Included');
-      } else if (install === 'arranged') {
+      if (install === 'arranged') {
         summaryItems.push('Installation Included');
       } else if (install === 'self') {
         summaryItems.push('Self-install');
