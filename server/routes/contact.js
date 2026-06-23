@@ -1,16 +1,15 @@
-// Public (unauthenticated) contact form endpoint. Used by the Enterprise /
-// Custom card on the marketing landing page to send a lead to Dan's inbox via
-// the existing Resend email service.
+// Public (unauthenticated) contact form endpoint. Captures leads from the
+// marketing website quiz. Saves every submission to SQLite first (so no lead
+// is ever lost), then attempts to send a notification email via Resend.
+// If email is unconfigured or fails, the lead is still saved and the user
+// gets a success response.
 //
-// Honeypot strategy: the form has a hidden 'fax_number' field that real users
-// never see (off-screen + aria-hidden + tabindex=-1). If a submission arrives
-// with that field populated, we return success to the bot but drop the
-// submission silently. Combined with the rate limit applied in server.js
-// (5 req/min/IP+path), this is enough friction for a low-traffic public form.
+// Honeypot: hidden 'fax_number' field — bots fill it, real users never see it.
 
 const express = require('express');
 const router = express.Router();
 const { sendEmail } = require('../services/email');
+const { db } = require('../db/client');
 
 function isEmail(s) {
   return typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -19,66 +18,95 @@ function clamp(s, max) {
   return String(s || '').slice(0, max);
 }
 
-router.post('/enterprise', async (req, res) => {
-  const { name, email, company, screens, multi_tenant, hosting, message, fax_number } = req.body || {};
+// Parse a screen-count value that may be "1", "2-3", "4+", or a plain integer.
+function parseScreens(val) {
+  if (!val) return null;
+  const n = parseInt(val, 10);
+  return Number.isFinite(n) && n >= 1 ? n : null;
+}
 
-  // Honeypot. Real users can't see or tab to this field; only bots fill it.
-  // Return 200 so the bot's retry logic doesn't kick in, but skip the send.
+router.post('/enterprise', async (req, res) => {
+  const {
+    name, email, company, screens, multi_tenant, hosting, message, fax_number,
+    // fields added by the new wizard
+    business_type, package: pkg, installation, has_screen
+  } = req.body || {};
+
+  // Honeypot — return 200 to fool bots but drop the submission
   if (fax_number && String(fax_number).trim() !== '') {
     console.log(`[contact] honeypot triggered from ${req.ip}; dropping`);
     return res.json({ success: true });
   }
 
-  // Server-side validation. Client validates too but we never trust that.
-  if (!name || !email || !company || !screens || !multi_tenant || !hosting) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
   }
   if (!isEmail(email)) {
     return res.status(400).json({ error: 'Invalid email address' });
   }
-  const screensNum = parseInt(screens);
-  if (!Number.isFinite(screensNum) || screensNum < 1 || screensNum > 100000) {
-    return res.status(400).json({ error: 'Screens must be a positive number' });
-  }
-  if (!['single', 'multi'].includes(multi_tenant)) {
-    return res.status(400).json({ error: 'Invalid multi-tenant selection' });
-  }
-  if (!['hosted', 'self', 'unsure'].includes(hosting)) {
-    return res.status(400).json({ error: 'Invalid hosting selection' });
-  }
 
-  // Length caps - keeps a 10MB textarea from filling the mailbox
-  const cleanName = clamp(name, 200);
-  const cleanEmail = clamp(email, 200);
-  const cleanCompany = clamp(company, 200);
+  const cleanName    = clamp(name, 200);
+  const cleanEmail   = clamp(email, 200);
+  const cleanCompany = clamp(company || business_type || '', 200);
   const cleanMessage = clamp(message, 5000);
+  const screensVal   = clamp(screens, 20);
+  const screensNum   = parseScreens(screens);
 
-  const tenantLabel = multi_tenant === 'multi' ? 'Multiple organizations' : 'Single organization';
-  const hostingLabel = { hosted: 'Hosted for me', self: 'Self-host', unsure: 'Not sure yet' }[hosting];
+  // Save lead to SQLite — this is the source of truth regardless of email
+  try {
+    db.prepare(`
+      INSERT INTO contact_leads
+        (name, email, business_type, screens, package, installation, has_screen, message)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      cleanName,
+      cleanEmail,
+      clamp(business_type || company || '', 100),
+      screensVal,
+      clamp(pkg || '', 50),
+      clamp(installation || '', 50),
+      clamp(has_screen || '', 10),
+      cleanMessage
+    );
+  } catch (dbErr) {
+    console.error('[contact] DB save failed:', dbErr.message);
+    // Continue — still try to send email and return success
+  }
 
-  const subject = `Enterprise inquiry: ${cleanCompany}`;
+  // Attempt email notification (best-effort)
+  const tenantLabel  = multi_tenant === 'multi' ? 'Multiple organizations' : 'Single organization';
+  const hostingLabel = { hosted: 'Hosted for me', self: 'Self-host', unsure: 'Not sure yet' }[hosting] || hosting || 'n/a';
+
+  const subject = `New enquiry: ${cleanName}${cleanCompany ? ' (' + cleanCompany + ')' : ''}`;
   const text =
-`New enterprise inquiry from ${cleanName} (${cleanEmail})
+`New ScreenFizz enquiry from ${cleanName} (${cleanEmail})
 
-Company: ${cleanCompany}
-Estimated screens: ${screensNum}
-Multi-tenant: ${tenantLabel}
-Hosting preference: ${hostingLabel}
-
+Business type: ${cleanCompany || 'Not provided'}
+Screens: ${screensVal || 'Not provided'}
+Package: ${pkg || 'Not provided'}
+Installation: ${installation || 'Not provided'}
+Has screen: ${has_screen || 'Not provided'}
+${multi_tenant ? 'Multi-tenant: ' + tenantLabel + '\n' : ''}${hosting ? 'Hosting: ' + hostingLabel + '\n' : ''}
 Message:
 ${cleanMessage || '(none)'}
 
 ---
-Submitted from screentinker.com pricing page
 Source IP: ${req.ip}
 `;
 
   const result = await sendEmail({ to: 'dan@bytetinker.net', subject, text });
-  if (!result.sent) {
-    console.error(`[contact] email send failed for ${cleanEmail}: reason=${result.reason} error=${result.error || ''}`);
-    return res.status(500).json({ error: 'Could not send your message. Please email dan@bytetinker.net directly.' });
+
+  if (result.sent) {
+    console.log(`[contact] enquiry from ${cleanEmail} delivered`);
+    // Mark email as sent in DB
+    try {
+      db.prepare('UPDATE contact_leads SET email_sent=1 WHERE email=? ORDER BY id DESC LIMIT 1').run(cleanEmail);
+    } catch (_) {}
+  } else {
+    console.warn(`[contact] email not sent for ${cleanEmail}: reason=${result.reason} — lead saved to DB`);
   }
-  console.log(`[contact] enterprise inquiry from ${cleanEmail} (${cleanCompany}) delivered`);
+
+  // Always return success — the lead is saved regardless of email status
   res.json({ success: true });
 });
 

@@ -651,6 +651,22 @@ CREATE TABLE IF NOT EXISTS agency_notifications (
 );
 CREATE INDEX IF NOT EXISTS idx_agency_notifications_unsent ON agency_notifications(sent_at);
 
+-- Contact form leads captured from the marketing website wizard
+CREATE TABLE IF NOT EXISTS contact_leads (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    name         TEXT NOT NULL,
+    email        TEXT NOT NULL,
+    business_type TEXT,
+    screens      TEXT,
+    package      TEXT,
+    installation TEXT,
+    has_screen   TEXT,
+    message      TEXT,
+    email_sent   INTEGER NOT NULL DEFAULT 0,
+    created_at   INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_contact_leads_created ON contact_leads(created_at);
+
 -- ===================== SCHEMA MIGRATIONS =====================
 
 CREATE TABLE IF NOT EXISTS schema_migrations (
