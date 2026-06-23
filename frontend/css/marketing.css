@@ -110,6 +110,16 @@ h3 { font-size:24px; margin-bottom:12px; }
 .journey-panel-scroll img { width:100%; height:auto; }
 .journey-panel figcaption { display:none; }
 .process-learn-more { display:inline-flex; margin-top:24px; font-weight:850; }
+.video-showcase-section { background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.video-showcase-heading { max-width:760px; margin:0 auto; text-align:center; }
+.video-showcase-heading h2 { margin-bottom:14px; }
+.video-showcase-heading p { font-size:18px; }
+.digital-display-shell { width:min(100%,1040px); margin:42px auto 0; }
+.digital-display-bezel { padding:10px 10px 8px; border:1px solid #33373d; border-radius:18px; background:linear-gradient(145deg,#272a2f,#090a0c 65%); box-shadow:0 34px 80px rgba(20,24,33,.25),0 8px 20px rgba(20,24,33,.16); }
+.digital-display-screen { position:relative; overflow:hidden; aspect-ratio:16/9; border:1px solid #000; border-radius:9px; background:#000; }
+.digital-display-screen video { display:block; width:100%; height:100%; object-fit:cover; background:#000; }
+.digital-display-brand { display:flex; align-items:center; justify-content:center; gap:6px; height:24px; color:#a7abb1; font-size:9px; font-weight:850; letter-spacing:.5px; }
+.digital-display-brand span { width:5px; height:5px; border-radius:50%; background:#df2b20; box-shadow:0 0 5px rgba(223,43,32,.8); }
 .band { background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
 .dark-band { background:#101113; color:#fff; }
 .dark-band p, .dark-band li { color:#d4d4d4; }
@@ -399,6 +409,11 @@ footer { background:#fff; border-top:1px solid var(--line); }
   .journey-panel-scroll { min-height:0; overflow-x:auto; border-radius:12px; overscroll-behavior-inline:contain; scrollbar-width:thin; }
   .journey-panel-scroll img { width:900px; max-width:none; }
   .journey-panel figcaption { display:block; margin:8px 0; color:var(--muted); font-size:12px; text-align:center; }
+  .video-showcase-heading { text-align:left; }
+  .digital-display-shell { margin-top:28px; }
+  .digital-display-bezel { padding:5px 5px 3px; border-radius:10px; box-shadow:0 20px 48px rgba(20,24,33,.22); }
+  .digital-display-screen { border-radius:5px; }
+  .digital-display-brand { height:18px; font-size:8px; }
   .panel-grid, .three-grid, .how-it-works, .pricing-grid, .reviews, .industries-grid, .four-grid, .use-case-strip, .form-grid { grid-template-columns:1fr; }
   .showcase-caption { left:12px; right:12px; bottom:12px; padding:12px; align-items:flex-start; flex-direction:column; }
   .image-panel img, .use-case-photo, .use-case-photo img { min-height:260px; }
