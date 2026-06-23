@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find My Perfect Display | ScreenFizz</title>
+  <meta name="description" content="Answer four quick questions and get a personalised ScreenFizz display, player and installation recommendation for your business.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://screenfizz.com/find-my-display.html">
+  <meta property="og:title" content="Find My Perfect Display | ScreenFizz">
+  <meta property="og:description" content="Get a personalised digital signage hardware recommendation in four quick steps.">
+  <meta property="og:image" content="https://screenfizz.com/assets/hero-window-display-storefront.webp">
+  <link rel="icon" href="/assets/screenfizz-logo.png">
+  <link rel="stylesheet" href="/css/marketing.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner"><a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a><div class="nav-links"><a href="/">Home</a><div class="dropdown"><a class="nav-link" href="/solutions/window-displays.html">Solutions</a><div class="dropdown-menu"><a href="/solutions/window-displays.html">Window Displays</a><a href="/solutions/digital-menu-boards.html">Digital Menu Boards</a></div></div><a href="/how-it-works.html">How It Works</a><a href="/pricing.html">Pricing</a><div class="dropdown"><a class="nav-link" href="/guides/digital-signage-android-tv.html">Resources</a><div class="dropdown-menu"><a href="/guides/digital-signage-android-tv.html">Android TV Guide</a><a href="/guides/raspberry-pi-digital-signage.html">Raspberry Pi Guide</a><a href="/guides/self-hosted-digital-signage.html">Self-Hosted Guide</a></div></div><a href="/contact.html">Contact</a></div><div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact.html#setup-plan">Find My Setup</a></div></div>
+  </nav>
+
+  <main class="display-finder-page">
+    <section class="display-finder-hero">
+      <div class="section section-tight">
+        <div class="eyebrow">Hardware Recommendation</div>
+        <h1>Find My Perfect Display</h1>
+        <p>Answer four quick questions and we’ll recommend the best setup for your business.</p>
+      </div>
+    </section>
+
+    <section class="section display-wizard-section">
+      <div class="display-wizard-card" data-display-wizard>
+        <div class="display-wizard-progress"><div><strong id="displayStepLabel">Step 1 of 4</strong><span>About 60 seconds</span></div><div class="quiz-progress"><span class="quiz-progress-fill" id="displayProgressFill" style="width:25%"></span></div></div>
+
+        <div class="display-wizard-step" data-display-step="0">
+          <div class="eyebrow">Question 1</div><h2>How many screens do you need?</h2>
+          <div class="display-option-grid">
+            <label class="display-option"><input type="radio" name="display_screens" value="1"><span><strong>1 Screen</strong></span></label>
+            <label class="display-option"><input type="radio" name="display_screens" value="2"><span><strong>2 Screens</strong></span></label>
+            <label class="display-option"><input type="radio" name="display_screens" value="3"><span><strong>3 Screens</strong></span></label>
+            <label class="display-option"><input type="radio" name="display_screens" value="4"><span><strong>4+ Screens</strong></span></label>
+          </div>
+        </div>
+
+        <div class="display-wizard-step" data-display-step="1" hidden>
+          <div class="eyebrow">Question 2</div><h2>What will you be displaying?</h2>
+          <div class="display-option-grid display-use-grid">
+            <label class="display-option"><input type="radio" name="display_use" value="menu"><span class="display-option-icon" aria-hidden="true">&#127828;</span><span><strong>Digital Menu Boards</strong><small>Restaurants, cafes and takeaways</small></span></label>
+            <label class="display-option"><input type="radio" name="display_use" value="window"><span class="display-option-icon" aria-hidden="true">&#128717;&#65039;</span><span><strong>Window Displays</strong><small>Shopfronts and direct sunlight</small></span></label>
+            <label class="display-option"><input type="radio" name="display_use" value="promo"><span class="display-option-icon" aria-hidden="true">&#128250;</span><span><strong>Promotional Screens</strong><small>Offers, information and branding</small></span></label>
+          </div>
+        </div>
+
+        <div class="display-wizard-step" data-display-step="2" hidden>
+          <div class="eyebrow">Question 3</div><h2>What’s your total hardware budget?</h2>
+          <p class="display-question-note" id="budgetQuestionNote">Budget ranges are adjusted for your number of screens.</p>
+          <div class="display-option-grid" id="budgetOptions"></div>
+        </div>
+
+        <div class="display-wizard-step" data-display-step="3" hidden>
+          <div class="eyebrow">Question 4</div><h2>Who should handle installation?</h2>
+          <div class="display-option-grid">
+            <label class="display-option"><input type="radio" name="display_install" value="self"><span><strong>I’ll install it myself</strong><small>We’ll send everything ready to connect.</small></span></label>
+            <label class="display-option"><input type="radio" name="display_install" value="arranged"><span><strong>ScreenFizz should arrange installation</strong><small>Estimated at £50 per screen.</small></span></label>
+          </div>
+        </div>
+
+        <div class="display-wizard-nav" id="displayWizardNav"><button class="quiz-back" id="displayBack" type="button" hidden>&larr; Back</button><button class="btn btn-primary" id="displayNext" type="button" disabled>Next &rarr;</button></div>
+
+        <div class="display-result" id="displayResult" hidden aria-live="polite">
+          <div class="display-result-top"><div><span class="recommendation-badge" id="recommendationBadge">&#11088; Recommended</span><div class="eyebrow">Your Recommended Setup</div><h2 id="recommendationName"></h2><p id="recommendationDescription"></p></div><button class="quiz-edit" id="displayRestart" type="button">Start again</button></div>
+          <div class="display-result-grid">
+            <div class="recommendation-fit"><h3>Perfect for</h3><ul id="recommendationFit"></ul></div>
+            <div class="recommendation-cost"><h3>Estimated cost</h3><dl><div><dt>Display</dt><dd id="displayCost"></dd></div><div><dt>ScreenFizz Player</dt><dd id="playerCost"></dd></div><div><dt>Installation</dt><dd id="installationCost"></dd></div></dl><div class="recommendation-total"><span>Estimated total</span><strong id="estimatedTotal"></strong></div></div>
+          </div>
+          <div class="recommendation-alternative"><div><span id="alternativeLabel">Upgrade</span><h3 id="alternativeName"></h3><p id="alternativeDescription"></p></div><strong id="alternativeCost"></strong></div>
+          <div class="recommendation-service"><div><div class="eyebrow">Monthly Service</div><h3>Choose how much you want us to manage.</h3></div><div class="service-price-pills"><span>Lite <strong>£5</strong></span><span>Complete <strong>£15</strong></span><span>Premium <strong>£29</strong></span></div></div>
+          <div class="display-result-cta"><div><strong>Need a personalised quote?</strong><span>We’ll confirm availability, hardware and installation for your space.</span></div><a class="btn btn-primary" id="displayQuoteLink" href="/contact.html#setup-plan">Get My Setup Plan</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a><a href="/how-it-works.html">How It Works</a><a href="/contact.html">Contact</a></div></div></footer>
+  <script src="/js/display-wizard.js" defer></script>
+</body>
+</html>

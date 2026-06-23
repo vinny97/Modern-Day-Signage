@@ -35,9 +35,10 @@
       </div>
 
       <form id="leadForm" novalidate>
+        <div class="quiz-wizard-progress" aria-hidden="true"><div><span id="quizStepLabel">Question 1 of 4</span><span>About 60 seconds</span></div><div class="quiz-progress"><span class="quiz-progress-fill" id="quizProgressFill" style="width:25%"></span></div></div>
 
         <!-- Step 1 -->
-        <div class="quiz-section">
+        <div class="quiz-section is-active" data-quiz-step="0">
           <div class="quiz-section-num">Step 1</div>
           <h3>Do you already have a screen?</h3>
           <label class="radio-option">
@@ -49,22 +50,22 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="quiz-section">
+        <div class="quiz-section" data-quiz-step="1" hidden>
           <div class="quiz-section-num">Step 2</div>
           <h3>Which service suits you?</h3>
           <label class="radio-option">
             <input type="radio" name="package" value="lite"> Lite
           </label>
           <label class="radio-option">
-            <input type="radio" name="package" value="managed"> Managed &#11088;
+            <input type="radio" name="package" value="complete"> Complete &middot; Managed &#11088;
           </label>
           <label class="radio-option">
-            <input type="radio" name="package" value="solution"> Complete Solution
+            <input type="radio" name="package" value="premium"> Premium &middot; Managed + Creative
           </label>
         </div>
 
         <!-- Step 3 -->
-        <div class="quiz-section">
+        <div class="quiz-section" data-quiz-step="2" hidden>
           <div class="quiz-section-num">Step 3</div>
           <h3>How many screens?</h3>
           <label class="radio-option">
@@ -79,7 +80,7 @@
         </div>
 
         <!-- Step 4 -->
-        <div class="quiz-section">
+        <div class="quiz-section" data-quiz-step="3" hidden>
           <div class="quiz-section-num">Step 4</div>
           <h3>Installation</h3>
           <label class="radio-option">
@@ -89,6 +90,14 @@
             <input type="radio" name="installation" value="arranged"> I want ScreenFizz to arrange installation
           </label>
         </div>
+
+        <div class="quiz-wizard-nav" id="quizWizardNav">
+          <button class="quiz-back" id="quizBack" type="button" hidden>&larr; Back</button>
+          <button class="btn btn-primary" id="quizNext" type="button" disabled>Continue</button>
+        </div>
+
+        <div class="quiz-final" id="quizFinal" hidden>
+          <div class="quiz-final-header"><div><div class="quiz-section-num">Your recommendation</div><h3>Your ScreenFizz setup</h3></div><button class="quiz-edit" id="quizEdit" type="button">&larr; Edit answers</button></div>
 
         <!-- Live estimate panel -->
         <div class="live-estimate hidden" id="liveEstimate" aria-live="polite">
@@ -109,7 +118,7 @@
         </div>
 
         <!-- Contact details -->
-        <h3 style="margin-top:28px;margin-bottom:14px">Your details</h3>
+        <h3 class="contact-details-title">Your details</h3>
         <div class="form-grid">
           <label>Business Name<input name="business_name" type="text" autocomplete="organization" maxlength="200" required></label>
           <label>Contact Name<input name="contact_name" type="text" autocomplete="name" maxlength="200" required></label>
@@ -123,6 +132,7 @@
           <span class="form-status" id="leadStatus" aria-live="polite"></span>
         </div>
         <div class="estimate-result hidden" id="submitResult" aria-live="polite"></div>
+        </div>
 
       </form>
     </section>
@@ -134,35 +144,29 @@
     /* Pricing matrix — edit these values to update estimates */
     var PRICING = {
       lite: {
-        '1':   { setup: '&#163;60', monthly: '&#163;5/month' },
-        '2-3': { setup: '&#163;120 &#8211; &#163;180', monthly: '&#163;10 &#8211; &#163;15/month' },
+        '1':   { setup: 'Personalised quote', monthly: '&#163;5/month' },
+        '2-3': { setup: 'Personalised quote', monthly: '&#163;10 &#8211; &#163;15/month' },
         '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
       },
-      managed: {
-        '1':   { setup: '&#163;60', monthly: '&#163;15/month' },
-        '2-3': { setup: '&#163;120 &#8211; &#163;180', monthly: '&#163;30 &#8211; &#163;45/month' },
+      complete: {
+        '1':   { setup: 'Personalised quote', monthly: '&#163;15/month' },
+        '2-3': { setup: 'Personalised quote', monthly: '&#163;30 &#8211; &#163;45/month' },
         '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
       },
-      solution: {
-        '1': {
-          self:     { setup: 'From &#163;399', monthly: 'Custom quote' },
-          arranged: { setup: 'Custom quote', monthly: 'Custom quote' }
-        },
-        '2-3': {
-          self:     { setup: 'Custom quote', monthly: 'Custom quote' },
-          arranged: { setup: 'Custom quote', monthly: 'Custom quote' }
-        },
+      premium: {
+        '1':   { setup: 'Personalised quote', monthly: 'From &#163;29/month' },
+        '2-3': { setup: 'Personalised quote', monthly: 'From &#163;58 &#8211; &#163;87/month' },
         '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
       }
     };
 
     var INCLUDES = {
-      lite:     ['Pre-configured ScreenFizz Player', 'Dashboard access', 'Remote troubleshooting', 'Email and WhatsApp support'],
-      managed:  ['ScreenFizz Player', 'Initial content creation', 'Managed updates', 'Remote monitoring'],
-      solution: ['Commercial display', 'ScreenFizz Player', 'Wall mount', 'Content creation and managed updates']
+      lite:     ['Self-service software', 'Playlists and scheduling', 'Remote screen management', 'Screen health monitoring'],
+      complete: ['Everything in Lite', 'Content uploads by ScreenFizz', 'Managed playlists', 'WhatsApp and email support'],
+      premium:  ['Everything in Complete', 'Monthly content creation', 'Seasonal campaigns', 'Creative refreshes']
     };
 
-    var PACKAGE_LABELS = { lite: 'ScreenFizz Lite', managed: 'ScreenFizz Managed', solution: 'Complete Solution' };
+    var PACKAGE_LABELS = { lite: 'ScreenFizz Lite', complete: 'ScreenFizz Complete', premium: 'ScreenFizz Premium' };
     var SCREEN_LABELS  = { '1': '1 Screen', '2-3': '2&#8211;3 Screens', '4+': '4+ Screens' };
 
     var leadForm      = document.getElementById('leadForm');
@@ -175,6 +179,44 @@
     var estimateSetup   = document.getElementById('estimateSetup');
     var estimateMonthly = document.getElementById('estimateMonthly');
     var estimateIncludes = document.getElementById('estimateIncludes');
+    var quizSteps       = Array.from(leadForm.querySelectorAll('[data-quiz-step]'));
+    var quizBack        = document.getElementById('quizBack');
+    var quizNext        = document.getElementById('quizNext');
+    var quizEdit        = document.getElementById('quizEdit');
+    var quizFinal       = document.getElementById('quizFinal');
+    var quizWizardNav   = document.getElementById('quizWizardNav');
+    var quizStepLabel   = document.getElementById('quizStepLabel');
+    var quizProgressFill = document.getElementById('quizProgressFill');
+    var currentQuizStep = 0;
+
+    function stepHasAnswer(index) {
+      return Boolean(quizSteps[index].querySelector('input[type="radio"]:checked'));
+    }
+
+    function showQuizStep(index) {
+      currentQuizStep = index;
+      quizSteps.forEach(function(step, stepIndex) {
+        var active = stepIndex === index;
+        step.hidden = !active;
+        step.classList.toggle('is-active', active);
+      });
+      quizFinal.hidden = true;
+      quizWizardNav.hidden = false;
+      quizBack.hidden = index === 0;
+      quizNext.disabled = !stepHasAnswer(index);
+      quizNext.textContent = index === quizSteps.length - 1 ? 'See My Recommendation' : 'Continue';
+      quizStepLabel.textContent = 'Question ' + (index + 1) + ' of ' + quizSteps.length;
+      quizProgressFill.style.width = (((index + 1) / quizSteps.length) * 100) + '%';
+    }
+
+    function showQuizResult() {
+      quizSteps.forEach(function(step) { step.hidden = true; step.classList.remove('is-active'); });
+      quizWizardNav.hidden = true;
+      quizFinal.hidden = false;
+      quizStepLabel.textContent = 'Your recommendation';
+      quizProgressFill.style.width = '100%';
+      updateEstimate();
+    }
 
     /* Style radio labels when their input is checked */
     leadForm.addEventListener('change', function(e) {
@@ -183,10 +225,22 @@
         group.forEach(function(r) {
           r.closest('.radio-option').classList.toggle('is-checked', r.checked);
         });
-        updateEstimate();
+        quizNext.disabled = !stepHasAnswer(currentQuizStep);
         updateWhatsApp();
       }
     });
+
+    quizNext.addEventListener('click', function() {
+      if (!stepHasAnswer(currentQuizStep)) return;
+      if (currentQuizStep === quizSteps.length - 1) showQuizResult();
+      else showQuizStep(currentQuizStep + 1);
+    });
+
+    quizBack.addEventListener('click', function() {
+      if (currentQuizStep > 0) showQuizStep(currentQuizStep - 1);
+    });
+
+    quizEdit.addEventListener('click', function() { showQuizStep(quizSteps.length - 1); });
 
     function getVal(name) {
       var el = leadForm.querySelector('input[name="' + name + '"]:checked');
@@ -208,16 +262,12 @@
       var setup, monthly;
 
       if (!row) { setup = 'Custom quote'; monthly = 'Custom quote'; }
-      else if (pkg === 'solution' && install && row[install]) {
-        setup   = row[install].setup;
-        monthly = row[install].monthly;
-      } else if (row.setup) {
+      else if (row.setup) {
         setup   = row.setup;
         monthly = row.monthly;
       } else {
-        /* complete solution without install selection yet */
-        setup   = row['self'].setup;
-        monthly = row['self'].monthly;
+        setup = 'Personalised quote';
+        monthly = 'Custom quote';
       }
 
       /* Summary checks */
@@ -254,6 +304,7 @@
     }
 
     updateWhatsApp();
+    showQuizStep(0);
 
     leadForm.addEventListener('submit', async function(event) {
       event.preventDefault();
@@ -317,6 +368,7 @@
           leadForm.querySelectorAll('.radio-option').forEach(function(el) { el.classList.remove('is-checked'); });
           liveEstimate.classList.add('hidden');
           updateWhatsApp();
+          showQuizStep(0);
         } else {
           leadStatus.className = 'form-status error';
           leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
