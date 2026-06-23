@@ -17,3 +17,40 @@
     nextSlide.removeAttribute('aria-hidden');
   }, 5000);
 })();
+
+(() => {
+  const tabsWidget = document.querySelector('[data-journey-tabs]');
+  if (!tabsWidget) return;
+
+  const tabs = Array.from(tabsWidget.querySelectorAll('[role="tab"]'));
+  const panels = Array.from(tabsWidget.querySelectorAll('[role="tabpanel"]'));
+
+  const selectTab = (nextTab, moveFocus = false) => {
+    tabs.forEach((tab) => {
+      const isSelected = tab === nextTab;
+      tab.classList.toggle('is-active', isSelected);
+      tab.setAttribute('aria-selected', String(isSelected));
+      tab.tabIndex = isSelected ? 0 : -1;
+    });
+
+    panels.forEach((panel) => {
+      panel.hidden = panel.id !== nextTab.getAttribute('aria-controls');
+    });
+
+    if (moveFocus) nextTab.focus();
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectTab(tab));
+    tab.addEventListener('keydown', (event) => {
+      let nextIndex;
+      if (['ArrowRight', 'ArrowDown'].includes(event.key)) nextIndex = (index + 1) % tabs.length;
+      if (['ArrowLeft', 'ArrowUp'].includes(event.key)) nextIndex = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = tabs.length - 1;
+      if (nextIndex === undefined) return;
+      event.preventDefault();
+      selectTab(tabs[nextIndex], true);
+    });
+  });
+})();
