@@ -157,11 +157,14 @@ app.use((req, res, next) => {
   if (req.path === '/' || req.path === '/landing.html') return marketingCsp(req, res, next);
   if ([
     '/managed-digital-signage.html',
+    '/how-it-works.html',
     '/self-service-software.html',
     '/pricing.html',
     '/hardware.html',
     '/hardware-order-success.html',
     '/contact.html',
+    '/solutions/window-displays.html',
+    '/solutions/digital-menu-boards.html',
     '/compare/pricing-tiers.html',
   ].includes(req.path)) return marketingCsp(req, res, next);
   if (req.path.startsWith('/player')) return next();
