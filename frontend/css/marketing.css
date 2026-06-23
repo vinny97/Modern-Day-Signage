@@ -222,3 +222,56 @@ footer { background:#fff; border-top:1px solid var(--line); }
 /* Pricing page quiz CTA band */
 .quiz-cta-band { margin-top:52px; text-align:center; padding:34px; background:#fff; border:1px solid var(--line); border-radius:14px; }
 .quiz-cta-band p { margin-bottom:18px; font-size:17px; }
+
+/* Radio option contact form */
+.quiz-section { margin-bottom:22px; padding-bottom:22px; border-bottom:1px solid var(--line); }
+.quiz-section:last-of-type { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.quiz-section-num { font-size:11px; font-weight:950; letter-spacing:2px; text-transform:uppercase; color:var(--red); margin-bottom:6px; }
+.quiz-section h3 { font-size:17px; margin-bottom:12px; }
+.radio-option { display:flex; align-items:center; gap:12px; padding:12px 16px; border:2px solid var(--line); border-radius:10px; margin-bottom:8px; cursor:pointer; font-size:15px; font-weight:750; color:var(--ink); transition:border-color 0.18s,background 0.18s; user-select:none; }
+.radio-option:hover { border-color:var(--red); background:#fff7f6; }
+.radio-option input[type="radio"] { width:18px; height:18px; accent-color:var(--red); cursor:pointer; flex-shrink:0; margin:0; }
+.radio-option.is-checked { border-color:var(--red); background:#fff2f0; }
+
+/* Live estimate panel */
+.live-estimate { background:#f5faf7; border:2px solid #a7dfc9; border-radius:14px; padding:24px; margin:22px 0; }
+.live-estimate-title { font-size:12px; font-weight:950; text-transform:uppercase; letter-spacing:1.5px; color:var(--green); margin-bottom:14px; }
+.estimate-summary-list { display:flex; flex-direction:column; gap:7px; margin-bottom:18px; }
+.estimate-summary-item { display:flex; align-items:center; gap:10px; font-weight:750; color:var(--ink); font-size:15px; }
+.estimate-summary-item::before { content:"✓"; color:var(--green); font-weight:950; flex-shrink:0; }
+.estimate-prices-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0; }
+.estimate-price-box { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.estimate-price-label { font-size:11px; font-weight:950; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:4px; }
+.estimate-price-val { font-size:24px; font-weight:950; color:var(--ink); line-height:1; }
+.estimate-includes-list { display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
+.estimate-include { display:flex; align-items:center; gap:10px; font-size:14px; color:#444d5a; }
+.estimate-include::before { content:"✓"; color:var(--green); font-weight:950; flex-shrink:0; }
+.estimate-disclaimer { font-size:13px; color:var(--muted); font-style:italic; }
+
+/* Perfect for sections */
+.perfect-for-title { font-size:12px; font-weight:950; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:8px; margin-top:16px; }
+.perfect-for-checklist { list-style:none; display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.perfect-for-checklist li { display:flex; align-items:center; gap:8px; font-size:14px; color:#444d5a; }
+.perfect-for-checklist li::before { content:"✓"; color:var(--green); font-weight:950; font-size:13px; flex-shrink:0; }
+.package-note { font-size:13px; font-style:italic; color:var(--muted); font-weight:750; margin-top:4px; margin-bottom:18px; }
+
+/* Every package includes */
+.shared-includes { background:var(--soft); border-radius:16px; padding:28px 32px; margin-top:42px; }
+.shared-includes h3 { font-size:19px; color:var(--ink); margin-bottom:18px; text-align:center; }
+.shared-includes-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px 16px; }
+.shared-include-pill { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:999px; padding:9px 18px; font-size:14px; font-weight:750; color:var(--ink); }
+
+/* WhatsApp callout band */
+.whatsapp-band { background:#f0fff5; border-top:1px solid #b9e7ca; border-bottom:1px solid #b9e7ca; }
+.whatsapp-inner { display:flex; align-items:center; gap:48px; }
+.whatsapp-label { display:inline-flex; align-items:center; gap:8px; background:#25d366; color:#fff; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:950; margin-bottom:12px; }
+.whatsapp-bubble { background:#fff; border:1px solid #b9e7ca; border-radius:18px 18px 18px 4px; padding:18px 22px; font-size:17px; font-weight:750; color:var(--ink); display:inline-block; box-shadow:0 6px 20px rgba(19,128,93,0.1); }
+.whatsapp-desc { flex:1; }
+.whatsapp-desc h3 { font-size:clamp(22px,3vw,30px); color:var(--ink); margin-bottom:10px; }
+.whatsapp-bubble-wrap { flex:1; }
+
+@media (max-width:680px) {
+  .whatsapp-inner { flex-direction:column; gap:22px; }
+  .estimate-prices-row { grid-template-columns:1fr; }
+  .shared-includes { padding:22px 18px; }
+}

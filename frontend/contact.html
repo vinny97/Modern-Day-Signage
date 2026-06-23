@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Find My ScreenFizz Package | 60-Second Quiz</title>
-  <meta name="description" content="Answer 4 quick questions and we'll recommend the right ScreenFizz package for your business. No hard sell — just a helpful recommendation.">
+  <meta name="description" content="Answer 4 quick questions and we'll recommend the right ScreenFizz package for your business. No hard sell. Just a helpful recommendation.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://screenfizz.com/contact.html">
-  <meta property="og:title" content="Find My ScreenFizz Package | 60-Second Quiz">
+  <meta property="og:title" content="Find My ScreenFizz Package">
   <meta property="og:description" content="Answer 4 quick questions and we'll recommend the right ScreenFizz package. No hard sell.">
   <meta property="og:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
   <link rel="icon" href="/assets/screenfizz-logo.png">
@@ -22,12 +22,12 @@
     <section class="section contact-layout" id="setup-plan">
       <div>
         <div class="eyebrow">Find My Perfect Setup</div>
-        <h1>Answer 4 quick questions.</h1>
-        <p>Tell us a little about your situation and we'll recommend the right ScreenFizz package for your business.</p>
+        <h1>Tell us what you need.</h1>
+        <p>Answer four quick questions and we will give you an estimated setup cost and monthly price. No hard sell. We will call you within 24 hours to confirm everything.</p>
         <div class="hero-note">
           <div class="check-line">Takes less than 60 seconds</div>
-          <div class="check-line">No hard sell</div>
-          <div class="check-line">We'll contact you within 24 hours</div>
+          <div class="check-line">Instant estimate shown</div>
+          <div class="check-line">We will call you within 24 hours</div>
         </div>
         <div class="button-row" style="margin-top:26px">
           <a class="whatsapp-link" id="whatsappLink" target="_blank" rel="noopener" href="https://wa.me/?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup.">Contact on WhatsApp</a>
@@ -35,55 +35,95 @@
       </div>
 
       <form id="leadForm" novalidate>
-        <div class="quiz-progress" aria-hidden="true">
-          <div class="quiz-progress-fill" id="quizProgressFill" style="width:25%"></div>
-        </div>
-        <p class="quiz-step-label" id="quizStepLabel">Step 1 of 4</p>
 
         <!-- Step 1 -->
-        <div class="quiz-step" id="step-1">
+        <div class="quiz-section">
+          <div class="quiz-section-num">Step 1</div>
           <h3>Do you already have a screen?</h3>
-          <button type="button" class="quiz-option" data-name="has_screen" data-value="yes">Yes, I have a TV or display</button>
-          <button type="button" class="quiz-option" data-name="has_screen" data-value="no">No, I need one</button>
+          <label class="radio-option">
+            <input type="radio" name="has_screen" value="yes"> Yes
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="has_screen" value="no"> No
+          </label>
         </div>
 
         <!-- Step 2 -->
-        <div class="quiz-step hidden" id="step-2">
-          <button type="button" class="quiz-back" id="back-2">&#8592; Back</button>
-          <h3>How many screens do you need?</h3>
-          <button type="button" class="quiz-option" data-name="screen_count" data-value="1">1</button>
-          <button type="button" class="quiz-option" data-name="screen_count" data-value="2-5">2&#8211;5</button>
-          <button type="button" class="quiz-option" data-name="screen_count" data-value="5+">5+</button>
+        <div class="quiz-section">
+          <div class="quiz-section-num">Step 2</div>
+          <h3>Which service suits you?</h3>
+          <label class="radio-option">
+            <input type="radio" name="package" value="lite"> Lite
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="package" value="complete"> Complete &#11088;
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="package" value="premium"> Premium
+          </label>
         </div>
 
         <!-- Step 3 -->
-        <div class="quiz-step hidden" id="step-3">
-          <button type="button" class="quiz-back" id="back-3">&#8592; Back</button>
-          <h3>What's your budget for the whole setup?</h3>
-          <button type="button" class="quiz-option" data-name="budget" data-value="under-500">Under &#163;500</button>
-          <button type="button" class="quiz-option" data-name="budget" data-value="500-1000">&#163;500&#8211;&#163;1,000</button>
-          <button type="button" class="quiz-option" data-name="budget" data-value="1000+">&#163;1,000+</button>
+        <div class="quiz-section">
+          <div class="quiz-section-num">Step 3</div>
+          <h3>How many screens?</h3>
+          <label class="radio-option">
+            <input type="radio" name="screens" value="1"> 1
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="screens" value="2-3"> 2&#8211;3
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="screens" value="4+"> 4+
+          </label>
         </div>
 
         <!-- Step 4 -->
-        <div class="quiz-step hidden" id="step-4">
-          <button type="button" class="quiz-back" id="back-4">&#8592; Back</button>
-          <h3>Almost done &#8212; where will the screen go?</h3>
-          <div class="upload-zone" id="uploadZone">
-            <label for="locationPhoto">&#128247; Upload a photo of the space (optional)<br><span style="font-weight:500;font-size:13px">Helps us recommend the best mount and display size</span></label>
-            <input type="file" name="location_photo" accept="image/*" id="locationPhoto">
-          </div>
-          <div class="form-grid" style="margin-top:18px">
-            <label>Business Name<input name="business_name" type="text" autocomplete="organization" maxlength="200" required></label>
-            <label>Contact Name<input name="contact_name" type="text" autocomplete="name" maxlength="200" required></label>
-            <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required></label>
-            <label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="80" required></label>
-            <label class="full">Anything else?<textarea name="message" maxlength="5000" placeholder="Tell us anything else that might be helpful."></textarea></label>
-            <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label></div>
-          </div>
-          <div class="form-actions"><button class="btn btn-primary" type="submit" id="leadSubmit">Get My Recommendation</button><span class="form-status" id="leadStatus" aria-live="polite"></span></div>
-          <div class="estimate-result hidden" id="estimateResult" aria-live="polite"></div>
+        <div class="quiz-section">
+          <div class="quiz-section-num">Step 4</div>
+          <h3>Installation</h3>
+          <label class="radio-option">
+            <input type="radio" name="installation" value="self"> I'll install myself
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="installation" value="arranged"> I want ScreenFizz to arrange installation
+          </label>
         </div>
+
+        <!-- Live estimate panel -->
+        <div class="live-estimate hidden" id="liveEstimate" aria-live="polite">
+          <div class="live-estimate-title">Your estimated setup</div>
+          <div class="estimate-summary-list" id="estimateSummary"></div>
+          <div class="estimate-prices-row">
+            <div class="estimate-price-box">
+              <div class="estimate-price-label">Estimated setup cost</div>
+              <div class="estimate-price-val" id="estimateSetup"></div>
+            </div>
+            <div class="estimate-price-box">
+              <div class="estimate-price-label">Estimated monthly</div>
+              <div class="estimate-price-val" id="estimateMonthly"></div>
+            </div>
+          </div>
+          <div class="estimate-includes-list" id="estimateIncludes"></div>
+          <p class="estimate-disclaimer">Final quotation provided after we review your requirements.</p>
+        </div>
+
+        <!-- Contact details -->
+        <h3 style="margin-top:28px;margin-bottom:14px">Your details</h3>
+        <div class="form-grid">
+          <label>Business Name<input name="business_name" type="text" autocomplete="organization" maxlength="200" required></label>
+          <label>Contact Name<input name="contact_name" type="text" autocomplete="name" maxlength="200" required></label>
+          <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required></label>
+          <label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="80" required></label>
+          <label class="full">Anything else?<textarea name="message" maxlength="5000" placeholder="Tell us anything else that might be helpful."></textarea></label>
+          <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Fax number<input name="fax_number" type="text" tabindex="-1" autocomplete="off"></label></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" id="leadSubmit">Get My Recommendation</button>
+          <span class="form-status" id="leadStatus" aria-live="polite"></span>
+        </div>
+        <div class="estimate-result hidden" id="submitResult" aria-live="polite"></div>
+
       </form>
     </section>
   </main>
@@ -91,89 +131,127 @@
   <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a></div></div></footer>
 
   <script>
-    const leadForm = document.getElementById('leadForm');
-    const leadStatus = document.getElementById('leadStatus');
-    const leadSubmit = document.getElementById('leadSubmit');
-    const estimateResult = document.getElementById('estimateResult');
-    const whatsappLink = document.getElementById('whatsappLink');
-    const progressFill = document.getElementById('quizProgressFill');
-    const stepLabel = document.getElementById('quizStepLabel');
+    /* Pricing matrix — edit these values to update estimates */
+    var PRICING = {
+      lite: {
+        '1':   { setup: '&#163;99 &#8211; &#163;149',  monthly: 'From &#163;19/month' },
+        '2-3': { setup: '&#163;179 &#8211; &#163;279', monthly: 'From &#163;35/month' },
+        '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
+      },
+      complete: {
+        '1': {
+          self:     { setup: '&#163;200 &#8211; &#163;350', monthly: 'From &#163;25/month' },
+          arranged: { setup: '&#163;250 &#8211; &#163;450', monthly: 'From &#163;29/month' }
+        },
+        '2-3': {
+          self:     { setup: '&#163;400 &#8211; &#163;650', monthly: 'From &#163;45/month' },
+          arranged: { setup: '&#163;500 &#8211; &#163;800', monthly: 'From &#163;49/month' }
+        },
+        '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
+      },
+      premium: {
+        '1':   { setup: '&#163;300 &#8211; &#163;550',    monthly: 'From &#163;39/month' },
+        '2-3': { setup: '&#163;600 &#8211; &#163;1,000',  monthly: 'From &#163;69/month' },
+        '4+':  { setup: 'Custom quote', monthly: 'Custom quote' }
+      }
+    };
 
-    const quizState = { has_screen: '', screen_count: '', budget: '' };
-    let currentStep = 1;
+    var INCLUDES = {
+      lite:     ['ScreenFizz Player', 'Managed service', 'Content updates', 'WhatsApp support'],
+      complete: ['ScreenFizz Player', 'Display included', 'Wall mount', 'Managed service', 'Content updates'],
+      premium:  ['Everything in Complete', 'Professional installation', 'Seasonal campaigns', 'Priority support']
+    };
 
-    function showStep(n) {
-      document.querySelectorAll('.quiz-step').forEach(function(el) { el.classList.add('hidden'); });
-      document.getElementById('step-' + n).classList.remove('hidden');
-      currentStep = n;
-      progressFill.style.width = (25 * n) + '%';
-      stepLabel.textContent = 'Step ' + n + ' of 4';
-    }
+    var PACKAGE_LABELS = { lite: 'ScreenFizz Lite', complete: 'ScreenFizz Complete', premium: 'ScreenFizz Premium' };
+    var SCREEN_LABELS  = { '1': '1 Screen', '2-3': '2&#8211;3 Screens', '4+': '4+ Screens' };
 
-    document.querySelectorAll('.quiz-option').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var name = btn.dataset.name;
-        var value = btn.dataset.value;
-        quizState[name] = value;
-        btn.closest('.quiz-step').querySelectorAll('.quiz-option').forEach(function(b) { b.classList.remove('selected'); });
-        btn.classList.add('selected');
+    var leadForm      = document.getElementById('leadForm');
+    var leadStatus    = document.getElementById('leadStatus');
+    var leadSubmit    = document.getElementById('leadSubmit');
+    var submitResult  = document.getElementById('submitResult');
+    var whatsappLink  = document.getElementById('whatsappLink');
+    var liveEstimate  = document.getElementById('liveEstimate');
+    var estimateSummary = document.getElementById('estimateSummary');
+    var estimateSetup   = document.getElementById('estimateSetup');
+    var estimateMonthly = document.getElementById('estimateMonthly');
+    var estimateIncludes = document.getElementById('estimateIncludes');
+
+    /* Style radio labels when their input is checked */
+    leadForm.addEventListener('change', function(e) {
+      if (e.target.type === 'radio') {
+        var group = leadForm.querySelectorAll('input[name="' + e.target.name + '"]');
+        group.forEach(function(r) {
+          r.closest('.radio-option').classList.toggle('is-checked', r.checked);
+        });
+        updateEstimate();
         updateWhatsApp();
-        setTimeout(function() { showStep(currentStep + 1); }, 220);
-      });
-    });
-
-    document.getElementById('back-2').addEventListener('click', function() { showStep(1); });
-    document.getElementById('back-3').addEventListener('click', function() { showStep(2); });
-    document.getElementById('back-4').addEventListener('click', function() { showStep(3); });
-
-    document.getElementById('uploadZone').addEventListener('click', function(e) {
-      if (e.target.tagName !== 'INPUT') {
-        document.getElementById('locationPhoto').click();
       }
     });
 
-    document.getElementById('locationPhoto').addEventListener('change', function(e) {
-      var file = e.target.files[0];
-      if (file) {
-        document.querySelector('#uploadZone label').innerHTML = '&#9989; ' + file.name + '<br><span style="font-weight:500;font-size:13px">Photo selected</span>';
-      }
-    });
-
-    function recommendPackage(state) {
-      if (state.has_screen === 'yes') {
-        return { package: 'lite', name: 'ScreenFizz Lite', reason: 'Since you already have a screen, Lite gives you everything you need — content design, remote management and monthly updates.', colour: 'rec-lite' };
-      }
-      if (state.screen_count === '5+') {
-        return { package: 'premium', name: 'ScreenFizz Premium', reason: 'For multiple screens, Premium covers installation, priority support, seasonal campaigns and full ongoing management.', colour: 'rec-premium' };
-      }
-      if (state.budget === 'under-500') {
-        return { package: 'lite', name: 'ScreenFizz Lite', reason: 'Lite keeps the upfront cost low — you provide the screen and we handle content design, setup and ongoing management.', colour: 'rec-lite' };
-      }
-      if (state.budget === '500-1000') {
-        return { package: 'complete', name: 'ScreenFizz Complete', reason: 'Complete includes a professionally sourced display, player, wall mount and full ongoing management — you just plug it in.', colour: 'rec-complete' };
-      }
-      if (state.screen_count === '2-5') {
-        return { package: 'premium', name: 'ScreenFizz Premium', reason: 'With your budget and multiple screens, Premium includes installation, all hardware and full ongoing managed content.', colour: 'rec-premium' };
-      }
-      return { package: 'complete', name: 'ScreenFizz Complete', reason: 'Complete includes a professionally sourced display, player, wall mount and full ongoing management — you just plug it in.', colour: 'rec-complete' };
+    function getVal(name) {
+      var el = leadForm.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : '';
     }
 
-    function buildEstimateHTML(rec) {
-      var includes = {
-        lite: ['ScreenFizz Player', 'Initial setup', 'Professional content design', 'Remote management', 'Monthly content updates', 'Email &amp; WhatsApp support'],
-        complete: ['ScreenFizz Player', 'Professionally sourced display', 'Wall mount', 'Content design', 'Remote management', 'Monthly updates', 'Ongoing support'],
-        premium: ['Everything in Complete', 'Professional installation', 'Multiple screens', 'Priority support', 'Seasonal campaigns', 'AI-generated promotions', 'Quarterly content refresh']
-      };
-      var items = includes[rec.package].map(function(i) { return '<li>' + i + '</li>'; }).join('');
-      return '<h3>Based on your answers, we recommend:</h3>'
-        + '<strong class="rec-package ' + rec.colour + '">' + rec.name + '</strong>'
-        + '<p>' + rec.reason + '</p>'
-        + '<ul style="margin:14px 0 0 18px;color:#444d5a">' + items + '</ul>'
-        + '<p style="margin-top:14px;font-weight:750">We\'ll call you to confirm within 24 hours.</p>';
+    function updateEstimate() {
+      var pkg    = getVal('package');
+      var screens = getVal('screens');
+      var install = getVal('installation');
+
+      if (!pkg || !screens) {
+        liveEstimate.classList.add('hidden');
+        return;
+      }
+
+      var pricing = PRICING[pkg];
+      var row = pricing[screens];
+      var setup, monthly;
+
+      if (!row) { setup = 'Custom quote'; monthly = 'Custom quote'; }
+      else if (pkg === 'complete' && install && row[install]) {
+        setup   = row[install].setup;
+        monthly = row[install].monthly;
+      } else if (row.setup) {
+        setup   = row.setup;
+        monthly = row.monthly;
+      } else {
+        /* complete without install selection yet */
+        setup   = row['self'].setup;
+        monthly = row['self'].monthly;
+      }
+
+      /* Summary checks */
+      var summaryItems = [PACKAGE_LABELS[pkg], SCREEN_LABELS[screens]];
+      if (pkg === 'premium') {
+        summaryItems.push('Installation Included');
+      } else if (install === 'arranged') {
+        summaryItems.push('Installation Included');
+      } else if (install === 'self') {
+        summaryItems.push('Self-install');
+      }
+
+      estimateSummary.innerHTML = summaryItems.map(function(s) {
+        return '<div class="estimate-summary-item">' + s + '</div>';
+      }).join('');
+
+      estimateSetup.innerHTML   = setup;
+      estimateMonthly.innerHTML = monthly;
+
+      estimateIncludes.innerHTML = INCLUDES[pkg].map(function(i) {
+        return '<div class="estimate-include">' + i + '</div>';
+      }).join('');
+
+      liveEstimate.classList.remove('hidden');
     }
 
     function updateWhatsApp() {
-      var text = 'Hi ScreenFizz, I would like a setup plan.\n\nHas screen: ' + (quizState.has_screen || 'Not answered') + '\nScreens: ' + (quizState.screen_count || 'Not answered') + '\nBudget: ' + (quizState.budget || 'Not answered');
+      var pkg     = getVal('package');
+      var screens = getVal('screens');
+      var install = getVal('installation');
+      var text = 'Hi ScreenFizz, I would like a setup plan.'
+        + '\n\nPackage: '     + (pkg     ? PACKAGE_LABELS[pkg] : 'Not selected')
+        + '\nScreens: '       + (screens ? screens              : 'Not selected')
+        + '\nInstallation: '  + (install === 'arranged' ? 'ScreenFizz to arrange' : install === 'self' ? 'Self-install' : 'Not selected');
       whatsappLink.href = 'https://wa.me/?text=' + encodeURIComponent(text);
     }
 
@@ -183,13 +261,11 @@
       event.preventDefault();
       leadStatus.className = 'form-status';
       leadStatus.textContent = '';
-      estimateResult.classList.add('hidden');
 
-      var data = Object.fromEntries(new FormData(leadForm).entries());
+      var data    = Object.fromEntries(new FormData(leadForm).entries());
       var required = ['business_name', 'contact_name', 'email', 'phone'];
       for (var i = 0; i < required.length; i++) {
-        var field = required[i];
-        if (!data[field] || String(data[field]).trim() === '') {
+        if (!data[required[i]] || !data[required[i]].trim()) {
           leadStatus.className = 'form-status error';
           leadStatus.textContent = 'Please fill in your name, email and phone number.';
           return;
@@ -201,61 +277,48 @@
         return;
       }
 
-      leadStatus.textContent = 'Building your recommendation...';
-      var rec = recommendPackage(quizState);
-      estimateResult.innerHTML = buildEstimateHTML(rec);
-      estimateResult.classList.remove('hidden');
+      var pkg     = getVal('package');
+      var screens = getVal('screens');
+      var install = getVal('installation');
 
-      var messageBody = ('Phone: ' + data.phone
-        + '\nHas screen: ' + (quizState.has_screen || 'Not answered')
-        + '\nScreen count: ' + (quizState.screen_count || 'Not answered')
-        + '\nBudget: ' + (quizState.budget || 'Not answered')
-        + '\nRecommendation: ' + rec.name
-        + (data.message ? '\n\n' + data.message : '')).trim();
+      var messageBody = (
+        'Phone: ' + data.phone
+        + '\nHas screen: '    + (getVal('has_screen') || 'Not answered')
+        + '\nPackage: '       + (pkg     ? PACKAGE_LABELS[pkg] : 'Not answered')
+        + '\nScreens: '       + (screens || 'Not answered')
+        + '\nInstallation: '  + (install  || 'Not answered')
+        + (data.message ? '\n\n' + data.message : '')
+      ).trim();
 
       leadSubmit.disabled = true;
       leadSubmit.textContent = 'Sending...';
 
-      var photoFile = document.getElementById('locationPhoto').files[0];
-
       try {
-        var response;
-        if (photoFile) {
-          var fd = new FormData();
-          fd.append('name', data.contact_name);
-          fd.append('email', data.email);
-          fd.append('company', data.business_name);
-          fd.append('screens', quizState.screen_count || '');
-          fd.append('multi_tenant', 'single');
-          fd.append('hosting', 'hosted');
-          fd.append('message', messageBody);
-          fd.append('fax_number', data.fax_number || '');
-          fd.append('location_photo', photoFile);
-          response = await fetch('/api/contact/enterprise', { method: 'POST', body: fd });
-        } else {
-          var payload = {
-            name: data.contact_name,
-            email: data.email,
-            company: data.business_name,
-            screens: quizState.screen_count || '',
-            multi_tenant: 'single',
-            hosting: 'hosted',
-            message: messageBody,
-            fax_number: data.fax_number || ''
-          };
-          response = await fetch('/api/contact/enterprise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        }
+        var payload = {
+          name:        data.contact_name,
+          email:       data.email,
+          company:     data.business_name,
+          screens:     screens || '',
+          multi_tenant: 'single',
+          hosting:     'hosted',
+          message:     messageBody,
+          fax_number:  data.fax_number || ''
+        };
+        var response = await fetch('/api/contact/enterprise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
         if (response.ok) {
           leadStatus.className = 'form-status success';
-          leadStatus.textContent = 'Your setup plan request has been sent.';
+          leadStatus.textContent = 'Your setup plan request has been sent. We will call you within 24 hours.';
+          submitResult.innerHTML = '<p style="margin-top:12px;font-weight:750">Thanks! Check your email for a confirmation.</p>';
+          submitResult.classList.remove('hidden');
           leadForm.reset();
-          document.querySelector('#uploadZone label').innerHTML = '&#128247; Upload a photo of the space (optional)<br><span style="font-weight:500;font-size:13px">Helps us recommend the best mount and display size</span>';
-          quizState.has_screen = '';
-          quizState.screen_count = '';
-          quizState.budget = '';
+          leadForm.querySelectorAll('.radio-option').forEach(function(el) { el.classList.remove('is-checked'); });
+          liveEstimate.classList.add('hidden');
           updateWhatsApp();
-          showStep(1);
         } else {
           leadStatus.className = 'form-status error';
           leadStatus.textContent = 'Sorry, something went wrong. Please try again.';
