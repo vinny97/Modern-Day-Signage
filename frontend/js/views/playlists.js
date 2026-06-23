@@ -131,7 +131,7 @@ async function loadPlaylists() {
           <div style="display:flex;align-items:center;gap:8px">
             <div style="font-size:16px;font-weight:600;color:var(--text-primary)">${esc(p.name)}</div>
             ${p.is_auto_generated ? `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--bg-input);color:var(--text-muted)">${t('playlist.tag_auto')}</span>` : ''}
-            ${p.status === 'draft' ? `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#78350f;color:#fbbf24">${t('playlist.tag_draft')}</span>` : ''}
+            ${p.status === 'draft' ? `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--warning-dim);color:var(--warning)">${t('playlist.tag_draft')}</span>` : ''}
           </div>
           <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;margin-left:12px">${tn('playlist.item_count', p.item_count)}</div>
         </div>
@@ -257,16 +257,16 @@ function renderDetailContent(container, playlist) {
 
   container.innerHTML = `
     ${isDraft ? `
-    <div id="draftBanner" style="background:#78350f;border:1px solid #92400e;border-radius:var(--radius-lg);padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
-      <div style="display:flex;align-items:center;gap:10px;color:#fbbf24">
+    <div id="draftBanner" style="background:var(--warning-dim);border:1px solid var(--warning);border-radius:var(--radius-lg);padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--warning)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <div>
           <div style="font-weight:600;font-size:14px">${t('playlist.draft.banner_title')}</div>
-          <div style="font-size:12px;color:#fcd34d;opacity:0.85">${hasPublished ? t('playlist.draft.devices_showing_published') : t('playlist.draft.never_published')}</div>
+          <div style="font-size:12px;color:var(--warning);opacity:0.85">${hasPublished ? t('playlist.draft.devices_showing_published') : t('playlist.draft.never_published')}</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-shrink:0">
-        ${hasPublished ? `<button class="btn btn-secondary btn-sm" id="discardDraftBtn" style="color:#fbbf24;border-color:#92400e">${t('playlist.draft.discard_changes')}</button>` : ''}
+        ${hasPublished ? `<button class="btn btn-secondary btn-sm" id="discardDraftBtn" style="color:var(--warning);border-color:var(--warning)">${t('playlist.draft.discard_changes')}</button>` : ''}
         <button class="btn btn-sm" id="publishBtn" style="background:#f59e0b;color:#000;font-weight:600;border:none">${t('playlist.draft.publish')}</button>
       </div>
     </div>
@@ -381,7 +381,7 @@ function renderItems(items) {
         <div style="font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.filename || item.widget_name || t('common.unknown'))}</div>
         <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:8px;min-width:0">
           <span style="white-space:nowrap">${item.widget_id ? t('playlist.item_widget') : esc(item.mime_type || t('playlist.unknown_type'))}</span>
-          ${item.schedules && item.schedules.length ? `<span style="font-size:11px;padding:1px 6px;border-radius:4px;background:#0c2a3f;color:#7dd3fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(scheduleSummary(item.schedules))}">🕐 ${esc(scheduleSummary(item.schedules))}</span>` : ''}
+          ${item.schedules && item.schedules.length ? `<span style="font-size:11px;padding:1px 6px;border-radius:4px;background:var(--accent-dim);color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(scheduleSummary(item.schedules))}">🕐 ${esc(scheduleSummary(item.schedules))}</span>` : ''}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -788,7 +788,7 @@ function showScheduleModal(item) {
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;width:580px;max-width:94vw;max-height:88vh;overflow:auto">
         <h3 style="margin:0 0 4px">${t('itemsched.title')}</h3>
         <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">${esc(item.filename || item.widget_name || 'item')}</p>
-        <p style="font-size:12px;color:#7dd3fc;background:#0c2a3f;border-radius:6px;padding:8px 10px;margin:0 0 16px">${t('itemsched.hint')}</p>
+        <p style="font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:8px 10px;margin:0 0 16px">${t('itemsched.hint')}</p>
         <div>${blocks.length ? blocks.map(blockRow).join('') : `<p style="font-size:13px;color:var(--text-muted);margin:0 0 10px">${t('itemsched.none')}</p>`}</div>
         <button class="btn btn-secondary btn-sm" id="schedAddBlock" style="margin-bottom:4px">${t('itemsched.add_block')}</button>
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">

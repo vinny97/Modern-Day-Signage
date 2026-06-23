@@ -196,16 +196,16 @@ async function loadDevice(deviceId, activeTab = null) {
       <!-- Playlist Tab -->
       <div class="tab-content" id="tab-playlist">
         ${device.playlist_status === 'draft' ? `
-        <div id="deviceDraftBanner" style="background:#78350f;border:1px solid #92400e;border-radius:var(--radius);padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
-          <div style="display:flex;align-items:center;gap:10px;color:#fbbf24">
+        <div id="deviceDraftBanner" style="background:var(--warning-dim);border:1px solid var(--warning);border-radius:var(--radius);padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px;color:var(--warning)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <div>
               <div style="font-weight:600;font-size:14px">${t('device.draft.banner_title')}</div>
-              <div style="font-size:12px;color:#fcd34d;opacity:0.85">${device.playlist_has_published ? t('device.draft.devices_showing_published') : t('device.draft.never_published')}</div>
+              <div style="font-size:12px;color:var(--warning);opacity:0.85">${device.playlist_has_published ? t('device.draft.devices_showing_published') : t('device.draft.never_published')}</div>
             </div>
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
-            ${device.playlist_has_published ? `<button class="btn btn-secondary btn-sm" id="deviceDiscardDraftBtn" style="color:#fbbf24;border-color:#92400e">${t('device.draft.discard')}</button>` : ''}
+            ${device.playlist_has_published ? `<button class="btn btn-secondary btn-sm" id="deviceDiscardDraftBtn" style="color:var(--warning);border-color:var(--warning)">${t('device.draft.discard')}</button>` : ''}
             <button class="btn btn-sm" id="devicePublishBtn" style="background:#f59e0b;color:#000;font-weight:600;border:none">${t('device.draft.publish')}</button>
           </div>
         </div>
