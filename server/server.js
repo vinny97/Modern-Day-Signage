@@ -59,6 +59,17 @@ const { getClientIp } = require('./services/activity');
 // non-trusted source is ignored, so the value can't be spoofed.
 app.set('trust proxy', trustedProxies);
 
+// Lightweight liveness endpoint for Render and external uptime monitors.
+// Deliberately avoids database or storage calls so it can respond quickly.
+app.get('/health', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Determine if SSL certs are available
 const hasSsl = fs.existsSync(config.sslCert) && fs.existsSync(config.sslKey);
 let server;
