@@ -159,10 +159,12 @@
         </div>
         <div class="digital-display-shell">
           <div class="digital-display-bezel">
-            <div class="digital-display-screen">
-              <video autoplay muted loop playsinline controls preload="metadata" aria-label="ScreenFizz digital signage content playing on a display">
+            <div class="digital-display-screen" data-video-reel aria-label="ScreenFizz landscape and portrait digital signage examples">
+              <video class="display-video is-active" autoplay muted playsinline preload="metadata" aria-hidden="true">
                 <source src="/assets/screenfizz-screens-in-action.mp4" type="video/mp4">
-                Your browser does not support embedded video.
+              </video>
+              <video class="display-video is-portrait" muted playsinline preload="metadata" aria-hidden="true">
+                <source src="/assets/screenfizz-portrait-in-action.mp4" type="video/mp4">
               </video>
             </div>
             <div class="digital-display-brand" aria-hidden="true"><span></span>ScreenFizz</div>

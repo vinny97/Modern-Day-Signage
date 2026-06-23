@@ -54,3 +54,33 @@
     });
   });
 })();
+
+(() => {
+  const reel = document.querySelector('[data-video-reel]');
+  if (!reel) return;
+
+  const videos = Array.from(reel.querySelectorAll('.display-video'));
+  if (videos.length < 2) return;
+
+  let activeIndex = 0;
+  let transitionTimer;
+
+  const playNextVideo = () => {
+    const previousVideo = videos[activeIndex];
+    activeIndex = (activeIndex + 1) % videos.length;
+    const nextVideo = videos[activeIndex];
+
+    nextVideo.currentTime = 0;
+    nextVideo.classList.add('is-active');
+    previousVideo.classList.remove('is-active');
+    nextVideo.play().catch(() => {});
+
+    window.clearTimeout(transitionTimer);
+    transitionTimer = window.setTimeout(() => {
+      previousVideo.pause();
+      previousVideo.currentTime = 0;
+    }, 850);
+  };
+
+  videos.forEach((video) => video.addEventListener('ended', playNextVideo));
+})();

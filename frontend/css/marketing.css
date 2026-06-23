@@ -74,6 +74,7 @@ h3 { font-size:24px; margin-bottom:12px; }
 .showcase-pill { flex:0 0 auto; background:var(--ink); color:#fff !important; border-radius:999px; padding:8px 12px; font-size:12px !important; font-weight:950; }
 @media (prefers-reduced-motion:reduce) {
   .landing-hero .showcase-card .showcase-slide { transition:none; transform:none; }
+  .digital-display-screen video { transition:none; }
 }
 .panel-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
 .three-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
@@ -117,7 +118,9 @@ h3 { font-size:24px; margin-bottom:12px; }
 .digital-display-shell { width:min(100%,1040px); margin:42px auto 0; }
 .digital-display-bezel { padding:10px 10px 8px; border:1px solid #33373d; border-radius:18px; background:linear-gradient(145deg,#272a2f,#090a0c 65%); box-shadow:0 34px 80px rgba(20,24,33,.25),0 8px 20px rgba(20,24,33,.16); }
 .digital-display-screen { position:relative; overflow:hidden; aspect-ratio:16/9; border:1px solid #000; border-radius:9px; background:#000; }
-.digital-display-screen video { display:block; width:100%; height:100%; object-fit:cover; background:#000; }
+.digital-display-screen video { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:cover; opacity:0; background:#000; transition:opacity .8s ease-in-out; }
+.digital-display-screen video.is-active { z-index:1; opacity:1; }
+.digital-display-screen video.is-portrait { object-fit:contain; }
 .digital-display-brand { display:flex; align-items:center; justify-content:center; gap:6px; height:24px; color:#a7abb1; font-size:9px; font-weight:850; letter-spacing:.5px; }
 .digital-display-brand span { width:5px; height:5px; border-radius:50%; background:#df2b20; box-shadow:0 0 5px rgba(223,43,32,.8); }
 .band { background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
