@@ -367,5 +367,17 @@
     </div>
   </footer>
   <script src="/js/marketing-hero.js" defer></script>
+  <script>
+    (function() {
+      var targets = document.querySelectorAll('.benefit-card,.package-card,.review,.step,.use-case-photo,.industry');
+      if (!window.IntersectionObserver) { targets.forEach(function(el) { el.classList.add('is-visible'); }); return; }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      targets.forEach(function(el) { el.classList.add('fade-up'); io.observe(el); });
+    })();
+  </script>
 </body>
 </html>
