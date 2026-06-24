@@ -33,8 +33,8 @@ p { color:var(--muted); }
 .dropdown-menu a:hover { background:var(--soft); color:var(--red); }
 .btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:11px 22px; border-radius:999px; border:1px solid transparent; font-weight:850; font-size:15px; cursor:pointer; font-family:inherit; transition:background 0.2s,border-color 0.2s,color 0.2s,transform 0.15s; }
 .btn:hover { transform:translateY(-1px); }
-.btn-primary { background:var(--red); color:#fff; }
-.btn-primary:hover { background:var(--red-dark); }
+.btn-primary { background:var(--ink); color:#fff; }
+.btn-primary:hover { background:#2d2d2d; }
 .btn-outline { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
 .btn-outline:hover { background:var(--ink); color:#fff; }
 .btn-dark { background:var(--ink); color:#fff; }
