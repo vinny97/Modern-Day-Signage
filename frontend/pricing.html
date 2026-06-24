@@ -44,13 +44,13 @@
         <article class="card price-card complete recommended">
           <span class="tag">&#11088; Most Popular · We manage it</span>
           <h3>Complete · Managed</h3>
-          <p>Send us your content. We’ll manage everything else.</p>
+          <p>Send us your content. We'll manage everything else.</p>
           <div class="package-price"><strong>£15</strong><span>/month per screen</span></div>
           <div class="package-section-title">Everything in Lite, plus</div>
           <ul class="feature-list"><li>We upload your content</li><li>We schedule promotions</li><li>We manage playlists</li><li>Remote monitoring</li><li>WhatsApp &amp; email support</li></ul>
           <div class="package-section-title muted">Does not include</div>
           <ul class="exclusion-list"><li>Graphic design</li><li>Monthly creative campaigns</li><li>Seasonal content creation</li></ul>
-          <div class="package-example"><strong>Example</strong><p>Send us a new menu PDF or promotional image and we’ll upload, schedule and publish it.</p></div>
+          <div class="package-example"><strong>Example</strong><p>Send us a new menu PDF or promotional image and we'll upload, schedule and publish it.</p></div>
           <a class="btn btn-primary" href="/contact.html#setup-plan">Find My Perfect Setup</a>
         </article>
 
@@ -61,7 +61,7 @@
           <div class="package-price"><small>From</small><strong>£29</strong><span>/month per screen</span></div>
           <div class="package-section-title">Everything in Complete, plus</div>
           <ul class="feature-list"><li>Monthly content creation</li><li>Seasonal campaigns</li><li>Promotional graphics</li><li>Menu redesigns</li><li>AI-assisted creative</li><li>Quarterly content refresh</li></ul>
-          <div class="package-example"><strong>Examples</strong><p>Summer promotions, Christmas campaigns, Father’s Day offers and new menu graphics.</p></div>
+          <div class="package-example"><strong>Examples</strong><p>Summer promotions, Christmas campaigns, Father's Day offers and new menu graphics.</p></div>
           <a class="btn btn-dark" href="/contact.html#setup-plan">Get a Custom Quote</a>
         </article>
       </div>
@@ -76,16 +76,273 @@
           </article>
           <article class="hardware-pricing-item display">
             <span class="hardware-pricing-icon" aria-hidden="true">&#128250;</span>
-            <div><h3>Need a display?</h3><p>We’ll source the right display for your business.</p><ul><li>Refurbished</li><li>Commercial</li><li>High brightness</li></ul></div>
-            <a href="/contact.html#setup-plan">Get a recommendation →</a>
+            <div><h3>Need a display?</h3><p>We'll source the right display for your business.</p><ul><li>Refurbished</li><li>Commercial</li><li>High brightness</li></ul></div>
+            <button class="btn btn-primary" onclick="document.getElementById('display-wizard').scrollIntoView({behavior:'smooth'});wizardOpen()">Find My Perfect Display</button>
           </article>
         </div>
       </aside>
     </section>
 
+    <!-- Find My Perfect Display Wizard -->
+    <section id="display-wizard" class="section section-tight" style="display:none;">
+      <div class="eyebrow">Hardware Recommender</div>
+      <h2>Find My Perfect Display</h2>
+      <p style="margin-bottom:40px;">Answer 4 quick questions and we'll recommend the best setup for your business.</p>
+
+      <div id="wizard-wrap" style="max-width:640px;">
+        <!-- Progress bar -->
+        <div style="margin-bottom:32px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span id="wiz-step-label" style="font-size:13px;font-weight:750;color:var(--muted);">Step 1 of 4</span>
+          </div>
+          <div style="background:var(--line);border-radius:999px;height:4px;">
+            <div id="wiz-progress" style="background:var(--ink);height:4px;border-radius:999px;width:25%;transition:width 0.3s;"></div>
+          </div>
+        </div>
+
+        <!-- Step 1: Screens -->
+        <div class="wiz-step" id="wiz-s1">
+          <h3 style="margin-bottom:20px;">How many screens do you need?</h3>
+          <div class="wiz-options" id="wiz-screens">
+            <label class="wiz-opt"><input type="radio" name="screens" value="1"><span>1 screen</span></label>
+            <label class="wiz-opt"><input type="radio" name="screens" value="2"><span>2 screens</span></label>
+            <label class="wiz-opt"><input type="radio" name="screens" value="3"><span>3 screens</span></label>
+            <label class="wiz-opt"><input type="radio" name="screens" value="4"><span>4+ screens</span></label>
+          </div>
+          <button class="btn btn-primary wiz-next" onclick="wizNext(1)" style="margin-top:28px;">Next &rarr;</button>
+        </div>
+
+        <!-- Step 2: Display type -->
+        <div class="wiz-step" id="wiz-s2" style="display:none;">
+          <h3 style="margin-bottom:20px;">What will you be displaying?</h3>
+          <div class="wiz-options" id="wiz-type">
+            <label class="wiz-opt"><input type="radio" name="dtype" value="menu"><span>&#127828; Digital Menu Boards</span></label>
+            <label class="wiz-opt"><input type="radio" name="dtype" value="window"><span>&#128717; Window Displays</span></label>
+            <label class="wiz-opt"><input type="radio" name="dtype" value="promo"><span>&#128250; Promotional Screens</span></label>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:28px;">
+            <button class="btn btn-outline" onclick="wizBack(2)">&#8592; Back</button>
+            <button class="btn btn-primary wiz-next" onclick="wizNext(2)">Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Budget (dynamic) -->
+        <div class="wiz-step" id="wiz-s3" style="display:none;">
+          <h3 style="margin-bottom:6px;">What's your total hardware budget?</h3>
+          <p id="wiz-budget-note" style="font-size:14px;margin-bottom:20px;"></p>
+          <div class="wiz-options" id="wiz-budget"></div>
+          <div style="display:flex;gap:12px;margin-top:28px;">
+            <button class="btn btn-outline" onclick="wizBack(3)">&#8592; Back</button>
+            <button class="btn btn-primary wiz-next" onclick="wizNext(3)">Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Installation -->
+        <div class="wiz-step" id="wiz-s4" style="display:none;">
+          <h3 style="margin-bottom:20px;">Do you need installation?</h3>
+          <div class="wiz-options" id="wiz-install">
+            <label class="wiz-opt"><input type="radio" name="install" value="self"><span>I'll install it myself</span></label>
+            <label class="wiz-opt"><input type="radio" name="install" value="pro"><span>ScreenFizz should arrange installation</span></label>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:28px;">
+            <button class="btn btn-outline" onclick="wizBack(4)">&#8592; Back</button>
+            <button class="btn btn-primary" onclick="wizResult()">See My Recommendation &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="wiz-step" id="wiz-result" style="display:none;">
+          <div id="wiz-rec-card" class="wiz-rec-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .wiz-options { display:flex; flex-direction:column; gap:10px; }
+      .wiz-opt { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--soft); border:1.5px solid var(--line); border-radius:12px; cursor:pointer; transition:border-color 0.15s,background 0.15s; font-weight:750; font-size:16px; }
+      .wiz-opt:hover { border-color:var(--ink); background:var(--paper); }
+      .wiz-opt input[type=radio] { width:18px; height:18px; accent-color:var(--ink); flex:0 0 18px; }
+      .wiz-opt input[type=radio]:checked + span { color:var(--ink); }
+      .wiz-opt:has(input:checked) { border-color:var(--ink); background:var(--paper); }
+      .wiz-rec-card { background:var(--soft); border:1px solid var(--line); border-radius:18px; overflow:hidden; }
+      .wiz-rec-header { background:var(--ink); color:#fff; padding:18px 24px; }
+      .wiz-rec-header .wiz-badge { font-size:12px; font-weight:950; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.65); margin-bottom:6px; }
+      .wiz-rec-header h3 { font-size:20px; margin-bottom:4px; color:#fff; }
+      .wiz-rec-header p { color:rgba(255,255,255,0.7); font-size:14px; margin:0; }
+      .wiz-rec-perks { padding:20px 24px; border-bottom:1px solid var(--line); }
+      .wiz-rec-perks li { display:flex; align-items:center; gap:10px; font-size:15px; color:var(--ink); margin-bottom:8px; list-style:none; }
+      .wiz-rec-perks li::before { content:"✓"; font-weight:950; color:var(--ink); }
+      .wiz-rec-costs { padding:20px 24px; border-bottom:1px solid var(--line); }
+      .wiz-cost-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:15px; color:var(--muted); }
+      .wiz-cost-row.total { font-size:18px; font-weight:950; color:var(--ink); border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
+      .wiz-alt { padding:18px 24px; border-bottom:1px solid var(--line); background:var(--paper); }
+      .wiz-alt-label { font-size:12px; font-weight:950; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+      .wiz-alt-card { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:var(--soft); border:1px solid var(--line); border-radius:10px; }
+      .wiz-alt-card span { font-size:14px; color:var(--muted); }
+      .wiz-alt-card strong { font-size:15px; color:var(--ink); }
+      .wiz-rec-footer { padding:20px 24px; background:var(--paper); }
+      .wiz-setup-title { font-size:13px; font-weight:950; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+      .wiz-setup-items { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+      .wiz-setup-items li { display:flex; align-items:center; gap:10px; font-size:15px; color:var(--ink); list-style:none; }
+      .wiz-setup-items li::before { content:"✓"; font-weight:950; color:var(--ink); }
+      .wiz-plans { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+      .wiz-plan-pill { padding:7px 14px; border-radius:999px; background:var(--soft); border:1px solid var(--line); font-size:13px; font-weight:750; color:var(--ink); }
+      #wiz-restart { background:none; border:none; color:var(--muted); font-size:14px; cursor:pointer; text-decoration:underline; margin-top:8px; padding:0; }
+    </style>
+
+    <script>
+    (function(){
+      var wizData = {};
+
+      window.wizardOpen = function() {
+        document.getElementById('display-wizard').style.display = '';
+      };
+
+      function getVal(name) {
+        var el = document.querySelector('input[name="'+name+'"]:checked');
+        return el ? el.value : null;
+      }
+
+      function showStep(n) {
+        document.querySelectorAll('.wiz-step').forEach(function(s){ s.style.display='none'; });
+        document.getElementById('wiz-s'+n) && (document.getElementById('wiz-s'+n).style.display='');
+        if(n==='result'){ document.getElementById('wiz-result').style.display=''; }
+        var stepNum = n==='result'?4:n;
+        document.getElementById('wiz-step-label').textContent = 'Step '+stepNum+' of 4';
+        document.getElementById('wiz-progress').style.width = (stepNum/4*100)+'%';
+      }
+
+      window.wizNext = function(step) {
+        if(step===1){
+          var s = getVal('screens');
+          if(!s){ alert('Please select an option.'); return; }
+          wizData.screens = parseInt(s,10);
+          buildBudgetOptions(wizData.screens);
+          showStep(2);
+        } else if(step===2){
+          var t = getVal('dtype');
+          if(!t){ alert('Please select an option.'); return; }
+          wizData.dtype = t;
+          showStep(3);
+        } else if(step===3){
+          var b = getVal('budget');
+          if(!b){ alert('Please select an option.'); return; }
+          wizData.budget = b;
+          showStep(4);
+        }
+      };
+
+      window.wizBack = function(step) {
+        showStep(step-1);
+      };
+
+      function buildBudgetOptions(screens) {
+        var n = screens>=4?4:screens;
+        var tiers = [
+          { label:'Under £'+(100*n), value:'low' },
+          { label:'£'+(100*n)+' – £'+(300*n), value:'mid' },
+          { label:'£'+(300*n)+' – £'+(600*n), value:'high' },
+          { label:'£'+(600*n)+'+', value:'premium' }
+        ];
+        var container = document.getElementById('wiz-budget');
+        container.innerHTML = '';
+        tiers.forEach(function(t){
+          var label = document.createElement('label');
+          label.className = 'wiz-opt';
+          label.innerHTML = '<input type="radio" name="budget" value="'+t.value+'"><span>'+t.label+'</span>';
+          container.appendChild(label);
+        });
+        document.getElementById('wiz-budget-note').textContent = 'For '+n+(n>=4?'+':'')+' screen'+(n>1?'s':'')+':';
+      }
+
+      window.wizResult = function() {
+        var inst = getVal('install');
+        if(!inst){ alert('Please select an option.'); return; }
+        wizData.install = inst;
+
+        var screens = wizData.screens;
+        var dtype = wizData.dtype;
+        var budget = wizData.budget;
+        var isWindow = dtype === 'window';
+
+        var displays = {
+          low:     { name:'Professionally Tested Second-Hand Display', badge:'Best Value', desc:'Ideal for indoor businesses. Tested and ready to go.', perks:['Indoor use','Tested & verified','Comes ready to use'], price:80, alt:{ name:'Refurbished Commercial Display', price:200 } },
+          mid:     { name:'Refurbished Commercial Display', badge:'Recommended', desc:'Great all-round display for most businesses.', perks:['Full HD resolution','Commercial grade','Reliable for daily use'], price:220, alt:{ name:'Commercial Display', price:380 } },
+          high:    { name:'43" Grade A Commercial Display', badge:'Recommended', desc:'Perfect for menu boards and indoor promotions.', perks:['Restaurant Menu Boards','Indoor Displays','24/7 Operation'], price:380, alt:{ name:'High Brightness Display', price:720 } },
+          premium: { name:'High Brightness Commercial Display', badge:'Best Quality', desc:'Built for maximum clarity and long-term reliability.', perks:['Superior brightness','Commercial warranty','Ideal for busy venues'], price:720, alt:null }
+        };
+
+        if(isWindow) {
+          displays = {
+            low:     { name:'Consumer Bright TV', badge:'Budget Option', desc:'A brighter consumer TV suitable for shaded windows.', perks:['Lower brightness','Shaded windows only','Budget friendly'], price:150, alt:{ name:'1200 Nit High Brightness Display', price:650 } },
+            mid:     { name:'Semi-Commercial Bright Display', badge:'Good Value', desc:'Suitable for partly shaded shopfront windows.', perks:['Enhanced brightness','Shopfront use','Weather resistant housing'], price:350, alt:{ name:'1200 Nit High Brightness Display', price:650 } },
+            high:    { name:'1200 Nit High Brightness Display', badge:'Recommended', desc:'Designed for shopfronts and direct sunlight.', perks:['Visible in sunlight','Shopfront & windows','Commercial grade'], price:650, alt:{ name:'2500 Nit Ultra Bright Display', price:980 } },
+            premium: { name:'2500 Nit Ultra Bright Display', badge:'Best Quality', desc:'Maximum visibility in direct sunlight, any angle.', perks:['2500 nit brightness','Direct sunlight ready','Premium commercial build'], price:980, alt:null }
+          };
+        }
+
+        var display = displays[budget] || displays.mid;
+        var playerCost = 60;
+        var installCost = inst==='pro' ? 50*screens : 0;
+        var displayCost = display.price * screens;
+        var total = displayCost + (playerCost * screens) + installCost;
+
+        var installLabel = inst==='pro' ? '£'+(50*screens)+' (£50 × '+screens+')' : 'Included (self-install)';
+        var installItem = inst==='pro' ? '<li>Professional Installation</li>' : '<li>Self Installation</li>';
+
+        var altHtml = '';
+        if(display.alt) {
+          altHtml = '<div class="wiz-alt"><div class="wiz-alt-label">Upgrade option</div><div class="wiz-alt-card"><div><strong>'+display.alt.name+'</strong><br><span>Better for '+(isWindow?'direct sun':'high-traffic venues')+'</span></div><strong>£'+display.alt.price+' per screen</strong></div></div>';
+        }
+
+        document.getElementById('wiz-rec-card').innerHTML =
+          '<div class="wiz-rec-header">'+
+            '<div class="wiz-badge">&#11088; '+display.badge+'</div>'+
+            '<h3>'+display.name+'</h3>'+
+            '<p>'+display.desc+'</p>'+
+          '</div>'+
+          '<ul class="wiz-rec-perks">'+display.perks.map(function(p){ return '<li>'+p+'</li>'; }).join('')+'</ul>'+
+          '<div class="wiz-rec-costs">'+
+            '<div class="wiz-cost-row"><span>Display'+(screens>1?' (×'+screens+')':'')+'</span><span>£'+displayCost+'</span></div>'+
+            '<div class="wiz-cost-row"><span>ScreenFizz Player'+(screens>1?' (×'+screens+')':'')+'</span><span>£'+(playerCost*screens)+'</span></div>'+
+            (inst==='pro'?'<div class="wiz-cost-row"><span>Installation</span><span>£'+installCost+'</span></div>':'')+
+            '<div class="wiz-cost-row total"><span>Estimated Total</span><span>£'+total+'</span></div>'+
+          '</div>'+
+          altHtml+
+          '<div class="wiz-rec-footer">'+
+            '<div class="wiz-setup-title">Your ScreenFizz Setup</div>'+
+            '<ul class="wiz-setup-items">'+
+              '<li>'+display.name+'</li>'+
+              '<li>ScreenFizz Player'+(screens>1?' × '+screens:'')+'</li>'+
+              installItem+
+            '</ul>'+
+            '<div class="wiz-setup-title">Monthly Service</div>'+
+            '<div class="wiz-plans">'+
+              '<span class="wiz-plan-pill">Lite £5/screen</span>'+
+              '<span class="wiz-plan-pill">Complete £15/screen</span>'+
+              '<span class="wiz-plan-pill">Premium from £29/screen</span>'+
+            '</div>'+
+            '<a class="btn btn-primary" href="/contact.html#setup-plan" style="width:100%;justify-content:center;">Get My Setup Plan &rarr;</a>'+
+            '<button id="wiz-restart" onclick="wizReset()">Start again</button>'+
+          '</div>';
+
+        showStep('result');
+        document.getElementById('wiz-step-label').textContent = 'Your recommendation';
+        document.getElementById('wiz-progress').style.width = '100%';
+        document.getElementById('wiz-result').style.display='';
+      };
+
+      window.wizReset = function() {
+        wizData = {};
+        document.querySelectorAll('input[type=radio]').forEach(function(r){ r.checked=false; });
+        showStep(1);
+      };
+    })();
+    </script>
+
     <section class="setup-cost-section">
       <div class="section section-tight">
-        <div class="setup-cost-copy"><div class="eyebrow">One-Off Setup</div><h2>Hardware and installation are quoted separately.</h2><p>One-off setup costs are based on the number of screens and whether hardware or installation is required. You’ll receive a personalised quote after a short consultation.</p></div>
+        <div class="setup-cost-copy"><div class="eyebrow">One-Off Setup</div><h2>Hardware and installation are quoted separately.</h2><p>One-off setup costs are based on the number of screens and whether hardware or installation is required. You'll receive a personalised quote after a short consultation.</p></div>
         <div class="setup-options"><span>Existing TV + Player</span><span>Complete hardware package</span><span>Professional installation</span></div>
         <div class="setup-quote-note"><strong>Setup costs vary</strong><span>Personalised quote provided after consultation.</span></div>
       </div>
@@ -118,7 +375,7 @@
       <h2>Who should manage your content?</h2>
       <div class="package-choice-grid">
         <article class="package-choice-card lite"><span>Lite · £5</span><h3>You manage it.</h3><p>Use ScreenFizz software to upload, schedule and manage your own content.</p><a href="/signup?plan=self-service">Start Free Trial →</a></article>
-        <article class="package-choice-card complete"><span>Complete · £15 · Most Popular</span><h3>We manage it.</h3><p>Send us finished content and we’ll handle the uploads, playlists and scheduling.</p><a href="/contact.html#setup-plan">Find My Perfect Setup →</a></article>
+        <article class="package-choice-card complete"><span>Complete · £15 · Most Popular</span><h3>We manage it.</h3><p>Send us finished content and we'll handle the uploads, playlists and scheduling.</p><a href="/contact.html#setup-plan">Find My Perfect Setup →</a></article>
         <article class="package-choice-card premium"><span>Premium · From £29</span><h3>We grow it.</h3><p>We manage your screens and proactively create campaigns that keep them fresh.</p><a href="/contact.html#setup-plan">Get a Custom Quote →</a></article>
       </div>
     </section>
