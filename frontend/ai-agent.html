@@ -14,35 +14,92 @@
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/assets/screenfizz-logo.png">
   <link rel="stylesheet" href="/css/marketing.css">
+  <!-- Space Grotesk — tech-forward heading font recommended for AI/managed service products -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .ai-feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 48px; margin-top:28px; }
-    .ai-feature-grid ul { list-style:none; display:flex; flex-direction:column; gap:14px; padding:0; margin:0; }
-    .ai-feature-grid li { position:relative; padding-left:26px; color:#414956; font-size:16px; }
-    .ai-feature-grid li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:950; }
-    .agent-callout { margin-top:36px; padding:28px 32px; border:1.5px solid var(--line); border-radius:16px; background:var(--soft); }
-    .agent-callout strong { display:block; color:var(--ink); font-size:18px; margin-bottom:8px; }
-    .agent-callout p { margin-top:6px; }
-    .agent-bundle { margin-top:32px; padding:28px 32px; border:2px solid var(--line); border-radius:16px; background:var(--paper); }
-    .agent-bundle strong { display:block; color:var(--ink); font-size:19px; margin-bottom:10px; }
-    .agent-smallprint { display:flex; gap:22px; flex-wrap:wrap; margin-top:30px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; font-weight:850; color:#505966; }
-    .use-case-chat { margin-top:20px; padding:16px; border-radius:12px; background:var(--paper); border:1px solid var(--line); }
-    .use-case-chat-label { font-size:10px; font-weight:950; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
-    .use-case-bubble { display:inline-block; margin:4px 0; padding:9px 12px; border-radius:8px; background:#d9ffc8; color:#2d3338; font-size:13px; line-height:1.4; max-width:90%; }
+    /* ── Typography: Space Grotesk headings scoped to this page ── */
+    body.ai-agent-page h1,
+    body.ai-agent-page h2,
+    body.ai-agent-page h3 {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    /* ── Social proof stats strip ── */
+    .ai-stats-strip { background:var(--ink); color:#fff; }
+    .ai-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
+    .ai-stat { padding:36px 32px; text-align:center; border-right:1px solid rgba(255,255,255,0.1); }
+    .ai-stat:last-child { border-right:0; }
+    .ai-stat-number { display:block; font-family:'Space Grotesk',sans-serif; font-size:clamp(36px,4vw,52px); font-weight:800; color:#fff; line-height:1; margin-bottom:8px; letter-spacing:-0.04em; }
+    .ai-stat-label { display:block; color:rgba(255,255,255,0.6); font-size:14px; font-weight:600; }
+
+    /* ── Use-case tabs ── */
+    .use-case-tabs { margin-top:38px; }
+    .uc-tab-list { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+    .uc-tab { padding:10px 20px; border:1.5px solid var(--line); border-radius:999px; background:var(--soft); color:#555d69; font-size:15px; font-weight:750; cursor:pointer; font-family:inherit; transition:border-color 0.15s,background 0.15s,color 0.15s; }
+    .uc-tab:hover { border-color:var(--ink); color:var(--ink); }
+    .uc-tab.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .uc-panel { display:none; }
+    .uc-panel.active { display:grid; grid-template-columns:minmax(0,1fr) minmax(320px,0.7fr); gap:56px; align-items:center; }
+    .uc-copy h3 { font-size:clamp(22px,2.4vw,30px); margin-bottom:14px; }
+    .uc-copy > p { font-size:18px; max-width:540px; }
+    .uc-detail { margin-top:20px; padding:20px 22px; border-radius:14px; background:var(--soft); border:1px solid var(--line); }
+    .uc-detail-label { font-size:11px; font-weight:950; letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+    .uc-detail p { font-size:14px; color:#444d5a; margin-top:10px; }
+    .uc-bubble { display:inline-block; padding:10px 13px; border-radius:10px 10px 10px 3px; background:#d9ffc8; color:#2d3338; font-size:14px; line-height:1.45; font-style:italic; }
+    .uc-result { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); display:flex; gap:10px; align-items:flex-start; }
+    .uc-result-icon { flex:0 0 20px; margin-top:2px; color:var(--green); }
+    .uc-result p { font-size:13px; color:#444d5a; margin:0; }
+
+    /* ── Featured pricing card ── */
+    .ai-pricing-featured { padding:0; overflow:hidden; border:2px solid var(--ink) !important; box-shadow:0 20px 60px rgba(20,24,33,0.12); }
+    .ai-pricing-head { background:var(--ink); color:#fff; padding:26px 30px 24px; }
+    .ai-pricing-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); font-size:11px; font-weight:950; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
+    .ai-pricing-head h3 { color:#fff; font-size:22px; margin-bottom:10px; }
+    .ai-pricing-amount { font-family:'Space Grotesk',sans-serif; font-size:52px; font-weight:800; color:#fff; line-height:1; letter-spacing:-0.04em; }
+    .ai-pricing-amount span { font-size:18px; font-weight:500; color:rgba(255,255,255,0.6); letter-spacing:0; }
+    .ai-pricing-body { padding:26px 30px 30px; }
+
+    /* ── Feature + not-included lists ── */
     .agent-price-check-list { list-style:none; display:flex; flex-direction:column; gap:11px; margin:20px 0 24px; padding:0; }
     .agent-price-check-list li { position:relative; padding-left:24px; color:#444d5a; font-size:15px; }
     .agent-price-check-list li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:950; }
     .not-included-list { list-style:none; display:flex; flex-direction:column; gap:8px; margin:10px 0 22px; padding:0; }
     .not-included-list li { position:relative; padding-left:22px; color:#747b85; font-size:13px; }
     .not-included-list li::before { content:"×"; position:absolute; left:2px; color:#bd655f; font-weight:950; }
+
+    /* ── Feature two-col grid ── */
+    .ai-feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 48px; margin-top:28px; }
+    .ai-feature-grid ul { list-style:none; display:flex; flex-direction:column; gap:14px; padding:0; margin:0; }
+    .ai-feature-grid li { position:relative; padding-left:26px; color:#414956; font-size:16px; }
+    .ai-feature-grid li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:950; }
+
+    /* ── Bundle callout + smallprint ── */
+    .agent-bundle { margin-top:32px; padding:28px 32px; border:2px solid var(--line); border-radius:16px; background:var(--paper); }
+    .agent-bundle strong { display:block; color:var(--ink); font-size:19px; margin-bottom:10px; }
+    .agent-smallprint { display:flex; gap:22px; flex-wrap:wrap; margin-top:30px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; font-weight:850; color:#505966; }
+
+    /* ── Chat mockup centering ── */
     .agent-chat-full { max-width:400px; margin:0 auto; }
+
+    /* ── Responsive ── */
+    @media (max-width:860px) {
+      .uc-panel.active { grid-template-columns:1fr; gap:28px; }
+    }
     @media (max-width:680px) {
+      .ai-stats-grid { grid-template-columns:1fr; }
+      .ai-stat { border-right:0; border-bottom:1px solid rgba(255,255,255,0.1); padding:26px 20px; }
+      .ai-stat:last-child { border-bottom:0; }
       .ai-feature-grid { grid-template-columns:1fr; gap:0; }
       .agent-bundle { padding:20px; }
-      .agent-callout { padding:20px; }
+      .ai-pricing-body { padding:22px; }
+      .ai-pricing-head { padding:22px; }
     }
   </style>
 </head>
-<body>
+<body class="ai-agent-page">
   <nav class="site-nav" aria-label="Primary navigation">
     <div class="nav-inner">
       <a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a>
@@ -67,16 +124,20 @@
         <div>
           <div class="eyebrow">AI Customer Agent</div>
           <h1>Your business keeps answering the same questions. Let us handle it.</h1>
-          <p>We set up an AI assistant on WhatsApp and your website that replies to customers straight away — taking bookings, answering questions about prices and opening hours, and following up so you do not lose enquiries when you are busy or closed.</p>
-          <p style="margin-top:14px;color:var(--muted);font-size:18px;">No software to learn. No messages to miss. We manage it all for you.</p>
-          <div class="hero-actions" style="margin-top:30px">
-            <a class="btn btn-primary" href="/contact.html#setup-plan">Get started</a>
-            <a class="btn btn-outline" href="#how-it-works">See how it works</a>
+          <p>We set up an AI agent that replies to customers instantly on WhatsApp and your website — handling bookings, questions and follow-ups while you get on with running your business.</p>
+          <div class="hero-proof" style="margin-top:22px;">
+            <span>No software to learn</span>
+            <span>No messages to miss</span>
+            <span>We manage everything</span>
+          </div>
+          <div class="hero-actions" style="margin-top:28px;">
+            <a class="btn btn-primary" href="/contact.html#setup-plan">See a demo for your business</a>
+            <a class="btn btn-outline" href="#how-it-works">How it works</a>
           </div>
         </div>
         <div class="showcase-card" style="padding:28px 20px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
           <div class="phone-visual" style="margin:0;width:100%;max-width:340px;">
-            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;">AI</span><div><strong>Your AI Agent</strong><small>online · replies in seconds</small></div></div>
+            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online · replies in seconds</small></div></div>
             <div class="chat-day">10:47 PM · Thursday</div>
             <div class="chat-bubble sent">Hi, do you have a table for 2 this Saturday? It's our anniversary<span>22:47 ✓✓</span></div>
             <div class="chat-bubble received">Happy anniversary! 🎉 We have availability at 7:00pm or 8:30pm on Saturday. Which works best?<span>22:47</span></div>
@@ -92,21 +153,21 @@
       </div>
     </section>
 
-    <!-- Three-column strip -->
-    <section class="band">
-      <div class="section section-tight">
-        <div class="three-grid" style="text-align:center;">
-          <div style="padding:18px 24px;">
-            <strong style="font-size:19px;display:block;color:var(--ink);margin-bottom:8px;">Replies in seconds</strong>
-            <p>Customers get an answer the moment they ask — day or night.</p>
+    <!-- Social proof stats strip -->
+    <section class="ai-stats-strip" aria-label="Key statistics">
+      <div class="section section-tight" style="padding-top:0;padding-bottom:0;">
+        <div class="ai-stats-grid">
+          <div class="ai-stat">
+            <span class="ai-stat-number">&lt;&nbsp;3s</span>
+            <span class="ai-stat-label">Average reply time, any hour</span>
           </div>
-          <div style="padding:18px 24px;border-left:1px solid var(--line);border-right:1px solid var(--line);">
-            <strong style="font-size:19px;display:block;color:var(--ink);margin-bottom:8px;">Works while you sleep</strong>
-            <p>Your agent handles messages at 10pm so you wake up to confirmed bookings.</p>
+          <div class="ai-stat">
+            <span class="ai-stat-number">9 in 10</span>
+            <span class="ai-stat-label">Messages handled without you</span>
           </div>
-          <div style="padding:18px 24px;">
-            <strong style="font-size:19px;display:block;color:var(--ink);margin-bottom:8px;">Nothing to manage</strong>
-            <p>We set it up, train it, and keep it running. You just run your business.</p>
+          <div class="ai-stat">
+            <span class="ai-stat-number">24/7</span>
+            <span class="ai-stat-label">Ready to respond, every day</span>
           </div>
         </div>
       </div>
@@ -130,6 +191,7 @@
         <h2>Up and running in a few days. Then we take care of everything.</h2>
       </div>
       <div class="process-steps">
+
         <article class="process-step section">
           <div class="process-copy">
             <span class="step-number">01</span>
@@ -166,12 +228,37 @@
             <h2>Your agent starts handling messages</h2>
             <p>We connect it to your WhatsApp number and your website. From that point it replies to customers automatically — bookings confirmed, questions answered, follow-ups sent.</p>
           </div>
+          <!-- SVG icons replace emojis per UX pro max no-emoji-icons rule -->
           <div class="connection-visual" aria-label="Agent connected to WhatsApp, website and Messenger">
-            <div class="connection-card"><span class="connection-icon" style="font-size:22px;border:none;min-width:auto;">💬</span><small>1</small><strong>WhatsApp</strong></div>
+            <div class="connection-card">
+              <span class="connection-icon" style="border:none;min-width:auto;background:none;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#25D366"/>
+                  <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.309A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" stroke="#25D366" stroke-width="1.5" fill="none"/>
+                </svg>
+              </span>
+              <small>1</small><strong>WhatsApp</strong>
+            </div>
             <div class="connection-arrow" aria-hidden="true">→</div>
-            <div class="connection-card"><span class="connection-icon" style="font-size:22px;border:none;min-width:auto;">🌐</span><small>2</small><strong>Website</strong></div>
+            <div class="connection-card">
+              <span class="connection-icon" style="border:none;min-width:auto;background:none;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </span>
+              <small>2</small><strong>Website</strong>
+            </div>
             <div class="connection-arrow" aria-hidden="true">→</div>
-            <div class="connection-card"><span class="connection-icon" style="font-size:22px;border:none;min-width:auto;">📱</span><small>3</small><strong>Messenger</strong></div>
+            <div class="connection-card">
+              <span class="connection-icon" style="border:none;min-width:auto;background:none;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.282 2 11.312c0 2.816 1.32 5.33 3.395 7.01L5 22l3.818-1.967A11.15 11.15 0 0012 20.625c5.523 0 10-4.182 10-9.313S17.523 2 12 2z" fill="#0084FF"/>
+                  <path d="M7 13l2.5-3.5L12 11l2.5-3.5L17 11" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <small>3</small><strong>Messenger</strong>
+            </div>
           </div>
         </article>
 
@@ -191,55 +278,131 @@
             <div class="phone-input">Message <b>›</b></div>
           </div>
         </article>
+
       </div>
     </section>
 
-    <!-- Use cases by business type -->
+    <!-- Use cases — tabbed so visitors self-select their business type -->
     <section class="section">
       <div class="eyebrow">Who It's For</div>
       <h2>Works for the businesses that get the most messages</h2>
-      <p style="max-width:620px;margin-top:12px;">Every business type has the same problem — too many routine messages and not enough time to answer them all.</p>
-      <div class="four-grid" style="margin-top:34px;">
+      <p style="max-width:580px;margin-top:12px;">Every business type has the same problem — too many routine messages and not enough time to answer them all. Pick yours.</p>
 
-        <article class="card">
-          <h3>Restaurants and takeaways</h3>
-          <p>Customers message to check availability, ask about the menu, and make special requests. Most of those messages arrive in the evenings and at weekends — exactly when you are busiest.</p>
-          <div class="use-case-chat">
-            <div class="use-case-chat-label">Example message your agent handles</div>
-            <div class="use-case-bubble">"Hi do you have a table for 4 on Saturday evening? It's my mum's birthday so would love somewhere nice."</div>
-          </div>
-          <p style="margin-top:14px;font-size:14px;">Your agent replies instantly, checks availability, takes the booking, notes the occasion, and sends a confirmation — all without you touching your phone.</p>
-        </article>
+      <div class="use-case-tabs" id="use-case-tabs">
+        <div class="uc-tab-list" role="tablist" aria-label="Business type">
+          <button class="uc-tab active" role="tab" aria-selected="true" aria-controls="tab-restaurants" data-tab="restaurants">Restaurants &amp; takeaways</button>
+          <button class="uc-tab" role="tab" aria-selected="false" aria-controls="tab-cafes" data-tab="cafes">Cafés</button>
+          <button class="uc-tab" role="tab" aria-selected="false" aria-controls="tab-barbers" data-tab="barbers">Barbers &amp; salons</button>
+          <button class="uc-tab" role="tab" aria-selected="false" aria-controls="tab-gyms" data-tab="gyms">Gyms &amp; fitness</button>
+        </div>
 
-        <article class="card">
-          <h3>Cafés and coffee shops</h3>
-          <p>Pre-orders, opening hours, allergen questions, and daily specials come in before and during your busiest hours — when you have the least time to reply.</p>
-          <div class="use-case-chat">
-            <div class="use-case-chat-label">Example message your agent handles</div>
-            <div class="use-case-bubble">"What time do you open on Sunday? And do you do oat milk?"</div>
+        <!-- Restaurant panel -->
+        <div class="uc-panel active" id="tab-restaurants" role="tabpanel">
+          <div class="uc-copy">
+            <h3>Restaurants and takeaways</h3>
+            <p>Customers message to check availability, ask about the menu, and make special requests. Most of those messages arrive in the evenings and at weekends — exactly when you are busiest.</p>
+            <div class="uc-detail">
+              <div class="uc-detail-label">Example message your agent handles</div>
+              <div class="uc-bubble">"Hi do you have a table for 4 on Saturday evening? It's my mum's birthday so would love somewhere nice."</div>
+              <div class="uc-result">
+                <span class="uc-result-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <p>Your agent replies instantly, checks availability, takes the booking, notes the occasion, and sends a confirmation — all without you touching your phone.</p>
+              </div>
+            </div>
           </div>
-          <p style="margin-top:14px;font-size:14px;">Your agent answers immediately and can send the day's special to anyone who opts in — before they've even left the house.</p>
-        </article>
+          <div class="phone-visual" aria-label="Example restaurant booking conversation">
+            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
+            <div class="chat-day">Saturday · 8:43 PM</div>
+            <div class="chat-bubble sent">Hi do you have a table for 4 on Saturday? Mum's birthday<span>20:43 ✓✓</span></div>
+            <div class="chat-bubble received">Of course! We'd love to help celebrate. We have availability at 7:00pm or 8:30pm. Which suits best?<span>20:43</span></div>
+            <div class="chat-bubble sent">7pm please<span>20:44 ✓✓</span></div>
+            <div class="chat-bubble received done">Booked — table for 4 at 7:00pm, birthday noted. See you then! ✓<span>20:44</span></div>
+            <div class="phone-input">Message <b>›</b></div>
+          </div>
+        </div>
 
-        <article class="card">
-          <h3>Barbers and salons</h3>
-          <p>Availability questions and booking requests come in constantly — including while you are in the middle of a cut and cannot pick up your phone.</p>
-          <div class="use-case-chat">
-            <div class="use-case-chat-label">Example message your agent handles</div>
-            <div class="use-case-bubble">"Any slots free this Saturday morning? Ideally before 11."</div>
+        <!-- Café panel -->
+        <div class="uc-panel" id="tab-cafes" role="tabpanel">
+          <div class="uc-copy">
+            <h3>Cafés and coffee shops</h3>
+            <p>Pre-orders, opening hours, allergen questions, and daily specials come in before and during your busiest hours — when you have the least time to reply.</p>
+            <div class="uc-detail">
+              <div class="uc-detail-label">Example message your agent handles</div>
+              <div class="uc-bubble">"What time do you open on Sunday? And do you do oat milk?"</div>
+              <div class="uc-result">
+                <span class="uc-result-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <p>Your agent answers immediately and can send the day's special to anyone who opts in — before they've even left the house.</p>
+              </div>
+            </div>
           </div>
-          <p style="margin-top:14px;font-size:14px;">Your agent checks your availability, offers suitable times, and confirms the booking. If someone cancels, it can message the next person on the waiting list automatically.</p>
-        </article>
+          <div class="phone-visual" aria-label="Example café conversation">
+            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
+            <div class="chat-day">Sunday · 8:11 AM</div>
+            <div class="chat-bubble sent">What time do you open? And do you do oat milk?<span>08:11 ✓✓</span></div>
+            <div class="chat-bubble received">We open at 9am today! Yes, we have oat, almond and soy. Today's special is a toasted sourdough with smashed avo — want me to send you our full menu?<span>08:11</span></div>
+            <div class="chat-bubble sent">Yes please!<span>08:12 ✓✓</span></div>
+            <div class="chat-bubble received done">Sent! See you from 9 ✓<span>08:12</span></div>
+            <div class="phone-input">Message <b>›</b></div>
+          </div>
+        </div>
 
-        <article class="card">
-          <h3>Gyms and fitness studios</h3>
-          <p>Class availability, membership questions, and drop-in rates get asked dozens of times a week. Your agent handles every one of them — and reminds members who have gone quiet to come back.</p>
-          <div class="use-case-chat">
-            <div class="use-case-chat-label">Example message your agent handles</div>
-            <div class="use-case-bubble">"Is there space in the Tuesday 6:30 class? And what's the drop-in price?"</div>
+        <!-- Barber panel -->
+        <div class="uc-panel" id="tab-barbers" role="tabpanel">
+          <div class="uc-copy">
+            <h3>Barbers and salons</h3>
+            <p>Availability questions and booking requests come in constantly — including while you are in the middle of a cut and cannot pick up your phone.</p>
+            <div class="uc-detail">
+              <div class="uc-detail-label">Example message your agent handles</div>
+              <div class="uc-bubble">"Any slots free this Saturday morning? Ideally before 11."</div>
+              <div class="uc-result">
+                <span class="uc-result-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <p>Your agent checks your availability, offers suitable times, and confirms the booking. If someone cancels, it can message the next person on the waiting list automatically.</p>
+              </div>
+            </div>
           </div>
-          <p style="margin-top:14px;font-size:14px;">Your agent checks availability, answers the pricing question, and can send a follow-up a few weeks later if the member has not booked again.</p>
-        </article>
+          <div class="phone-visual" aria-label="Example barber booking conversation">
+            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
+            <div class="chat-day">Thursday · 11:22 PM</div>
+            <div class="chat-bubble sent">Any slots Saturday morning? Before 11 ideally<span>23:22 ✓✓</span></div>
+            <div class="chat-bubble received">Yes — we have 9:30am and 10:15am free on Saturday. Which works for you?<span>23:22</span></div>
+            <div class="chat-bubble sent">10:15 please<span>23:23 ✓✓</span></div>
+            <div class="chat-bubble received done">Booked — 10:15am Saturday. We'll send a reminder Friday evening ✓<span>23:23</span></div>
+            <div class="phone-input">Message <b>›</b></div>
+          </div>
+        </div>
+
+        <!-- Gym panel -->
+        <div class="uc-panel" id="tab-gyms" role="tabpanel">
+          <div class="uc-copy">
+            <h3>Gyms and fitness studios</h3>
+            <p>Class availability, membership questions, and drop-in rates get asked dozens of times a week. Your agent handles every one of them — and reminds members who have gone quiet to come back.</p>
+            <div class="uc-detail">
+              <div class="uc-detail-label">Example message your agent handles</div>
+              <div class="uc-bubble">"Is there space in the Tuesday 6:30 class? And what's the drop-in price?"</div>
+              <div class="uc-result">
+                <span class="uc-result-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <p>Your agent checks availability, answers the pricing question, and can send a follow-up a few weeks later if the member has not booked again.</p>
+              </div>
+            </div>
+          </div>
+          <div class="phone-visual" aria-label="Example gym booking conversation">
+            <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
+            <div class="chat-day">Monday · 7:04 PM</div>
+            <div class="chat-bubble sent">Space in Tuesday 6:30 class? Drop-in price?<span>19:04 ✓✓</span></div>
+            <div class="chat-bubble received">Yes — 3 spots left in Tuesday 6:30pm. Drop-in is £12. Want me to reserve your spot?<span>19:04</span></div>
+            <div class="chat-bubble sent">Yes please<span>19:05 ✓✓</span></div>
+            <div class="chat-bubble received done">Reserved! See you Tuesday at 6:30pm ✓<span>19:05</span></div>
+            <div class="phone-input">Message <b>›</b></div>
+          </div>
+        </div>
 
       </div>
     </section>
@@ -275,7 +438,7 @@
       <p style="max-width:560px;margin-top:8px;">A real conversation handled by your agent — at 10:47pm on a Thursday.</p>
       <div class="agent-chat-full" style="margin-top:36px;">
         <div class="phone-visual" style="width:100%;max-width:400px;">
-          <div class="phone-top"><span class="phone-avatar" style="font-size:13px;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
+          <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
           <div class="chat-day">Thursday · 10:47 PM</div>
           <div class="chat-bubble sent">Hi, do you have a table for 2 this Saturday? It's our anniversary dinner<span>22:47 ✓✓</span></div>
           <div class="chat-bubble received">Happy anniversary! 🎉 We have availability at 7:00pm or 8:30pm on Saturday. Which works best for you?<span>22:47</span></div>
@@ -289,44 +452,52 @@
       </div>
     </section>
 
-    <!-- Pricing -->
+    <!-- Pricing — Starter featured with dark header for clear visual hierarchy -->
     <section class="section" id="pricing">
       <div class="eyebrow">Pricing</div>
       <h2>Simple monthly pricing. No setup fees. Cancel any time.</h2>
       <p style="max-width:640px;margin-top:12px;">Every plan is fully managed. We do all the work — you just tell us about your business and we take care of the rest.</p>
 
-      <div class="panel-grid" style="margin-top:36px;">
+      <div class="panel-grid" style="margin-top:36px;align-items:start;">
 
-        <article class="card service-card recommended">
-          <span class="tag">⭐ Most Popular</span>
-          <h3>Starter</h3>
-          <div class="price">
-            <span class="amount">£49</span>
-            <span class="unit">/ month</span>
+        <!-- Starter — featured card with dark header -->
+        <article class="card ai-pricing-featured" aria-label="Starter plan, most popular">
+          <div class="ai-pricing-head">
+            <div class="ai-pricing-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Most Popular
+            </div>
+            <h3>Starter</h3>
+            <div>
+              <span class="ai-pricing-amount">£49<span> / month</span></span>
+            </div>
+            <p style="color:rgba(255,255,255,0.65);font-size:14px;margin-top:10px;">Best for cafés, barbers, takeaways and small restaurants that get a steady flow of customer messages.</p>
           </div>
-          <p>Best for cafés, barbers, takeaways and small restaurants that get a steady flow of customer messages.</p>
-          <div class="package-section-title" style="margin-top:20px;">What is included</div>
-          <ul class="agent-price-check-list">
-            <li>AI agent set up and trained on your business</li>
-            <li>WhatsApp — handles bookings, questions, and FAQs</li>
-            <li>Website chat widget — same agent on your website</li>
-            <li>Facebook Messenger — covers your Facebook page too</li>
-            <li>Booking and appointment handling</li>
-            <li>Instant FAQ replies (prices, hours, allergens, location)</li>
-            <li>Daily or weekly update via WhatsApp if anything changes</li>
-            <li>Monthly check-in to review and improve responses</li>
-            <li>We handle everything — nothing for you to manage</li>
-          </ul>
-          <div class="package-section-title muted">Not included</div>
-          <ul class="not-included-list">
-            <li>Loyalty programme</li>
-            <li>Promos and seasonal campaigns</li>
-            <li>Review requests</li>
-            <li>Cancellation waitlist</li>
-          </ul>
-          <a class="btn btn-primary" href="/contact.html#setup-plan">Get started</a>
+          <div class="ai-pricing-body">
+            <div class="package-section-title" style="margin-top:0;">What is included</div>
+            <ul class="agent-price-check-list">
+              <li>AI agent set up and trained on your business</li>
+              <li>WhatsApp — handles bookings, questions, and FAQs</li>
+              <li>Website chat widget — same agent on your website</li>
+              <li>Facebook Messenger — covers your Facebook page too</li>
+              <li>Booking and appointment handling</li>
+              <li>Instant FAQ replies (prices, hours, allergens, location)</li>
+              <li>Daily or weekly update via WhatsApp if anything changes</li>
+              <li>Monthly check-in to review and improve responses</li>
+              <li>We handle everything — nothing for you to manage</li>
+            </ul>
+            <div class="package-section-title muted">Not included</div>
+            <ul class="not-included-list">
+              <li>Loyalty programme</li>
+              <li>Promos and seasonal campaigns</li>
+              <li>Review requests</li>
+              <li>Cancellation waitlist</li>
+            </ul>
+            <a class="btn btn-primary" href="/contact.html#setup-plan" style="width:100%;justify-content:center;">Get started with Starter</a>
+          </div>
         </article>
 
+        <!-- Pro card -->
         <article class="card service-card">
           <span class="tag">Pro</span>
           <h3>Pro</h3>
@@ -346,7 +517,7 @@
             <li>Priority support — same-day responses if anything needs changing</li>
             <li>Monthly performance summary — messages handled, bookings taken, reviews requested</li>
           </ul>
-          <a class="btn btn-primary" href="/contact.html#setup-plan">Get started</a>
+          <a class="btn btn-primary" href="/contact.html#setup-plan">Get started with Pro</a>
         </article>
 
       </div>
@@ -387,7 +558,7 @@
           <h2>Ready to stop missing messages?</h2>
           <p>Tell us about your business and we will show you exactly what your agent would look like — before you commit to anything.</p>
         </div>
-        <a class="btn btn-primary" href="/contact.html#setup-plan">Get started →</a>
+        <a class="btn btn-primary" href="/contact.html#setup-plan">See a demo for your business →</a>
       </div>
     </section>
 
@@ -396,5 +567,23 @@
   <footer>
     <div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/ai-agent.html">AI Agent</a><a href="/how-it-works.html">How It Works</a><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a><a href="/contact.html">Contact</a></div></div>
   </footer>
+
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('.uc-tab');
+      var panels = document.querySelectorAll('.uc-panel');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var target = tab.getAttribute('data-tab');
+          tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+          panels.forEach(function (p) { p.classList.remove('active'); });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          var panel = document.getElementById('tab-' + target);
+          if (panel) panel.classList.add('active');
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
