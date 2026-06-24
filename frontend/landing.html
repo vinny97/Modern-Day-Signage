@@ -23,6 +23,35 @@
   <link rel="icon" href="/assets/screenfizz-logo.png">
   <link rel="apple-touch-icon" href="/assets/screenfizz-logo.png">
   <link rel="stylesheet" href="/css/marketing.css">
+  <style>
+    /* Stats strip */
+    .landing-stats-strip { background:var(--ink); color:#fff; }
+    .landing-stats-grid { max-width:1240px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(3,1fr); }
+    .landing-stat { padding:36px 24px; text-align:center; border-right:1px solid rgba(255,255,255,0.08); }
+    .landing-stat:last-child { border-right:none; }
+    .landing-stat-number { display:block; font-family:'Space Grotesk',sans-serif; font-size:clamp(34px,4vw,50px); font-weight:800; color:#fff; line-height:1; margin-bottom:8px; letter-spacing:-0.04em; }
+    .landing-stat-label { font-size:13px; color:rgba(255,255,255,0.55); line-height:1.4; }
+
+    /* Workflow diagram (journey tabs) */
+    .wf-diagram { padding:32px 0 16px; }
+    .wf-steps { display:flex; align-items:flex-start; gap:0; }
+    .wf-step { width:130px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; text-align:center; }
+    .wf-circle { width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-family:'Space Grotesk',sans-serif; letter-spacing:-0.02em; }
+    .wf-step.wf-ongoing .wf-circle { background:#25D366; }
+    .wf-icon { width:50px; height:50px; border:1.5px solid var(--line); border-radius:13px; background:var(--soft); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+    .wf-icon svg { width:24px; height:24px; stroke:var(--ink); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+    .wf-step.wf-live .wf-icon { background:#ecfdf5; border-color:#bbf7d0; }
+    .wf-step.wf-live .wf-icon svg { stroke:#16a34a; }
+    .wf-step.wf-ongoing .wf-icon { background:#25D366; border-color:#25D366; }
+    .wf-step.wf-ongoing .wf-icon svg { stroke:#fff; }
+    .wf-title { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.3; }
+    .wf-desc { font-size:11px; color:var(--muted); line-height:1.4; padding:0 4px; }
+    .wf-arrow { display:flex; align-items:flex-start; padding-top:46px; padding-left:2px; padding-right:2px; flex-shrink:0; }
+    .wf-arrow svg { width:16px; height:16px; stroke:var(--line); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .wf-loop { margin-top:20px; display:flex; align-items:center; gap:10px; }
+    .wf-loop-line { flex:1; height:2px; background:repeating-linear-gradient(90deg,#25D366 0,#25D366 5px,transparent 5px,transparent 10px); border-radius:2px; }
+    .wf-loop-badge { background:#f0fdf4; color:#16a34a; font-size:11.5px; font-weight:700; padding:5px 14px; border-radius:99px; border:1px solid #bbf7d0; white-space:nowrap; }
+  </style>
 </head>
 <body>
   <nav class="site-nav" aria-label="Primary navigation">
@@ -40,7 +69,7 @@
         <a href="/how-it-works.html">How It Works</a>
         <a href="/ai-agent.html">AI Agent</a>
         <a href="/pricing.html">Pricing</a>
-        <div class="dropdown"><a class="nav-link" href="/guides/digital-signage-android-tv.html">Resources</a><div class="dropdown-menu"><a href="/guides/digital-signage-android-tv.html">Android TV Guide</a><a href="/guides/raspberry-pi-digital-signage.html">Raspberry Pi Guide</a><a href="/guides/self-hosted-digital-signage.html">Self-Hosted Guide</a></div></div>
+        
         <a href="/contact.html">Contact</a>
       </div>
       <div class="nav-actions">
@@ -85,6 +114,23 @@
             </div>
             <span class="showcase-pill">Managed for you</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-stats-strip" aria-label="Key facts about ScreenFizz">
+      <div class="landing-stats-grid">
+        <div class="landing-stat">
+          <span class="landing-stat-number">3 min</span>
+          <span class="landing-stat-label">Average plug-in time to go live</span>
+        </div>
+        <div class="landing-stat">
+          <span class="landing-stat-number">500+</span>
+          <span class="landing-stat-label">Screens managed across the UK</span>
+        </div>
+        <div class="landing-stat">
+          <span class="landing-stat-number">24/7</span>
+          <span class="landing-stat-label">Remote monitoring, always on</span>
         </div>
       </div>
     </section>
@@ -139,12 +185,107 @@
         </div>
         <div class="journey-panels">
           <figure class="journey-panel" id="tv-journey-panel" role="tabpanel" aria-labelledby="tv-journey-tab" tabindex="0">
-            <div class="journey-panel-scroll"><img src="/assets/tv-journey.webp" alt="The ScreenFizz journey for an existing TV: receive the configured player, connect HDMI and WiFi, go live and request future changes through WhatsApp" width="1536" height="1024" loading="lazy" decoding="async"></div>
-            <figcaption>Swipe across to see the full journey</figcaption>
+            <div class="journey-panel-scroll">
+              <div class="wf-diagram" role="img" aria-label="TV journey: we configure, it ships, you plug in, you're live, then update any time via WhatsApp">
+                <div class="wf-steps">
+                  <div class="wf-step">
+                    <div class="wf-circle">01</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+                    <div class="wf-title">We configure</div>
+                    <div class="wf-desc">Player set up for your business before it leaves us</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step">
+                    <div class="wf-circle">02</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><line x1="3.27" y1="6.96" x2="12" y2="12.01"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+                    <div class="wf-title">Player arrives</div>
+                    <div class="wf-desc">Ready to use straight out of the box</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step">
+                    <div class="wf-circle">03</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M8 10l2 2 4-4"/></svg></div>
+                    <div class="wf-title">Plug in</div>
+                    <div class="wf-desc">HDMI into your TV, connect WiFi — takes 3 minutes</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step wf-live">
+                    <div class="wf-circle">04</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
+                    <div class="wf-title">You're live</div>
+                    <div class="wf-desc">Content starts playing immediately on your screen</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step wf-ongoing">
+                    <div class="wf-circle">05</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="wf-title">WhatsApp us</div>
+                    <div class="wf-desc">Send any change — we update your screen same day</div>
+                  </div>
+                </div>
+                <div class="wf-loop">
+                  <div class="wf-loop-line"></div>
+                  <div class="wf-loop-badge">Repeats whenever you need a change</div>
+                  <div class="wf-loop-line"></div>
+                </div>
+              </div>
+            </div>
+            <figcaption>Swipe to see the full journey</figcaption>
           </figure>
           <figure class="journey-panel" id="complete-journey-panel" role="tabpanel" aria-labelledby="complete-journey-tab" tabindex="0" hidden>
-            <div class="journey-panel-scroll"><img src="/assets/how-screenfizz-works-process.webp" alt="The complete ScreenFizz journey: we source the display, create the content, install or deliver it ready to use, get it live and manage future changes through WhatsApp" width="1774" height="887" loading="lazy" decoding="async"></div>
-            <figcaption>Swipe across to see the full journey</figcaption>
+            <div class="journey-panel-scroll">
+              <div class="wf-diagram" role="img" aria-label="Complete solution: we source the display, create content, install, go live, then manage updates via WhatsApp">
+                <div class="wf-steps">
+                  <div class="wf-step">
+                    <div class="wf-circle">01</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+                    <div class="wf-title">We source your display</div>
+                    <div class="wf-desc">Right screen and mount for your space</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step">
+                    <div class="wf-circle">02</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                    <div class="wf-title">We create content</div>
+                    <div class="wf-desc">Professional designs for your business</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step">
+                    <div class="wf-circle">03</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+                    <div class="wf-title">Install or deliver</div>
+                    <div class="wf-desc">We come to you, or ship it ready to plug in</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step wf-live">
+                    <div class="wf-circle">04</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
+                    <div class="wf-title">You're live</div>
+                    <div class="wf-desc">Screens on, content running, all managed by us</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step wf-ongoing">
+                    <div class="wf-circle">05</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="wf-title">WhatsApp us</div>
+                    <div class="wf-desc">Send any change, any time</div>
+                  </div>
+                  <div class="wf-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></div>
+                  <div class="wf-step wf-ongoing">
+                    <div class="wf-circle">06</div>
+                    <div class="wf-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                    <div class="wf-title">Updated same day</div>
+                    <div class="wf-desc">Change is live on your screens</div>
+                  </div>
+                </div>
+                <div class="wf-loop">
+                  <div class="wf-loop-line"></div>
+                  <div class="wf-loop-badge">Steps 05 &amp; 06 repeat whenever you need a change</div>
+                  <div class="wf-loop-line"></div>
+                </div>
+              </div>
+            </div>
+            <figcaption>Swipe to see the full journey</figcaption>
           </figure>
         </div>
       </div>
