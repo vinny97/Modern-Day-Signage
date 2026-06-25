@@ -3,190 +3,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Self-Hosted Digital Signage Software - Complete Guide (2026) | ScreenTinker</title>
-  <meta name="description" content="Why and how to self-host your digital signage CMS. Data privacy, cost control, and no recurring fees. Complete deployment guide using ScreenTinker - open source, MIT licensed.">
-  <meta name="keywords" content="self hosted digital signage, on premise digital signage, self hosted signage cms, open source signage server, deploy signage on premise, private digital signage">
+  <title>Self-Hosted vs Managed Digital Signage: Which Is Right for Your Business? | ScreenFizz</title>
+  <meta name="description" content="Self-hosted digital signage gives you full control but requires technical effort to set up and maintain. A managed service handles everything for you. Here's how to decide which is right for your business.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://screentinker.com/guides/self-hosted-digital-signage.html">
-
+  <link rel="canonical" href="https://screenfizz.com/guides/self-hosted-digital-signage.html">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://screentinker.com/guides/self-hosted-digital-signage.html">
-  <meta property="og:title" content="Self-Hosted Digital Signage Software - Complete Guide (2026)">
-  <meta property="og:description" content="Why and how to self-host your digital signage CMS. Data privacy, cost control, no recurring fees.">
-  <meta property="og:image" content="https://screentinker.com/assets/dashboard-preview.png">
-  <meta property="og:site_name" content="ScreenTinker">
-
+  <meta property="og:url" content="https://screenfizz.com/guides/self-hosted-digital-signage.html">
+  <meta property="og:title" content="Self-Hosted vs Managed Digital Signage: Which Is Right for Your Business?">
+  <meta property="og:description" content="Self-hosted signage needs technical resource to run. A managed service handles everything. Here's how to choose.">
+  <meta property="og:image" content="https://screenfizz.com/assets/screenfizz-screens-showcase.jpeg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Self-Hosted Digital Signage Software - Complete Guide (2026)">
-  <meta name="twitter:description" content="Why and how to self-host your digital signage CMS. Data privacy, cost control, no recurring fees.">
-  <meta name="twitter:image" content="https://screentinker.com/assets/dashboard-preview.png">
-
   <meta name="theme-color" content="#111827">
   <link rel="icon" href="/assets/screenfizz-logo.png">
-  <link rel="apple-touch-icon" href="/assets/screenfizz-logo.png">
-  <link rel="stylesheet" href="/css/seo-page.css">
+  <link rel="stylesheet" href="/css/marketing.css">
+  <style>
+    .guide-page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    .guide-page h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 950; line-height: 1.15; margin-bottom: 16px; }
+    .guide-page .lead { font-size: 18px; color: var(--muted); line-height: 1.7; margin-bottom: 40px; }
+    .guide-page h2 { font-size: 22px; font-weight: 950; margin: 40px 0 12px; }
+    .guide-page p { font-size: 16px; line-height: 1.75; color: var(--ink); margin-bottom: 18px; }
+    .guide-page ul { padding-left: 20px; margin-bottom: 18px; }
+    .guide-page li { font-size: 16px; line-height: 1.75; color: var(--ink); margin-bottom: 8px; }
+    .guide-page strong { font-weight: 850; }
+    .guide-tag { font-size: 11px; font-weight: 950; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 14px; display: block; }
+    .guide-divider { border: none; border-top: 2px solid var(--line); margin: 40px 0; }
+    .guide-cta { background: var(--ink); border-radius: 16px; padding: 36px; margin-top: 48px; text-align: center; }
+    .guide-cta h3 { color: #fff; font-size: 22px; font-weight: 950; margin-bottom: 8px; }
+    .guide-cta p { color: rgba(255,255,255,0.65); font-size: 15px; margin-bottom: 20px; }
+    .guide-meta { font-size: 13px; font-weight: 750; color: var(--muted); margin-bottom: 40px; display: flex; gap: 16px; }
+    .compare-table-wrap { overflow-x: auto; margin: 24px 0 32px; }
+    .compare-table { width: 100%; border-collapse: collapse; border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .compare-table th { background: var(--soft); padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 950; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1.5px solid var(--line); }
+    .compare-table td { padding: 13px 16px; font-size: 15px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .compare-table td:first-child { font-weight: 750; color: var(--ink); }
+    .compare-table tr:last-child td { border-bottom: none; }
+  </style>
+  <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="1f04a59b-438b-4552-b41f-fedc6917c3a6";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </head>
 <body>
-  <nav>
+  <nav class="site-nav" aria-label="Primary navigation">
     <div class="nav-inner">
-      <div class="nav-logo">
-        <a href="/"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a>
-      </div>
+      <a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a>
       <div class="nav-links">
-        <a href="/#features">Features</a>
-        <a href="/#pricing">Pricing</a>
-        <a href="/#compare">Compare</a>
-        <a href="/app#/login" class="btn btn-outline" style="margin-left:16px">Sign In</a>
-        <a href="/app#/login" class="btn btn-primary" style="margin-left:8px">Try Free</a>
+        <a href="/">Home</a>
+        <div class="dropdown">
+          <a class="nav-link" href="/solutions/window-displays.html">Solutions</a>
+          <div class="dropdown-menu">
+            <a href="/solutions/window-displays.html">Window Displays</a>
+            <a href="/solutions/digital-menu-boards.html">Digital Menu Boards</a>
+          </div>
+        </div>
+        <a href="/how-it-works.html">How It Works</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+      <div class="nav-actions">
+        <a class="btn btn-outline" href="/app#/login">Client Portal</a>
+        <a class="btn btn-primary" href="/contact.html#setup-plan">Find My Setup</a>
       </div>
     </div>
   </nav>
 
-  <main class="article">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span>/</span>
-      <a href="/#features">Guides</a>
-      <span>/</span>
-      <span>Self-Hosted Digital Signage</span>
-    </nav>
+  <main>
+    <div class="guide-page">
+      <span class="guide-tag">Guide</span>
+      <h1>Self-Hosted vs Managed Digital Signage: Which Is Right for Your Business?</h1>
+      <div class="guide-meta">
+        <span>By ScreenFizz</span>
+        <span>June 2026</span>
+        <span>6 min read</span>
+      </div>
 
-    <h1>Self-Hosted Digital Signage Software: Complete Guide (2026)</h1>
-    <p class="lead">Why you might want to self-host your digital signage CMS, what you need to do it well, and how to deploy ScreenTinker on your own server.</p>
+      <p class="lead">There are two ways to run digital signage: self-hosted (you run the software on your own server or device) and managed (a service handles everything for you). Here is an honest comparison of both approaches so you can choose the right fit for your situation.</p>
 
-    <h2>Why self-host digital signage?</h2>
-    <p>Most digital signage products are cloud-only. That works for many businesses, but there are real reasons to keep the server in-house:</p>
-    <ul>
-      <li><strong>Data sovereignty.</strong> Healthcare, finance, government, and education often cannot put internal information into a third-party cloud. Self-hosting keeps content, schedules, and access logs on your network.</li>
-      <li><strong>Cost control.</strong> Per-screen monthly fees stack up fast. Self-hosting trades that for a fixed server cost - typically $5 to $50 per month for a small VPS that can run hundreds of screens.</li>
-      <li><strong>Network isolation.</strong> Some deployments live on private LANs with no internet access at all. Self-hosting is the only way to manage signage in those environments.</li>
-      <li><strong>No vendor lock-in.</strong> If the cloud vendor disappears, raises prices 3x, or pivots away from your use case, your deployment goes with them. Self-hosters control their own roadmap.</li>
-      <li><strong>Customization.</strong> Open source self-hosted means you can fork the code, add a custom widget, or wire it into your existing systems.</li>
-    </ul>
+      <h2>What is self-hosted digital signage?</h2>
+      <p>Self-hosted signage means you run your own signage software on your own infrastructure — either on a server you control or directly on the player device. You are responsible for setup, configuration, updates, and maintenance.</p>
+      <p>This approach gives you maximum control and, in some cases, lower ongoing costs. But it requires technical resource to do it well.</p>
 
-    <h2>What you need</h2>
-    <h3>Hardware / VPS</h3>
-    <p>A modest Linux server is enough for most deployments:</p>
-    <ul>
-      <li><strong>Up to 25 displays:</strong> 1 vCPU, 1 GB RAM, 20 GB disk. ~$5/month on Hetzner, DigitalOcean, or Vultr.</li>
-      <li><strong>25-100 displays:</strong> 2 vCPU, 2 GB RAM, 40 GB disk. ~$12-20/month.</li>
-      <li><strong>100+ displays:</strong> 4+ vCPU, 4+ GB RAM, faster disk. Plan for content storage at ~50-200 MB per screen depending on media volume.</li>
-    </ul>
-    <p>An on-prem VM works just as well as a cloud VPS - in fact, on-prem is often the whole point.</p>
+      <h2>What is managed digital signage?</h2>
+      <p>A managed service like ScreenFizz handles the full stack for you — hardware, software, installation, content, and ongoing maintenance. You communicate what you need (usually via WhatsApp or email), and the service team handles execution. You never touch any software or settings.</p>
 
-    <h3>Software prerequisites</h3>
-    <ul>
-      <li>Ubuntu 22.04 or 24.04 LTS (Debian 12 also works)</li>
-      <li>Node.js 18 or newer</li>
-      <li>A domain name pointed at your server (or just an internal hostname / IP for LAN deployments)</li>
-      <li>SSL certificate (Let's Encrypt is free; or self-signed for LAN)</li>
-    </ul>
+      <hr class="guide-divider">
 
-    <h2>Deploying ScreenTinker</h2>
-    <p>Detailed setup is in the <a href="https://github.com/screentinker/screentinker" target="_blank" rel="noopener">GitHub README</a>. Quick version:</p>
-    <pre><code>git clone https://github.com/screentinker/screentinker.git
-cd screentinker/server
-npm install
-cp .env.example .env
-# edit .env with your domain, JWT_SECRET, and SELF_HOSTED=true
-node server.js</code></pre>
-    <p>Set <code>SELF_HOSTED=true</code> in the env. This unlocks the enterprise plan for your account, disables subscription expiry checks, and skips Stripe entirely. It is meant for the operator-controlled deployment case.</p>
+      <h2>Side-by-side comparison</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Factor</th><th>Self-hosted</th><th>Managed (ScreenFizz)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Setup</td>
+              <td>You configure software and hardware</td>
+              <td>We handle everything before it arrives</td>
+            </tr>
+            <tr>
+              <td>Technical knowledge needed</td>
+              <td>Moderate to high</td>
+              <td>None</td>
+            </tr>
+            <tr>
+              <td>Content updates</td>
+              <td>You log in and update yourself</td>
+              <td>WhatsApp us — done same day</td>
+            </tr>
+            <tr>
+              <td>Maintenance</td>
+              <td>Your responsibility</td>
+              <td>Included in the service</td>
+            </tr>
+            <tr>
+              <td>TV installation</td>
+              <td>Not included — arrange yourself</td>
+              <td>Available across the UK</td>
+            </tr>
+            <tr>
+              <td>Monthly cost</td>
+              <td>Server + software costs, plus your time</td>
+              <td>From £15/month per screen (all-in)</td>
+            </tr>
+            <tr>
+              <td>Support</td>
+              <td>Self-supported</td>
+              <td>UK team, included</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <h2>Reverse proxy and TLS</h2>
-    <p>ScreenTinker listens on HTTP/HTTPS directly, but in production you typically front it with nginx or Caddy for TLS termination, gzip, and rate limiting. A minimal Caddyfile:</p>
-    <pre><code>signage.example.com {
-  reverse_proxy localhost:3001
-}</code></pre>
-    <p>Caddy handles Let's Encrypt automatically. nginx works too if your team prefers it.</p>
-
-    <h2>Running as a service</h2>
-    <p>Use systemd to keep the process alive across reboots. A unit file at <code>/etc/systemd/system/screentinker.service</code>:</p>
-    <pre><code>[Unit]
-Description=ScreenTinker Digital Signage Server
-After=network.target
-
-[Service]
-WorkingDirectory=/opt/screentinker/server
-ExecStart=/usr/bin/node server.js
-EnvironmentFile=/opt/screentinker/.env
-Restart=always
-User=screentinker
-
-[Install]
-WantedBy=multi-user.target</code></pre>
-    <p>Enable with <code>systemctl enable --now screentinker</code>.</p>
-
-    <h2>Backups</h2>
-    <p>The state lives in two places:</p>
-    <ul>
-      <li><code>server/db/remote_display.db</code> - SQLite database of users, devices, playlists, schedules</li>
-      <li><code>server/uploads/</code> - uploaded media (images, videos, thumbnails)</li>
-    </ul>
-    <p>A nightly tarball of those two paths gives you a full restore point. Pair with offsite sync (rclone, restic) for disaster recovery.</p>
-
-    <h2>Self-hosted vs cloud-hosted comparison</h2>
-    <div class="compare-table-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr><th>Concern</th><th>ScreenTinker self-hosted</th><th>Cloud-only signage products</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Data location</td><td>Your server</td><td>Vendor's cloud</td></tr>
-          <tr><td>Recurring per-screen cost</td><td>None</td><td>$5-15/screen/month</td></tr>
-          <tr><td>Server cost</td><td>$5-50/month flat</td><td>None (included)</td></tr>
-          <tr><td>Internet required for management</td><td>No (LAN works)</td><td>Yes</td></tr>
-          <tr><td>Source code access</td><td>Yes (MIT)</td><td>Closed</td></tr>
-          <tr><td>Air-gapped deployment</td><td>Possible</td><td>Not possible</td></tr>
-          <tr><td>Vendor lock-in risk</td><td>None (you own it)</td><td>High</td></tr>
-          <tr><td>Update / patch responsibility</td><td>Yours</td><td>Vendor</td></tr>
-          <tr><td>Initial setup time</td><td>~1 hour</td><td>~5 minutes</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>When the cloud is the right answer</h2>
-    <p>Self-hosting is not free of cost - it requires someone who can run a Linux server, monitor it, and apply security updates. If your screen count is small (under ~10) and you do not have IT capacity, the managed cloud version is probably the right choice. ScreenTinker's hosted plans start at $39/mo for 5 devices.</p>
-
-    <div class="related">
-      <h2>Related guides</h2>
+      <h2>When self-hosted makes sense</h2>
+      <p>Self-hosted signage is the right choice in a narrow set of circumstances:</p>
       <ul>
-        <li><a href="/guides/raspberry-pi-digital-signage.html">How to set up digital signage on a Raspberry Pi</a></li>
-        <li><a href="/guides/digital-signage-android-tv.html">Free digital signage for Android TV and Fire TV</a></li>
-        <li><a href="/compare/yodeck-alternative.html">Compare: ScreenTinker vs Yodeck</a></li>
-        <li><a href="/compare/screencloud-alternative.html">Compare: ScreenTinker vs ScreenCloud</a></li>
-        <li><a href="/compare/optisigns-alternative.html">Compare: ScreenTinker vs OptiSigns</a></li>
+        <li><strong>You have in-house IT capacity.</strong> Schools, corporate environments, and organisations with dedicated IT staff who want full control over their infrastructure.</li>
+        <li><strong>Data sovereignty requirements.</strong> Healthcare, government, or financial services environments where content cannot leave your network.</li>
+        <li><strong>Large deployments with existing technical resource.</strong> If you are managing 50+ screens with a team that can maintain them, self-hosting can reduce per-screen costs at scale.</li>
+        <li><strong>Air-gapped or offline environments.</strong> Locations with no internet connection where cloud management is not possible.</li>
       </ul>
-    </div>
 
-    <div class="cta">
-      <h2>Try the cloud version first</h2>
-      <p>Use the hosted version to get familiar, then deploy on your own server when you are ready.</p>
-      <a href="/app#/login" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Start Free</a>
-      <a href="https://github.com/screentinker/screentinker" target="_blank" rel="noopener" class="btn btn-outline" style="padding:14px 28px;font-size:16px;margin-left:12px">View on GitHub</a>
+      <h2>When managed makes sense</h2>
+      <p>For most independent businesses in the UK, managed is the better choice:</p>
+      <ul>
+        <li><strong>You do not have technical staff.</strong> Running signage software on a server requires Linux knowledge, security maintenance, and troubleshooting capacity. If you do not have this in-house, self-hosting creates ongoing risk.</li>
+        <li><strong>Your time is better spent on your business.</strong> A cafe owner should be focused on customers, not on why the signage server is unreachable at 7am.</li>
+        <li><strong>You want consistent, professional-looking content.</strong> Managed services typically include content design and management, so your screens always look professional without you needing to create anything.</li>
+        <li><strong>You need support when something goes wrong.</strong> With a managed service, problems are someone else's problem. With self-hosted, they are yours.</li>
+      </ul>
+
+      <h2>The real cost of self-hosted signage</h2>
+      <p>Self-hosted signage often looks cheaper on paper — no monthly service fee, just server costs. But the full cost includes:</p>
+      <ul>
+        <li>Initial setup time (several hours to a full day)</li>
+        <li>Content creation and management (ongoing)</li>
+        <li>Server or hosting costs</li>
+        <li>Security updates and software maintenance</li>
+        <li>Time spent troubleshooting issues</li>
+      </ul>
+      <p>When you factor in the time cost — even at minimum wage — a managed service usually works out cheaper for small businesses, and significantly less stressful.</p>
+
+      <div class="guide-cta">
+        <h3>Let us handle the technical side</h3>
+        <p>ScreenFizz manages everything — hardware, software, content, and support — for one flat monthly fee.</p>
+        <a class="btn btn-primary" href="/contact.html#setup-plan">Find My Setup &rarr;</a>
+      </div>
     </div>
   </main>
 
   <footer>
-    <div style="color:var(--dim);font-size:13px">&copy; 2026 ScreenTinker. All rights reserved.</div>
-    <div class="links">
-      <a href="https://github.com/screentinker/screentinker" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://discord.gg/utTdsrqq4Z" target="_blank" rel="noopener">Discord</a>
-      <a href="/legal/terms.html">Terms</a>
-      <a href="/legal/privacy.html">Privacy</a>
-      <a href="/legal/third-party.html">Licenses</a>
-      <a href="/app#/login">Sign In</a>
+    <div class="footer-inner">
+      <div>&copy; 2026 ScreenFizz.</div>
+      <div class="footer-links">
+        <a href="/managed-digital-signage.html">Managed Digital Signage</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/legal/privacy.html">Privacy Policy</a>
+        <a href="/legal/terms.html">Terms of Service</a>
+      </div>
     </div>
   </footer>
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://screentinker.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://screentinker.com/#features" },
-      { "@type": "ListItem", "position": 3, "name": "Self-Hosted Digital Signage", "item": "https://screentinker.com/guides/self-hosted-digital-signage.html" }
-    ]
+    "@type": "Article",
+    "headline": "Self-Hosted vs Managed Digital Signage: Which Is Right for Your Business?",
+    "description": "Self-hosted signage needs technical resource to run. A managed service handles everything. Here's an honest comparison to help you choose.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ScreenFizz",
+      "url": "https://screenfizz.com",
+      "logo": "https://screenfizz.com/assets/screenfizz-logo.png"
+    },
+    "url": "https://screenfizz.com/guides/self-hosted-digital-signage.html",
+    "datePublished": "2026-06-25",
+    "dateModified": "2026-06-25"
   }
   </script>
 </body>

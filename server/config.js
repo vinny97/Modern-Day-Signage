@@ -86,6 +86,10 @@ module.exports = {
   // to Resend). Intended for local dev that pulls fresh prod DB copies - keeps
   // us from accidentally emailing real prod users. UNSET on prod systemd unit.
   resendDevRestrictTo: process.env.RESEND_DEV_RESTRICT_TO || '',
+  // MailerSend (used for marketing transactional emails — contact form etc.)
+  mailersendApiKey: process.env.MAILERSEND_API_KEY || '',
+  mailersendFromEmail: process.env.MAILERSEND_FROM_EMAIL || 'info@screenfizz.com',
+  mailersendFromName: process.env.MAILERSEND_FROM_NAME || 'ScreenFizz',
   // Self-hosted mode: if true, first user gets enterprise plan and no billing
   selfHosted: process.env.SELF_HOSTED === 'true',
   // #116: opt-in UI gate. When true, hides the Subscription nav item + billing view
