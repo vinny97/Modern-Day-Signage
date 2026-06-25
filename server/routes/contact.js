@@ -1,6 +1,6 @@
 // Public (unauthenticated) contact form endpoint. Captures leads from the
-// marketing website quiz. Saves every submission to SQLite first (so no lead
-// is ever lost), then attempts to send a notification email via Resend.
+// marketing website quiz. Saves every submission to Postgres (Supabase) first,
+// then attempts to send a notification email via Resend.
 // If email is unconfigured or fails, the lead is still saved and the user
 // gets a success response.
 //
@@ -45,29 +45,28 @@ router.post('/enterprise', async (req, res) => {
     return res.status(400).json({ error: 'Invalid email address' });
   }
 
-  const cleanName    = clamp(name, 200);
-  const cleanEmail   = clamp(email, 200);
-  const cleanCompany = clamp(company || business_type || '', 200);
-  const cleanMessage = clamp(message, 5000);
-  const screensVal   = clamp(screens, 20);
-  const screensNum   = parseScreens(screens);
+  const cleanName        = clamp(name, 200);
+  const cleanEmail       = clamp(email, 200);
+  const cleanCompany     = clamp(company || business_type || '', 200);
+  const cleanMessage     = clamp(message, 5000);
+  const screensVal       = clamp(screens, 20);
+  const cleanBizType     = clamp(business_type || company || '', 100);
+  const cleanPkg         = clamp(pkg || '', 50);
+  const cleanInstall     = clamp(installation || '', 50);
+  const cleanHasScreen   = clamp(has_screen || '', 10);
 
-  // Save lead to SQLite — this is the source of truth regardless of email
+  // Save lead to DB — source of truth regardless of email outcome
+  let savedId = null;
   try {
-    db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO contact_leads
         (name, email, business_type, screens, package, installation, has_screen, message)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      cleanName,
-      cleanEmail,
-      clamp(business_type || company || '', 100),
-      screensVal,
-      clamp(pkg || '', 50),
-      clamp(installation || '', 50),
-      clamp(has_screen || '', 10),
-      cleanMessage
+    `).runReturningId(
+      cleanName, cleanEmail, cleanBizType, screensVal,
+      cleanPkg, cleanInstall, cleanHasScreen, cleanMessage
     );
+    savedId = result.lastInsertRowid;
   } catch (dbErr) {
     console.error('[contact] DB save failed:', dbErr.message);
     // Continue — still try to send email and return success
@@ -94,14 +93,15 @@ ${cleanMessage || '(none)'}
 Source IP: ${req.ip}
 `;
 
-  const result = await sendEmail({ to: 'dan@bytetinker.net', subject, text });
+  const result = await sendEmail({ to: 'info@screenfizz.com', subject, text });
 
   if (result.sent) {
     console.log(`[contact] enquiry from ${cleanEmail} delivered`);
-    // Mark email as sent in DB
-    try {
-      db.prepare('UPDATE contact_leads SET email_sent=1 WHERE email=? ORDER BY id DESC LIMIT 1').run(cleanEmail);
-    } catch (_) {}
+    if (savedId) {
+      try {
+        await db.prepare('UPDATE contact_leads SET email_sent=1 WHERE id=?').run(savedId);
+      } catch (_) {}
+    }
   } else {
     console.warn(`[contact] email not sent for ${cleanEmail}: reason=${result.reason} — lead saved to DB`);
   }
