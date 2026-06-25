@@ -61,15 +61,16 @@
       <div>
         <div class="eyebrow">Find My Perfect Setup</div>
         <h1>Tell us what you need.</h1>
-        <p>Answer five quick questions and we will give you an estimated setup cost and monthly price. No hard sell. We will call you within 24 hours to confirm everything.</p>
+        <p>Answer six quick questions and we will give you an estimated setup cost and monthly price. No hard sell. We will call you within 24 hours to confirm everything.</p>
         <div class="hero-note">
           <div class="check-line">Takes less than 60 seconds</div>
           <div class="check-line">Instant estimate shown</div>
           <div class="check-line">We will call you within 24 hours</div>
         </div>
         <div class="button-row" style="margin-top:26px">
-          <a class="whatsapp-link" id="whatsappLink" target="_blank" rel="noopener" href="https://wa.me/?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup.">Contact on WhatsApp</a>
+          <a class="whatsapp-link" id="whatsappLink" target="_blank" rel="noopener" href="https://wa.me/447304061595?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup.">Contact on WhatsApp</a>
         </div>
+        <p style="margin-top:14px;font-size:14px;font-weight:750;color:var(--muted)">Prefer email? <a href="mailto:info@screenfizz.com" style="color:var(--ink)">info@screenfizz.com</a></p>
       </div>
 
       <form id="leadForm" novalidate>
@@ -91,9 +92,24 @@
           </select>
         </div>
 
-        <!-- Step 2 -->
+        <!-- Step 2 — Use case -->
         <div class="quiz-section" data-quiz-step="1" hidden>
           <div class="quiz-section-num">Step 2</div>
+          <h3>What will you mainly use your screens for?</h3>
+          <label class="radio-option">
+            <input type="radio" name="use_case" value="menu"> Menu Boards
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="use_case" value="window"> Window Displays
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="use_case" value="general"> Promotions &amp; Info
+          </label>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="quiz-section" data-quiz-step="2" hidden>
+          <div class="quiz-section-num">Step 3</div>
           <h3>Do you already have a screen?</h3>
           <label class="radio-option">
             <input type="radio" name="has_screen" value="yes"> Yes
@@ -103,9 +119,9 @@
           </label>
         </div>
 
-        <!-- Step 3 -->
-        <div class="quiz-section" data-quiz-step="2" hidden>
-          <div class="quiz-section-num">Step 3</div>
+        <!-- Step 4 -->
+        <div class="quiz-section" data-quiz-step="3" hidden>
+          <div class="quiz-section-num">Step 4</div>
           <h3>Which service suits you?</h3>
           <label class="radio-option">
             <input type="radio" name="package" value="lite"> Lite
@@ -118,9 +134,9 @@
           </label>
         </div>
 
-        <!-- Step 4 -->
-        <div class="quiz-section" data-quiz-step="3" hidden>
-          <div class="quiz-section-num">Step 4</div>
+        <!-- Step 5 -->
+        <div class="quiz-section" data-quiz-step="4" hidden>
+          <div class="quiz-section-num">Step 5</div>
           <h3>How many screens?</h3>
           <label class="radio-option">
             <input type="radio" name="screens" value="1"> 1
@@ -133,9 +149,9 @@
           </label>
         </div>
 
-        <!-- Step 5 -->
-        <div class="quiz-section" data-quiz-step="4" hidden>
-          <div class="quiz-section-num">Step 5</div>
+        <!-- Step 6 -->
+        <div class="quiz-section" data-quiz-step="5" hidden>
+          <div class="quiz-section-num">Step 6</div>
           <h3>Installation</h3>
           <label class="radio-option">
             <input type="radio" name="installation" value="self"> I'll install myself
@@ -211,7 +227,7 @@
             </div>
             <hr class="quiz-success-divider">
             <div class="quiz-success-help">Need help sooner?</div>
-            <a class="quiz-success-wa" id="successWhatsapp" href="https://wa.me/?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup." target="_blank" rel="noopener">📱 WhatsApp us</a>
+            <a class="quiz-success-wa" id="successWhatsapp" href="https://wa.me/447304061595?text=Hi%20ScreenFizz%2C%20I%27d%20like%20help%20with%20a%20managed%20digital%20signage%20setup." target="_blank" rel="noopener">📱 WhatsApp us</a>
           </div>
         </div>
 
@@ -219,7 +235,7 @@
     </section>
   </main>
 
-  <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a></div></div></footer>
+  <footer><div class="footer-inner"><div>&copy; 2026 ScreenFizz.</div><div class="footer-links"><a href="/managed-digital-signage.html">Managed Digital Signage</a><a href="/self-service-software.html">Self-Service Software</a><a href="/pricing.html">Pricing</a><a href="/hardware.html">Hardware</a><a href="/legal/privacy.html">Privacy Policy</a><a href="/legal/terms.html">Terms of Service</a></div></div></footer>
 
   <script>
     var PRICING = {
@@ -313,8 +329,11 @@
       buildRecommendation();
     }
 
+    var USE_CASE_LABELS = { menu: 'Menu Boards', window: 'Window Displays', general: 'Promotions & Info' };
+
     function buildRecommendation() {
       var bizType   = getSelectVal('business_type');
+      var useCase   = getVal('use_case');
       var hasScreen = getVal('has_screen');
       var pkg       = getVal('package');
       var screens   = getVal('screens');
@@ -325,6 +344,7 @@
 
       /* Detail pills */
       var details = [];
+      if (useCase) details.push(USE_CASE_LABELS[useCase]);
       if (screens) details.push(SCREEN_LABELS[screens]);
       if (hasScreen === 'yes') details.push('Use existing TV');
       else if (hasScreen === 'no') details.push('New screen needed');
@@ -354,15 +374,17 @@
 
     function updateWhatsApp() {
       var bizType  = getSelectVal('business_type');
+      var useCase  = getVal('use_case');
       var pkg      = getVal('package');
       var screens  = getVal('screens');
       var install  = getVal('installation');
       var text = 'Hi ScreenFizz, I would like a setup plan.'
         + '\n\nBusiness type: ' + (bizType  || 'Not selected')
+        + '\nUse case: '        + (useCase  ? USE_CASE_LABELS[useCase] : 'Not selected')
         + '\nPackage: '         + (pkg      ? PACKAGE_LABELS[pkg].replace(/&#\d+;/g,'') : 'Not selected')
         + '\nScreens: '         + (screens  || 'Not selected')
         + '\nInstallation: '    + (install === 'arranged' ? 'ScreenFizz to arrange' : install === 'self' ? 'Self-install' : 'Not selected');
-      var url = 'https://wa.me/?text=' + encodeURIComponent(text);
+      var url = 'https://wa.me/447304061595?text=' + encodeURIComponent(text);
       whatsappLink.href = url;
       var successWa = document.getElementById('successWhatsapp');
       if (successWa) successWa.href = url;
@@ -423,6 +445,7 @@
       }
 
       var bizType   = getSelectVal('business_type');
+      var useCase   = getVal('use_case');
       var pkg       = getVal('package');
       var screens   = getVal('screens');
       var install   = getVal('installation');
@@ -431,6 +454,7 @@
       var messageBody = (
         'Phone: '         + data.phone
         + '\nBusiness type: ' + (bizType   || 'Not answered')
+        + '\nUse case: '      + (useCase   ? USE_CASE_LABELS[useCase] : 'Not answered')
         + '\nHas screen: '    + (hasScreen || 'Not answered')
         + '\nPackage: '       + (pkg       ? PACKAGE_LABELS[pkg].replace(/&#\d+;/g,'') : 'Not answered')
         + '\nScreens: '       + (screens   || 'Not answered')
@@ -445,7 +469,11 @@
           name:         data.contact_name,
           email:        data.email,
           company:      bizType || 'Not provided',
+          use_case:     useCase || '',
           screens:      screens || '',
+          has_screen:   hasScreen || '',
+          package:      pkg || '',
+          installation: install || '',
           multi_tenant: 'single',
           hosting:      'hosted',
           message:      messageBody,

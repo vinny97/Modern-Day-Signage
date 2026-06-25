@@ -3,154 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - ScreenTinker</title>
+  <title>Privacy Policy | ScreenFizz</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/screenfizz-logo.png">
+  <link rel="stylesheet" href="/css/marketing.css">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:-apple-system,sans-serif; background:#111827; color:#e2e8f0; line-height:1.8; }
-    .container { max-width:800px; margin:0 auto; padding:40px 24px 80px; }
-    h1 { color:#3b82f6; font-size:32px; margin-bottom:8px; }
-    .updated { color:#64748b; font-size:14px; margin-bottom:40px; }
-    h2 { color:#f1f5f9; font-size:20px; margin:32px 0 12px; }
-    h3 { color:#cbd5e1; font-size:16px; margin:20px 0 8px; }
-    p, li { color:#94a3b8; font-size:15px; margin-bottom:12px; }
-    ul { padding-left:24px; }
-    a { color:#3b82f6; }
-    .back { display:inline-flex; align-items:center; gap:6px; color:#64748b; font-size:13px; margin-bottom:24px; text-decoration:none; }
-    .back:hover { color:#94a3b8; }
-    table { width:100%; border-collapse:collapse; margin:16px 0; }
-    th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #1e293b; font-size:14px; color:#94a3b8; }
-    th { color:#cbd5e1; font-weight:600; }
+    .legal-page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    .legal-page h1 { font-size: 36px; font-weight: 950; margin-bottom: 6px; }
+    .legal-meta { color: var(--muted); font-size: 14px; font-weight: 700; margin-bottom: 40px; }
+    .legal-page h2 { font-size: 20px; font-weight: 950; margin: 36px 0 10px; }
+    .legal-page p, .legal-page li { font-size: 15px; color: var(--ink); line-height: 1.75; margin-bottom: 12px; }
+    .legal-page ul { padding-left: 22px; margin-bottom: 12px; }
+    .legal-page table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    .legal-page th, .legal-page td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+    .legal-page th { font-weight: 950; }
+    .legal-back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; font-weight: 750; text-decoration: none; margin-bottom: 32px; }
+    .legal-back:hover { color: var(--ink); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="/" class="back">&larr; Back to ScreenTinker</a>
-    <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: May 15, 2026</p>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner">
+      <a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-wordmark.png" alt="ScreenFizz" width="1813" height="613"></a>
+      <div class="nav-actions">
+        <a class="btn btn-primary" href="/contact.html#setup-plan">Find My Setup</a>
+      </div>
+    </div>
+  </nav>
 
-    <h2>1. Overview</h2>
-    <p>ScreenTinker ("we", "us", "our") respects your privacy. This policy explains what data we collect, how we use it, and your rights regarding your information.</p>
+  <main>
+    <div class="legal-page">
+      <a href="/" class="legal-back">&larr; Back to ScreenFizz</a>
+      <h1>Privacy Policy</h1>
+      <p class="legal-meta">Last updated: 25 June 2026</p>
 
-    <h2>2. Information We Collect</h2>
+      <h2>1. Who We Are</h2>
+      <p>ScreenFizz ("we", "us", "our") is a UK-based managed digital signage service. We help small businesses display professional content on their screens without any technical effort on their part. For privacy enquiries, contact us at <a href="mailto:info@screenfizz.com">info@screenfizz.com</a>.</p>
 
-    <h3>2.1 Account Information</h3>
-    <table>
-      <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
-      <tr><td>Email address</td><td>Authentication, notifications</td><td>Until account deletion</td></tr>
-      <tr><td>Name</td><td>Display in dashboard</td><td>Until account deletion</td></tr>
-      <tr><td>Password hash</td><td>Authentication (bcrypt, never stored in plain text)</td><td>Until account deletion</td></tr>
-      <tr><td>OAuth provider ID</td><td>Google/Microsoft sign-in</td><td>Until account deletion</td></tr>
-    </table>
+      <h2>2. What Data We Collect</h2>
+      <p>We collect only the information needed to provide and improve our service:</p>
 
-    <h3>2.2 Device Information</h3>
-    <table>
-      <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
-      <tr><td>Device ID</td><td>Unique device identification</td><td>Until device removal</td></tr>
-      <tr><td>IP address</td><td>Network connectivity, security</td><td>Overwritten each connection</td></tr>
-      <tr><td>Android version, screen resolution</td><td>Compatibility, display optimization</td><td>Until device removal</td></tr>
-      <tr><td>Battery, storage, RAM, CPU, WiFi</td><td>Device health monitoring</td><td>90 days (rolling)</td></tr>
-      <tr><td>Device fingerprint (hardware hash)</td><td>Prevent trial abuse</td><td>Until device removal</td></tr>
-    </table>
+      <h2>2.1 Enquiry and Contact Data</h2>
+      <table>
+        <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
+        <tr><td>Name</td><td>Identify you and personalise communication</td><td>Until you request deletion</td></tr>
+        <tr><td>Email address</td><td>Send your quote and follow-up communications</td><td>Until you request deletion</td></tr>
+        <tr><td>Phone number</td><td>Call-back within 24 hours as promised</td><td>Until you request deletion</td></tr>
+        <tr><td>Business type and screen preferences</td><td>Prepare an accurate recommendation</td><td>Until you request deletion</td></tr>
+        <tr><td>IP address</td><td>Security and spam prevention</td><td>90 days</td></tr>
+      </table>
 
-    <h3>2.3 Usage Data</h3>
-    <table>
-      <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
-      <tr><td>Content play logs</td><td>Proof-of-play reporting</td><td>90 days</td></tr>
-      <tr><td>Activity log (API actions)</td><td>Audit trail, security</td><td>90 days</td></tr>
-      <tr><td>Screenshots (on-demand)</td><td>Remote monitoring</td><td>Latest only per device</td></tr>
-    </table>
+      <h2>2.2 Customer Account Data</h2>
+      <p>If you become a ScreenFizz customer, we also hold your business name, billing address, and subscription details to deliver and invoice the service.</p>
 
-    <h3>2.4 Content</h3>
-    <p>Media files (images, videos) you upload are stored on our servers solely to deliver them to your devices. We do not analyze, sell, or share your content.</p>
+      <h2>2.3 Website Usage</h2>
+      <p>We do not use third-party tracking cookies or analytics tools that profile you individually. We may log basic server access data (page requests, error codes) for security and performance monitoring. This data is not tied to your identity.</p>
 
-    <h3>2.5 Error and Diagnostic Telemetry</h3>
-    <p>Player clients submit error reports automatically so we can fix issues on devices we cannot directly access (smart TVs, embedded signage browsers). Reports may be submitted before a device has paired; in that case only the network IP and user-agent are present, with no device ID.</p>
-    <table>
-      <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
-      <tr><td>Browser user-agent string</td><td>Identifying which player platforms encounter errors</td><td>Rolling buffer (10,000 entries)</td></tr>
-      <tr><td>Error messages, stack traces, and source-file references</td><td>Diagnosing player issues we cannot reproduce in development</td><td>Rolling buffer (10,000 entries)</td></tr>
-      <tr><td>Recent player log entries (up to 50, including filenames of content being played)</td><td>Context for the error so we understand what the player was doing</td><td>Rolling buffer (10,000 entries)</td></tr>
-      <tr><td>Screen and viewport dimensions</td><td>Diagnosing layout and rendering issues at the device's actual size</td><td>Rolling buffer (10,000 entries)</td></tr>
-      <tr><td>Coarse player state (idle, playing, waiting)</td><td>Distinguishing errors during playback vs setup</td><td>Rolling buffer (10,000 entries)</td></tr>
-    </table>
-    <p>This telemetry can be disabled by self-hosters via the <code>PLAYER_DEBUG_REPORTING=off</code> environment variable. On screentinker.com it is on by default.</p>
+      <h2>3. Legal Basis for Processing (GDPR)</h2>
+      <ul>
+        <li><strong>Legitimate interests</strong> — responding to your enquiry and providing the service you requested</li>
+        <li><strong>Contract performance</strong> — processing your order and managing your subscription</li>
+        <li><strong>Legal obligation</strong> — retaining billing records as required by UK law</li>
+        <li><strong>Consent</strong> — where we send marketing communications, you can opt out at any time</li>
+      </ul>
 
-    <h2>3. How We Use Your Information</h2>
-    <ul>
-      <li><strong>Provide the Service:</strong> Deliver content to devices, enable remote management, process subscriptions</li>
-      <li><strong>Security:</strong> Detect unauthorized access, prevent abuse, protect accounts</li>
-      <li><strong>Communications:</strong> Send device offline alerts, subscription notifications, service updates</li>
-      <li><strong>Improvement:</strong> Analyze aggregate usage patterns to improve the Service (no individual tracking)</li>
-    </ul>
+      <h2>4. How We Use Your Information</h2>
+      <ul>
+        <li>Respond to your setup enquiry and provide a personalised quote</li>
+        <li>Set up and manage your digital signage displays</li>
+        <li>Send content updates, invoices, and service notifications</li>
+        <li>Improve our service based on aggregate feedback (no individual profiling)</li>
+      </ul>
 
-    <h2>4. Data Sharing</h2>
-    <p>We do not sell your personal information. We share data only in these limited circumstances:</p>
-    <ul>
-      <li><strong>Service providers:</strong> Payment processing (Stripe), email delivery, hosting infrastructure</li>
-      <li><strong>Team members:</strong> If you belong to a team, other team members can see shared devices and content</li>
-      <li><strong>Legal requirements:</strong> When required by law, subpoena, or court order</li>
-      <li><strong>Business transfers:</strong> In the event of a merger, acquisition, or sale of assets</li>
-    </ul>
+      <h2>5. Data Sharing</h2>
+      <p>We do not sell your personal data. We share it only where necessary:</p>
+      <ul>
+        <li><strong>Payment processing</strong> — Stripe, for billing (they are PCI-DSS compliant)</li>
+        <li><strong>Email delivery</strong> — Resend, to send transactional emails on our behalf</li>
+        <li><strong>Hosting</strong> — our servers are hosted on Render and Supabase within secure, GDPR-compliant data centres</li>
+        <li><strong>Legal requirements</strong> — if required by UK law, court order, or regulatory authority</li>
+      </ul>
+      <p>All third-party processors are bound by data processing agreements and are not permitted to use your data for any purpose beyond delivering the service.</p>
 
-    <h2>5. Self-Hosted Deployments</h2>
-    <p>If you self-host ScreenTinker on your own infrastructure:</p>
-    <ul>
-      <li>All data stays on your servers. We have no access to it.</li>
-      <li>You are the data controller and responsible for compliance with applicable privacy laws.</li>
-      <li>No telemetry or usage data is sent to us from self-hosted instances. The error and diagnostic telemetry described in Section 2.5 is collected by the self-hosted server itself, not transmitted externally, and can be disabled entirely with <code>PLAYER_DEBUG_REPORTING=off</code>.</li>
-    </ul>
+      <h2>6. Data Security</h2>
+      <ul>
+        <li>All data is transmitted over HTTPS/TLS encryption</li>
+        <li>Passwords are hashed — never stored in plain text</li>
+        <li>Access to customer data is restricted to authorised team members only</li>
+        <li>We use rate limiting and honeypot techniques to prevent spam and abuse on our contact forms</li>
+      </ul>
 
-    <h2>6. Data Security</h2>
-    <ul>
-      <li>Passwords are hashed with bcrypt (never stored in plain text)</li>
-      <li>API authentication uses JWT tokens with auto-expiry</li>
-      <li>All connections use HTTPS/TLS encryption</li>
-      <li>Android app uses encrypted storage for credentials</li>
-      <li>Rate limiting protects against brute force attacks</li>
-      <li>Regular security audits of the codebase</li>
-    </ul>
+      <h2>7. Your Rights</h2>
+      <p>Under UK GDPR, you have the right to:</p>
+      <ul>
+        <li><strong>Access</strong> — request a copy of the personal data we hold about you</li>
+        <li><strong>Rectification</strong> — ask us to correct inaccurate data</li>
+        <li><strong>Erasure</strong> — ask us to delete your data (subject to legal retention obligations)</li>
+        <li><strong>Restriction</strong> — ask us to limit how we use your data</li>
+        <li><strong>Portability</strong> — receive your data in a machine-readable format</li>
+        <li><strong>Objection</strong> — object to processing based on legitimate interests</li>
+      </ul>
+      <p>To exercise any of these rights, email <a href="mailto:info@screenfizz.com">info@screenfizz.com</a>. We will respond within 30 days.</p>
+      <p>You also have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong> at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>.</p>
 
-    <h2>7. Your Rights</h2>
-    <p>You have the right to:</p>
-    <ul>
-      <li><strong>Access:</strong> View all data associated with your account from the Settings page</li>
-      <li><strong>Correction:</strong> Update your account information at any time</li>
-      <li><strong>Deletion:</strong> Delete your account and all associated data from Settings</li>
-      <li><strong>Export:</strong> Download your data via the database backup feature (admin) or API</li>
-      <li><strong>Portability:</strong> Export content and reports in standard formats (CSV, PNG, MP4)</li>
-    </ul>
+      <h2>8. Cookies</h2>
+      <p>Our marketing website does not use tracking or advertising cookies. We use browser localStorage only where strictly necessary (for example, to remember your quiz progress). No third-party advertising networks have access to your browsing behaviour on our site.</p>
 
-    <h2>8. Cookies and Local Storage</h2>
-    <ul>
-      <li>We use localStorage to store your authentication token and preferences (language, theme)</li>
-      <li>The web player uses a Service Worker for offline content caching</li>
-      <li>We do not use third-party tracking cookies</li>
-      <li>Google/Microsoft OAuth may set cookies as part of their authentication flow</li>
-    </ul>
+      <h2>9. Data Retention</h2>
+      <ul>
+        <li>Enquiry data: retained for up to 2 years from last contact, then deleted</li>
+        <li>Customer account data: retained for the duration of your subscription plus 6 years (UK accounting requirements)</li>
+        <li>Server logs: 90 days, then automatically deleted</li>
+      </ul>
 
-    <h2>9. Children's Privacy</h2>
-    <p>The Service is not intended for use by children under 13. We do not knowingly collect information from children under 13.</p>
+      <h2>10. Changes to This Policy</h2>
+      <p>We may update this policy from time to time. The "Last updated" date at the top of this page will reflect any changes. For significant changes, we will notify active customers by email.</p>
 
-    <h2>10. International Data Transfers</h2>
-    <p>If you access the Service from outside the United States, your data may be transferred to and processed in the United States. By using the Service, you consent to this transfer.</p>
+      <h2>11. Contact</h2>
+      <p>For any privacy-related questions, email us at <a href="mailto:info@screenfizz.com">info@screenfizz.com</a>.</p>
+    </div>
+  </main>
 
-    <h2>11. Data Retention</h2>
-    <ul>
-      <li>Account data: retained until you delete your account</li>
-      <li>Device telemetry: 90 days (automatically pruned)</li>
-      <li>Play logs: 90 days (automatically pruned)</li>
-      <li>Activity logs: 90 days (automatically pruned)</li>
-      <li>Error and diagnostic telemetry: rolling buffer of the 10,000 most recent entries (oldest pruned on insert)</li>
-      <li>Content: retained until you delete it or your account</li>
-      <li>After account deletion: all data removed within 30 days</li>
-    </ul>
-
-    <h2>12. Changes to This Policy</h2>
-    <p>We may update this policy from time to time. We will notify registered users of material changes via email. The "Last updated" date will be revised accordingly.</p>
-
-    <h2>13. Contact Us</h2>
-    <p>For privacy-related questions or data requests, contact us at:</p>
-    <p>Email: support@screentinker.com</p>
-  </div>
+  <footer>
+    <div class="footer-inner">
+      <div>&copy; 2026 ScreenFizz.</div>
+      <div class="footer-links">
+        <a href="/pricing.html">Pricing</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/legal/privacy.html">Privacy Policy</a>
+        <a href="/legal/terms.html">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

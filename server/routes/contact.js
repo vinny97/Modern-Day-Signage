@@ -29,7 +29,7 @@ router.post('/enterprise', async (req, res) => {
   const {
     name, email, company, screens, multi_tenant, hosting, message, fax_number,
     // fields added by the new wizard
-    business_type, package: pkg, installation, has_screen
+    business_type, package: pkg, installation, has_screen, use_case
   } = req.body || {};
 
   // Honeypot — return 200 to fool bots but drop the submission
@@ -54,16 +54,17 @@ router.post('/enterprise', async (req, res) => {
   const cleanPkg         = clamp(pkg || '', 50);
   const cleanInstall     = clamp(installation || '', 50);
   const cleanHasScreen   = clamp(has_screen || '', 10);
+  const cleanUseCase     = clamp(use_case || '', 50);
 
   // Save lead to DB — source of truth regardless of email outcome
   let savedId = null;
   try {
     const result = await db.prepare(`
       INSERT INTO contact_leads
-        (name, email, business_type, screens, package, installation, has_screen, message)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (name, email, business_type, use_case, screens, package, installation, has_screen, message)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).runReturningId(
-      cleanName, cleanEmail, cleanBizType, screensVal,
+      cleanName, cleanEmail, cleanBizType, cleanUseCase, screensVal,
       cleanPkg, cleanInstall, cleanHasScreen, cleanMessage
     );
     savedId = result.lastInsertRowid;
