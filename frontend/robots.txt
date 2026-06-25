@@ -10,4 +10,4 @@ Disallow: /player
 Disallow: /uploads/
 Disallow: /scripts/
 
-Sitemap: https://screentinker.com/sitemap.xml
+Sitemap: https://screenfizz.com/sitemap.xml
