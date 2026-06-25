@@ -193,11 +193,11 @@ export async function render(container) {
         <p><strong>ScreenTinker</strong>${appVersion ? ` v${esc(appVersion)}` : ''}</p>
         <p style="margin-top:4px">${t('settings.about_tagline')}</p>
         <p style="margin-top:12px">
-          <a href="/legal/terms.html" target="_blank" style="color:var(--accent);font-size:12px">${t('auth.terms')}</a>
+          <a href="/legal/terms" target="_blank" style="color:var(--accent);font-size:12px">${t('auth.terms')}</a>
           &nbsp;&middot;&nbsp;
-          <a href="/legal/privacy.html" target="_blank" style="color:var(--accent);font-size:12px">${t('auth.privacy')}</a>
+          <a href="/legal/privacy" target="_blank" style="color:var(--accent);font-size:12px">${t('auth.privacy')}</a>
           &nbsp;&middot;&nbsp;
-          <a href="/legal/third-party.html" target="_blank" style="color:var(--accent);font-size:12px">${t('settings.third_party_licenses')}</a>
+          <a href="/legal/third-party" target="_blank" style="color:var(--accent);font-size:12px">${t('settings.third_party_licenses')}</a>
         </p>
       </div>
     </div>

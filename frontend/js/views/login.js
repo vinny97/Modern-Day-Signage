@@ -162,9 +162,9 @@ export async function render(container) {
 
         <p id="loginError" style="color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none"></p>
         <p style="text-align:center;margin-top:16px;font-size:11px;color:var(--text-muted)">
-          <a href="/legal/terms.html" target="_blank" style="color:var(--text-muted);text-decoration:underline">${t('auth.terms')}</a>
+          <a href="/legal/terms" target="_blank" style="color:var(--text-muted);text-decoration:underline">${t('auth.terms')}</a>
           &nbsp;&middot;&nbsp;
-          <a href="/legal/privacy.html" target="_blank" style="color:var(--text-muted);text-decoration:underline">${t('auth.privacy')}</a>
+          <a href="/legal/privacy" target="_blank" style="color:var(--text-muted);text-decoration:underline">${t('auth.privacy')}</a>
         </p>
       </div>
     </div>

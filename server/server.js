@@ -165,33 +165,8 @@ app.use(helmet({
 // - /         (landing page has inline JSON-LD + a pricing fetch script)
 // The dashboard at /app uses ES modules only and gets the strict policy.
 app.use((req, res, next) => {
-  if (req.path === '/' || req.path === '/landing.html') return marketingCsp(req, res, next);
-  if ([
-    '/managed-digital-signage.html',
-    '/fully-managed-digital-signage.html',
-    '/digital-signage-for-small-business.html',
-    '/digital-advertising-screens.html',
-    '/digital-menu-boards.html',
-    '/restaurant-digital-signage.html',
-    '/window-display-screens.html',
-    '/digital-signage-installation.html',
-    '/digital-signage-content-creation.html',
-    '/digital-signage-management.html',
-    '/how-it-works.html',
-    '/self-service-software.html',
-    '/pricing.html',
-    '/hardware.html',
-    '/hardware-order-success.html',
-    '/contact.html',
-    '/solutions/window-displays.html',
-    '/solutions/digital-menu-boards.html',
-    '/compare/pricing-tiers.html',
-    '/blog.html',
-    '/blog/digital-menu-board-ideas-for-cafes.html',
-    '/blog/digital-signage-for-barbers.html',
-    '/legal/privacy.html',
-    '/legal/terms.html',
-  ].includes(req.path)) return marketingCsp(req, res, next);
+  if (req.path === '/' || req.path === '/landing' || req.path === '/landing.html') return marketingCsp(req, res, next);
+  if (isMarketingHtmlPath(req.path)) return marketingCsp(req, res, next);
   if (req.path.startsWith('/locations/')) return marketingCsp(req, res, next);
   if (req.path.startsWith('/industries/')) return marketingCsp(req, res, next);
   if (req.path.startsWith('/player')) return next();
@@ -242,6 +217,63 @@ app.use('/api/stripe', stripeRouter);
 app.use(express.json({ limit: '12mb' }));
 const { sanitizeBody } = require('./middleware/sanitize');
 app.use(sanitizeBody);
+
+const EXTENSIONLESS_RESERVED_PREFIXES = [
+  '/api',
+  '/app',
+  '/assets',
+  '/css',
+  '/download',
+  '/js',
+  '/player',
+  '/scripts',
+  '/socket.io',
+  '/socket.io-client',
+  '/uploads',
+  '/vendor',
+];
+
+function isReservedExtensionlessPath(urlPath) {
+  return EXTENSIONLESS_RESERVED_PREFIXES.some(prefix => urlPath === prefix || urlPath.startsWith(prefix + '/'));
+}
+
+function htmlFileForPublicPath(urlPath) {
+  if (!urlPath || urlPath === '/') return null;
+  if (isReservedExtensionlessPath(urlPath)) return null;
+  if (path.basename(urlPath).includes('.')) return null;
+  const normalized = path.normalize(urlPath).replace(/^(\.\.[/\\])+/, '');
+  if (normalized.includes('..')) return null;
+  const file = path.join(config.frontendDir, normalized + '.html');
+  if (!file.startsWith(config.frontendDir + path.sep)) return null;
+  return fs.existsSync(file) ? file : null;
+}
+
+function isMarketingHtmlPath(urlPath) {
+  if (urlPath.endsWith('.html')) {
+    const normalized = path.normalize(urlPath).replace(/^(\.\.[/\\])+/, '');
+    const file = path.join(config.frontendDir, normalized);
+    return file.startsWith(config.frontendDir + path.sep) && fs.existsSync(file);
+  }
+  return !!htmlFileForPublicPath(urlPath);
+}
+
+// Public marketing pages use extensionless canonical URLs. Keep legacy .html
+// URLs working as permanent redirects so old links and indexed URLs consolidate.
+app.get('*.html', (req, res, next) => {
+  if (isReservedExtensionlessPath(req.path)) return next();
+  const normalized = path.normalize(req.path).replace(/^(\.\.[/\\])+/, '');
+  const file = path.join(config.frontendDir, normalized);
+  if (!file.startsWith(config.frontendDir + path.sep) || !fs.existsSync(file)) return next();
+  const cleanPath = req.path.replace(/\.html$/, '') || '/';
+  const query = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+  res.redirect(301, cleanPath + query);
+});
+
+app.get('*', (req, res, next) => {
+  const file = htmlFileForPublicPath(req.path);
+  if (!file) return next();
+  res.sendFile(file);
+});
 
 // Landing page BEFORE static middleware (so / doesn't serve index.html).
 // When DISABLE_HOMEPAGE is set, redirect to the app instead - for self-hosted

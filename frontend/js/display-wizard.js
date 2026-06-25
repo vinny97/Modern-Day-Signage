@@ -84,7 +84,7 @@
     document.getElementById('alternativeDescription').textContent = recommendation.alternative.description;
     document.getElementById('alternativeCost').textContent = `From ${money(recommendation.alternative.unit * screens + playerTotal)}`;
     const quoteParams = new URLSearchParams({ screens: String(screens), use: useCase, display: recommendation.name, install: installation });
-    document.getElementById('displayQuoteLink').href = `/contact.html?${quoteParams.toString()}#setup-plan`;
+    document.getElementById('displayQuoteLink').href = `/contact?${quoteParams.toString()}#setup-plan`;
 
     steps.forEach(step => { step.hidden = true; });
     nav.hidden = true;

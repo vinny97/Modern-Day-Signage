@@ -171,7 +171,7 @@ async function loadHardwareOrders() {
     orders = [];
   }
   if (!orders || !orders.length) {
-    el.innerHTML = `<p style="color:var(--text-muted);font-size:13px">You haven't ordered any hardware yet. <a href="/hardware.html">Buy a ScreenFizz Player</a>.</p>`;
+    el.innerHTML = `<p style="color:var(--text-muted);font-size:13px">You haven't ordered any hardware yet. <a href="/hardware">Buy a ScreenFizz Player</a>.</p>`;
     return;
   }
   el.innerHTML = orders.map(o => `
