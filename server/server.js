@@ -168,6 +168,15 @@ app.use((req, res, next) => {
   if (req.path === '/' || req.path === '/landing.html') return marketingCsp(req, res, next);
   if ([
     '/managed-digital-signage.html',
+    '/fully-managed-digital-signage.html',
+    '/digital-signage-for-small-business.html',
+    '/digital-advertising-screens.html',
+    '/digital-menu-boards.html',
+    '/restaurant-digital-signage.html',
+    '/window-display-screens.html',
+    '/digital-signage-installation.html',
+    '/digital-signage-content-creation.html',
+    '/digital-signage-management.html',
     '/how-it-works.html',
     '/self-service-software.html',
     '/pricing.html',
@@ -184,6 +193,7 @@ app.use((req, res, next) => {
     '/legal/terms.html',
   ].includes(req.path)) return marketingCsp(req, res, next);
   if (req.path.startsWith('/locations/')) return marketingCsp(req, res, next);
+  if (req.path.startsWith('/industries/')) return marketingCsp(req, res, next);
   if (req.path.startsWith('/player')) return next();
   if (req.path === '/docs') return next(); // Redoc API reference needs a relaxed CSP
   if (req.path.startsWith('/api/widgets/') && req.path.endsWith('/render')) return next();
