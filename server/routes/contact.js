@@ -116,7 +116,7 @@ Source IP: ${req.ip}
 
   const installLabel = {
     yes: 'Yes — I need installation',
-    no: 'No — I'll handle it myself',
+    no: "No — I'll handle it myself",
     unsure: 'Not sure yet',
   }[cleanInstall] || cleanInstall || null;
 
