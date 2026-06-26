@@ -49,7 +49,7 @@ export async function applyBranding() {
 
   const logo = document.getElementById('brandLogo');
   if (logo) {
-    logo.setAttribute('src', wl.logo_url || '/assets/screenfizz-logo-wordmark.png');
+    logo.setAttribute('src', wl.logo_url || '/assets/screenfizz-logo-nobg.png');
     logo.setAttribute('alt', wl.brand_name || 'ScreenFizz');
   }
 

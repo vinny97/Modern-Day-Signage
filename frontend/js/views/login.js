@@ -51,7 +51,7 @@ export async function render(container) {
 
   applyLoginBrandingDoc(branding);
   const brandName = branding.brand_name || 'ScreenFizz';
-  const logoUrl = branding.logo_url || '/assets/screenfizz-logo-wordmark.png';
+  const logoUrl = branding.logo_url || '/assets/screenfizz-logo-nobg.png';
   const logoHtml = `<img src="${brandEsc(logoUrl)}" alt="${brandEsc(brandName)}" style="width:220px;max-width:82%;height:auto;margin:0 auto 18px;display:block">`;
   document.title = brandName;
 
