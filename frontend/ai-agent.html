@@ -29,7 +29,7 @@
 
     /* ── Social proof stats strip ── */
     .ai-stats-strip { background:var(--ink); color:#fff; }
-    .ai-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
+    .ai-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
     .ai-stat { padding:36px 32px; text-align:center; border-right:1px solid rgba(255,255,255,0.1); }
     .ai-stat:last-child { border-right:0; }
     .ai-stat-number { display:block; font-family:'Space Grotesk',sans-serif; font-size:clamp(36px,4vw,52px); font-weight:800; color:#fff; line-height:1; margin-bottom:8px; letter-spacing:-0.04em; }
@@ -106,11 +106,16 @@
       <a class="brand" href="/" aria-label="ScreenFizz home"><img src="/assets/screenfizz-logo-nobg.png" alt="ScreenFizz" width="908" height="212"></a>
       <div class="nav-links">
         <a href="/">Home</a>
-        <a href="/pricing">Pricing</a>
+        <div class="dropdown">
+          <a class="nav-link" href="/solutions/window-displays">Solutions</a>
+          <div class="dropdown-menu">
+            <a href="/solutions/window-displays">Window Displays</a>
+            <a href="/solutions/digital-menu-boards">Digital Menu Boards</a>
+          </div>
+        </div>
         <a href="/how-it-works">How It Works</a>
-        <a href="/ai-agent" aria-current="page">AI Agent</a>
         <a href="/pricing">Pricing</a>
-        
+        <a href="/blog">Blog</a>
         <a href="/contact">Contact</a>
       </div>
       <div class="nav-actions"><a class="btn btn-outline" href="/app#/login">Client Portal</a><a class="btn btn-primary" href="/contact#setup-plan">Get My Setup Plan</a></div>
@@ -141,9 +146,9 @@
             <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online · replies in seconds</small></div></div>
             <div class="chat-day">10:47 PM · Thursday</div>
             <div class="chat-bubble sent">Hi, do you have a table for 2 this Saturday? It's our anniversary<span>22:47 ✓✓</span></div>
-            <div class="chat-bubble received">Happy anniversary! 🎉 We have availability at 7:00pm or 8:30pm on Saturday. Which works best?<span>22:47</span></div>
-            <div class="chat-bubble sent">8:30 please<span>22:48 ✓✓</span></div>
-            <div class="chat-bubble received done">Booked! Table for 2 at 8:30pm Saturday ✓<span>22:52</span></div>
+            <div class="chat-bubble received">Happy anniversary! 🎉 We'd love to have you. I'll note Saturday evening for 2 and get that confirmed — any preference on time, early or later?<span>22:47</span></div>
+            <div class="chat-bubble sent">Later is better, around 8:30<span>22:48 ✓✓</span></div>
+            <div class="chat-bubble received done">Perfect, noted for ~8:30pm Saturday. You'll get a confirmation shortly ✓<span>22:52</span></div>
             <div class="phone-input">Message <b>›</b></div>
           </div>
           <div class="showcase-caption" style="position:relative;left:auto;right:auto;bottom:auto;margin-top:16px;box-shadow:none;">
@@ -159,12 +164,16 @@
       <div class="section section-tight" style="padding-top:0;padding-bottom:0;">
         <div class="ai-stats-grid">
           <div class="ai-stat">
-            <span class="ai-stat-number">&lt;&nbsp;3s</span>
-            <span class="ai-stat-label">Average reply time, any hour</span>
+            <span class="ai-stat-number" style="font-size:clamp(22px,2.5vw,32px);letter-spacing:-0.02em;">No missed messages</span>
+            <span class="ai-stat-label">Every message gets a reply</span>
           </div>
           <div class="ai-stat">
-            <span class="ai-stat-number">9 in 10</span>
-            <span class="ai-stat-label">Messages handled without you</span>
+            <span class="ai-stat-number" style="font-size:clamp(22px,2.5vw,32px);letter-spacing:-0.02em;">Replies in seconds</span>
+            <span class="ai-stat-label">Any hour, any day</span>
+          </div>
+          <div class="ai-stat">
+            <span class="ai-stat-number" style="font-size:clamp(22px,2.5vw,32px);letter-spacing:-0.02em;">Most messages</span>
+            <span class="ai-stat-label">Handled without you</span>
           </div>
           <div class="ai-stat">
             <span class="ai-stat-number">24/7</span>
@@ -283,6 +292,16 @@
       </div>
     </section>
 
+    <!-- Win-back callout -->
+    <section class="band">
+      <div class="section" style="max-width:760px;">
+        <div style="border:2px solid var(--line);border-radius:16px;padding:36px 40px;background:var(--soft);">
+          <h2 style="font-size:clamp(20px,2.8vw,28px);font-weight:950;margin-bottom:14px;">It also brings lapsed customers back.</h2>
+          <p style="font-size:17px;line-height:1.75;color:#414956;margin:0;">If someone has not visited in a while, your agent can send them a message — a quiet nudge, a seasonal offer, a friendly check-in. Most businesses never follow up. Yours will do it automatically.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Use cases, tabbed so visitors self-select their business type -->
     <section class="section">
       <div class="eyebrow">Who It's For</div>
@@ -317,9 +336,9 @@
             <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
             <div class="chat-day">Saturday · 8:43 PM</div>
             <div class="chat-bubble sent">Hi do you have a table for 4 on Saturday? Mum's birthday<span>20:43 ✓✓</span></div>
-            <div class="chat-bubble received">Of course! We'd love to help celebrate. We have availability at 7:00pm or 8:30pm. Which suits best?<span>20:43</span></div>
-            <div class="chat-bubble sent">7pm please<span>20:44 ✓✓</span></div>
-            <div class="chat-bubble received done">Booked, table for 4 at 7:00pm, birthday noted. See you then! ✓<span>20:44</span></div>
+            <div class="chat-bubble received">Of course, we'd love to help celebrate! I'll note a table for 4 and flag the birthday. Do you have a preference — earlier or later in the evening?<span>20:43</span></div>
+            <div class="chat-bubble sent">7pm if possible<span>20:44 ✓✓</span></div>
+            <div class="chat-bubble received done">7pm noted — the team will confirm your table. Birthday flagged too ✓<span>20:44</span></div>
             <div class="phone-input">Message <b>›</b></div>
           </div>
         </div>
@@ -371,9 +390,9 @@
             <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
             <div class="chat-day">Thursday · 11:22 PM</div>
             <div class="chat-bubble sent">Any slots Saturday morning? Before 11 ideally<span>23:22 ✓✓</span></div>
-            <div class="chat-bubble received">Yes and we have 9:30am and 10:15am free on Saturday. Which works for you?<span>23:22</span></div>
-            <div class="chat-bubble sent">10:15 please<span>23:23 ✓✓</span></div>
-            <div class="chat-bubble received done">Booked, 10:15am Saturday. We'll send a reminder Friday evening ✓<span>23:23</span></div>
+            <div class="chat-bubble received">Saturday morning is popular — I'll hold 10:15am for you and let the team know. What's your name?<span>23:22</span></div>
+            <div class="chat-bubble sent">Jake<span>23:23 ✓✓</span></div>
+            <div class="chat-bubble received done">Sorted Jake — 10:15am Saturday noted. We'll confirm and send a reminder the evening before ✓<span>23:23</span></div>
             <div class="phone-input">Message <b>›</b></div>
           </div>
         </div>
@@ -398,9 +417,9 @@
             <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
             <div class="chat-day">Monday · 7:04 PM</div>
             <div class="chat-bubble sent">Space in Tuesday 6:30 class? Drop-in price?<span>19:04 ✓✓</span></div>
-            <div class="chat-bubble received">Yes, 3 spots left in Tuesday 6:30pm. Drop-in is £12. Want me to reserve your spot?<span>19:04</span></div>
+            <div class="chat-bubble received">Tuesday 6:30pm usually has space and drop-in is £12. Want me to put your name down and get it confirmed?<span>19:04</span></div>
             <div class="chat-bubble sent">Yes please<span>19:05 ✓✓</span></div>
-            <div class="chat-bubble received done">Reserved! See you Tuesday at 6:30pm ✓<span>19:05</span></div>
+            <div class="chat-bubble received done">Done — name noted for Tuesday 6:30pm. You'll get a confirmation from us shortly ✓<span>19:05</span></div>
             <div class="phone-input">Message <b>›</b></div>
           </div>
         </div>
@@ -413,43 +432,46 @@
       <div class="section">
         <div class="eyebrow">What Is Included</div>
         <h2>What your agent handles, so you do not have to</h2>
-        <div class="ai-feature-grid">
-          <ul>
-            <li>Answers questions about opening hours, prices and services</li>
-            <li>Takes table bookings and appointment requests</li>
-            <li>Confirms bookings and sends reminders</li>
-            <li>Handles cancellations and offers the slot to someone else</li>
-            <li>Answers allergen and dietary questions</li>
-          </ul>
-          <ul>
-            <li>Sends your daily special or current offer to customers who want it</li>
-            <li>Follows up with customers who have not visited in a while</li>
-            <li>Asks happy customers to leave a Google review</li>
-            <li>Flags anything complicated to you directly</li>
-            <li>Works on WhatsApp, your website, and Facebook Messenger</li>
-          </ul>
+        <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:32px 56px;">
+          <div>
+            <p style="font-size:12px;font-weight:950;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Handles every day</p>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px;">
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Answers questions on opening hours, prices and allergens</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Takes bookings and appointment requests</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Confirms and sends reminders</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Handles cancellations and offers the slot to someone else</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Flags anything it can't handle to you directly</li>
+            </ul>
+          </div>
+          <div>
+            <p style="font-size:12px;font-weight:950;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Works to bring customers back</p>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px;">
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Sends daily specials to customers who opt in</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Follows up with customers who have not visited in a while</li>
+              <li style="position:relative;padding-left:22px;color:#414956;font-size:16px;"><span style="position:absolute;left:0;color:var(--green);font-weight:950;">✓</span>Asks happy customers for a Google review</li>
+            </ul>
+          </div>
         </div>
+        <p style="margin-top:28px;font-size:15px;color:var(--muted);padding-top:20px;border-top:1px solid var(--line);">Runs across WhatsApp, your website, and Facebook Messenger.</p>
       </div>
     </section>
 
     <!-- WhatsApp chat mockup -->
     <section class="section">
       <div class="eyebrow">In Practice</div>
-      <h2>Here is what a customer sees</h2>
-      <p style="max-width:560px;margin-top:8px;">A real conversation handled by your agent, at 10:47pm on a Thursday.</p>
+      <h2>What it looks like when you're mid-cut on a busy Saturday</h2>
+      <p style="max-width:560px;margin-top:8px;">A real conversation handled while the barber is with a client, at 11:22pm on a Thursday.</p>
       <div class="agent-chat-full" style="margin-top:36px;">
         <div class="phone-visual" style="width:100%;max-width:400px;">
           <div class="phone-top"><span class="phone-avatar" style="font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:700;">AI</span><div><strong>Your AI Agent</strong><small>online</small></div></div>
-          <div class="chat-day">Thursday · 10:47 PM</div>
-          <div class="chat-bubble sent">Hi, do you have a table for 2 this Saturday? It's our anniversary dinner<span>22:47 ✓✓</span></div>
-          <div class="chat-bubble received">Happy anniversary! 🎉 We have availability at 7:00pm or 8:30pm on Saturday. Which works best for you?<span>22:47</span></div>
-          <div class="chat-bubble sent">8:30 please. Can we have something a bit quieter?<span>22:48 ✓✓</span></div>
-          <div class="chat-bubble received">Booked! Table for 2 at 8:30pm Saturday, quiet area noted. Any dietary requirements we should know about?<span>22:49</span></div>
-          <div class="chat-bubble sent">No we're fine thanks<span>22:51 ✓✓</span></div>
-          <div class="chat-bubble received done">Perfect. We'll send you a reminder on Friday. See you Saturday evening! ✓<span>22:52</span></div>
+          <div class="chat-day">Thursday · 11:22 PM</div>
+          <div class="chat-bubble sent">Any slots Saturday morning? Before 11 ideally<span>23:22 ✓✓</span></div>
+          <div class="chat-bubble received">Saturday's looking busy but I can hold 10:15am for you. What's your name and what are you in for?<span>23:22</span></div>
+          <div class="chat-bubble sent">Jake, just a trim<span>23:23 ✓✓</span></div>
+          <div class="chat-bubble received done">Sorted Jake — 10:15am Saturday, trim. We'll drop you a reminder Friday evening ✓<span>23:23</span></div>
           <div class="phone-input">Message <b>›</b></div>
         </div>
-        <p style="margin-top:18px;font-size:14px;color:var(--muted);text-align:center;">This booking was confirmed at 10:52pm. The restaurant owner saw it in the morning.</p>
+        <p style="margin-top:18px;font-size:14px;color:var(--muted);text-align:center;">Three messages. One booking. No phone picked up.</p>
       </div>
     </section>
 
@@ -547,6 +569,7 @@
         <details><summary>How quickly can the agent be updated?</summary><p>The same way you update your screens, send us a WhatsApp message. Price changes, new menu items, holiday hours and we update the agent within one business day.</p></details>
         <details><summary>Does it work outside of WhatsApp?</summary><p>Yes. The Starter and Pro plans both include a website chat widget so the same agent works on your website too. The Starter plan also includes Facebook Messenger, so your Facebook page is covered as well.</p></details>
         <details><summary>What if I already have a ScreenFizz screen plan?</summary><p>You can add the AI agent to your existing plan from £35 per month. Get in touch and we will sort it out on the same invoice.</p></details>
+        <details><summary>What if the agent gives a customer the wrong information?</summary><p>The agent only answers from what you tell us about your business — it won't invent prices or make things up. If a customer asks something it hasn't been trained on, it tells them you'll be in touch shortly and sends you a notification so nothing slips. We also review responses monthly and adjust anything that isn't landing right.</p></details>
         <details><summary>Can I try it before committing?</summary><p>Yes. Get in touch and we can walk you through a live demo using a real example for your type of business, before you pay anything.</p></details>
       </div>
     </section>
