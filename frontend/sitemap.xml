@@ -64,9 +64,15 @@
   <!-- Blog -->
   <url>
     <loc>https://screenfizz.com/blog</loc>
-    <lastmod>2026-06-29</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://screenfizz.com/blog/digital-signage-roi-small-business</loc>
+    <lastmod>2026-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://screenfizz.com/blog/how-digital-signage-reduces-perceived-wait-times</loc>
