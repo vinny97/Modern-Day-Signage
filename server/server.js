@@ -137,13 +137,13 @@ const marketingCsp = helmet.contentSecurityPolicy({
   useDefaults: true,
   directives: {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", 'https://client.crisp.chat'],
+    scriptSrc: ["'self'", "'unsafe-inline'", 'https://client.crisp.chat', 'https://vinnyrpi4.tail0f40fc.ts.net'],
     scriptSrcAttr: ["'unsafe-inline'"],
     styleSrc: ["'self'", "'unsafe-inline'", 'https://client.crisp.chat', 'https://fonts.googleapis.com'],
     styleSrcAttr: ["'unsafe-inline'"],
     imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
     mediaSrc: ["'self'", 'blob:', 'https:'],
-    connectSrc: ["'self'", 'https://wa.me', 'https://*.crisp.chat', 'wss://*.crisp.chat'],
+    connectSrc: ["'self'", 'https://wa.me', 'https://*.crisp.chat', 'wss://*.crisp.chat', 'https://vinnyrpi4.tail0f40fc.ts.net'],
     fontSrc: ["'self'", 'data:', 'https://client.crisp.chat', 'https://fonts.gstatic.com'],
     frameSrc: ["'self'", 'https://*.crisp.chat'],
     objectSrc: ["'none'"],
@@ -257,6 +257,18 @@ function isMarketingHtmlPath(urlPath) {
   return !!htmlFileForPublicPath(urlPath);
 }
 
+const UMAMI_ANALYTICS_SCRIPT = '  <script defer src="https://vinnyrpi4.tail0f40fc.ts.net/script.js" data-website-id="643553c9-4b1b-42ec-888b-d6380e67d912"></script>\n';
+
+function sendMarketingHtml(res, file) {
+  fs.readFile(file, 'utf8', (err, html) => {
+    if (err) return res.sendFile(file);
+    if (html.includes('data-website-id="643553c9-4b1b-42ec-888b-d6380e67d912"')) {
+      return res.type('html').send(html);
+    }
+    res.type('html').send(html.replace('</head>', UMAMI_ANALYTICS_SCRIPT + '</head>'));
+  });
+}
+
 // Public marketing pages use extensionless canonical URLs. Keep legacy .html
 // URLs working as permanent redirects so old links and indexed URLs consolidate.
 app.get('*.html', (req, res, next) => {
@@ -272,7 +284,7 @@ app.get('*.html', (req, res, next) => {
 app.get('*', (req, res, next) => {
   const file = htmlFileForPublicPath(req.path);
   if (!file) return next();
-  res.sendFile(file);
+  sendMarketingHtml(res, file);
 });
 
 // Landing page BEFORE static middleware (so / doesn't serve index.html).
@@ -281,7 +293,7 @@ app.get('*', (req, res, next) => {
 // 301) so flipping the var back later isn't hard-cached by browsers.
 app.get('/', (req, res) => {
   if (config.disableHomepage) return res.redirect(302, '/app');
-  res.sendFile(path.join(config.frontendDir, 'landing.html'));
+  sendMarketingHtml(res, path.join(config.frontendDir, 'landing.html'));
 });
 
 // Clean marketing entry point for the hosted Self Service trial. The public
