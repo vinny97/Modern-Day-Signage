@@ -262,6 +262,7 @@ footer { background:var(--paper); border-top:1px solid var(--line); }
 .comparison-stage { --split:50%; position:relative; min-height:520px; overflow:hidden; border-radius:14px; background:#e2ddd5; }
 .comparison-side { position:absolute; inset:0; overflow:hidden; }
 .comparison-before { clip-path:inset(0 calc(100% - var(--split)) 0 0); z-index:2; }
+.comparison-photo { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
 .comparison-side .window-scene,.comparison-side.menu-compare { width:100%; height:100%; border:0; }
 .comparison-side .paper-poster { width:28%; height:28%; }.comparison-side .digital-screen { inset:7% 18%; }
 .comparison-divider { position:absolute; z-index:5; top:0; bottom:0; left:var(--split); width:3px; transform:translateX(-1px); background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.1); pointer-events:none; }
