@@ -256,10 +256,7 @@ footer { background:var(--paper); border-top:1px solid var(--line); }
 .counter-sign { position:absolute; right:13%; bottom:10%; padding:13px 19px; border-radius:8px; color:#fff; background:var(--red); font-weight:950; transform:rotate(-2deg); }
 
 .comparison-wrap { padding:20px; border-radius:22px; background:#17191d; box-shadow:var(--shadow); }
-.comparison-control { display:flex; justify-content:center; margin-bottom:18px; }
-.comparison-control label { color:#fff; font-size:13px; }
-.comparison-control input[type="range"] { width:min(100%,560px); accent-color:var(--red); }
-.comparison-stage { --split:50%; position:relative; min-height:520px; overflow:hidden; border-radius:14px; background:#e2ddd5; }
+.comparison-stage { --split:50%; position:relative; min-height:520px; overflow:hidden; border-radius:14px; background:#e2ddd5; cursor:ew-resize; touch-action:none; }
 .comparison-side { position:absolute; inset:0; overflow:hidden; }
 .comparison-before { clip-path:inset(0 calc(100% - var(--split)) 0 0); z-index:2; }
 .comparison-photo { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
@@ -267,6 +264,7 @@ footer { background:var(--paper); border-top:1px solid var(--line); }
 .comparison-side .paper-poster { width:28%; height:28%; }.comparison-side .digital-screen { inset:7% 18%; }
 .comparison-divider { position:absolute; z-index:5; top:0; bottom:0; left:var(--split); width:3px; transform:translateX(-1px); background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.1); pointer-events:none; }
 .comparison-divider::after { content:"↔"; position:absolute; left:50%; top:50%; display:grid; place-items:center; width:46px; height:46px; transform:translate(-50%,-50%); border-radius:50%; color:var(--red); background:#fff; font-weight:950; }
+.comparison-stage:focus-visible { outline:3px solid var(--red); outline-offset:4px; }
 .compare-title { position:absolute; z-index:7; top:18px; padding:8px 12px; border-radius:999px; color:#fff; background:rgba(20,24,33,.83); font-size:12px; font-weight:950; }.compare-title.left { left:18px; }.compare-title.right { right:18px; }
 .menu-compare { background:linear-gradient(#d8cdc0 0 65%,#9a7158 65%); }.menu-compare .menu-board-row { top:8%; }.menu-compare.printed .menu-board { color:#4e4a44; border-color:#9e968b; background:#f5f0e7; box-shadow:none; transform:rotate(-1deg); }.menu-compare.printed .menu-board:nth-child(2) { transform:rotate(2deg); }.menu-compare.printed .menu-lines i { background:#a6a096; }
 
